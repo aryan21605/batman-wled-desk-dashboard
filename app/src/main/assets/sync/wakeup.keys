@@ -1,3 +1,4 @@
-jipsy listen /1e-6/
-jipsy wake up /1e-6/
-wake up /1e-8/
+jipsy listen /1e-3/
+jipsy wake up /1e-3/
+wake up /1e-5/
+jipsy /1e-5/

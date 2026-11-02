@@ -50,12 +50,12 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private static final String SEARCH_BATMAN_CMD = "batman_cmd";
     private static final int REQ_CODE_SPEECH_INPUT = 1001;
 
-    /* 10 seconds total listening window for commands */
+    /* 10 seconds max listening window for commands */
     private static final int COMMAND_LISTEN_TIMEOUT_MS = 10000;
-    /* 3.0 seconds delay after wake word ("Yes, I am listening") before opening command mic */
-    private static final long WAKE_GREETING_DELAY_MS = 3000L;
-    /* 2.4 seconds pause after last spoken word before auto-executing command */
-    private static final long END_OF_COMMAND_SILENCE_MS = 2400L;
+    /* 2.5 seconds delay after wake word ("Yes, I am listening") before opening command mic */
+    private static final long WAKE_GREETING_DELAY_MS = 2500L;
+    /* 1.8 seconds max silence buffer after the last spoken word before auto-executing command */
+    private static final long END_OF_COMMAND_SILENCE_MS = 1800L;
 
     private WebView webView;
     private TextToSpeech tts;
@@ -64,6 +64,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     private SpeechRecognizer offlineRecognizer;
     private volatile boolean offlineAsrReady = false;
+    private volatile boolean autoWakeEnabled = true;
     private volatile String currentSearchMode = "";
     private volatile String lastHeardCommandPartial = "";
 
@@ -104,6 +105,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         );
 
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        autoWakeEnabled = prefs.getBoolean("auto_wake_enabled", true);
         watchdogHandler = new Handler(Looper.getMainLooper());
         resumeWakeupRunnable = new ResumeWakeupRunnable(this);
         startCommandAfterGreetingRunnable = new StartCommandAfterGreetingRunnable(this);
@@ -260,12 +262,50 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             cancelPendingVoiceTimers();
             offlineRecognizer.cancel();
             lastHeardCommandPartial = "";
+            if (!autoWakeEnabled) {
+                currentSearchMode = "";
+                Log.i(TAG, "Auto-wake disabled by user; wakeup listening paused.");
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_PAUSED', 'Auto-Wake is OFF. Tap [Auto-Wake: OFF] to enable or tap [Mic] to speak.');}");
+                return;
+            }
             currentSearchMode = SEARCH_WAKEUP;
             offlineRecognizer.startListening(SEARCH_WAKEUP);
             Log.i(TAG, "Started KWS wakeup listening (jipsy listen / wake up)");
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Hands-Free Active: Say \"Jipsy listen\" or \"Wake up\"');}");
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Auto-Wake ON: Say \"Jipsy listen\" or \"Wake up\"');}");
         } catch (Exception ignored) {
         }
+    }
+
+    public void setAutoWakeOnUi(boolean enabled) {
+        this.autoWakeEnabled = enabled;
+        if (prefs != null) {
+            prefs.edit().putBoolean("auto_wake_enabled", enabled).apply();
+        }
+        try {
+            cancelPendingVoiceTimers();
+            if (offlineRecognizer != null) {
+                offlineRecognizer.cancel();
+            }
+            currentSearchMode = "";
+            lastHeardCommandPartial = "";
+            if (enabled) {
+                startWakeupListeningOnUi();
+            } else {
+                Log.i(TAG, "User paused continuous catch-phrase listening.");
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_PAUSED', 'Auto-Wake is OFF. Tap [Auto-Wake: OFF] to enable or tap [Mic] to speak.');}");
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void requestToggleAutoWakeFromJs(boolean enabled) {
+        if (watchdogHandler != null) {
+            watchdogHandler.post(new ToggleAutoWakeRunnable(this, enabled));
+        }
+    }
+
+    public boolean isAutoWakeActive() {
+        return autoWakeEnabled;
     }
 
     /* Called when "Jipsy listen" / "Wake up" is spoken or when the button is tapped */
@@ -388,8 +428,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         if (SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
             String clean = normalizeNumbersInSpeech(lower).replace("'", "");
-            if (clean.length() > 0) {
+            if (clean.length() > 0 && !clean.equals(lastHeardCommandPartial)) {
                 lastHeardCommandPartial = clean;
+                Log.i(TAG, "New word heard [" + clean + "] -> resetting 1.8s silence buffer");
                 sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PARTIAL', '" + clean + "');}");
                 if (watchdogHandler != null && finalizeCommandRunnable != null) {
                     watchdogHandler.removeCallbacks(finalizeCommandRunnable);
@@ -420,17 +461,17 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         if (spoken.length() > 0) {
             sendJsToWebView("if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
-            scheduleResumeWakeup(6000L);
+            scheduleResumeWakeup(3800L);
             return;
         }
-        scheduleResumeWakeup(1500L);
+        scheduleResumeWakeup(1000L);
     }
 
     @Override
     public void onError(Exception error) {
         Log.e(TAG, "ASR Error: " + error.getMessage());
         currentSearchMode = "";
-        scheduleResumeWakeup(2500L);
+        scheduleResumeWakeup(1800L);
     }
 
     @Override
@@ -479,8 +520,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                     currentSearchMode = "";
                     offlineRecognizer.cancel();
                 }
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('SPEAKING_REPLY', 'Jipsy Speaking...');}");
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                long speakDurationMs = Math.max(3500L, Math.min(20000L, (long) text.length() * 80L)) + 3000L;
+                long speakDurationMs = Math.max(2200L, Math.min(12000L, (long) text.length() * 68L)) + 1200L;
                 scheduleResumeWakeup(speakDurationMs);
             } catch (Exception ignored) {
             }
@@ -623,6 +665,21 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
+    private static class ToggleAutoWakeRunnable implements Runnable {
+        private final MainActivity activity;
+        private final boolean enabled;
+
+        ToggleAutoWakeRunnable(MainActivity act, boolean en) {
+            this.activity = act;
+            this.enabled = en;
+        }
+
+        @Override
+        public void run() {
+            activity.setAutoWakeOnUi(enabled);
+        }
+    }
+
     private static class JsCallbackRunnable implements Runnable {
         private final WebView targetWebView;
         private final String jsCode;
@@ -705,6 +762,16 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         public boolean startVoiceRecognition() {
             activity.requestVoiceRecognizerOnUi();
             return true;
+        }
+
+        @JavascriptInterface
+        public void setAutoWakeEnabled(boolean enabled) {
+            activity.requestToggleAutoWakeFromJs(enabled);
+        }
+
+        @JavascriptInterface
+        public boolean isAutoWakeEnabled() {
+            return activity.isAutoWakeActive();
         }
 
         @JavascriptInterface

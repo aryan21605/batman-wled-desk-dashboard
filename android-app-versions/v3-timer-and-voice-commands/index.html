@@ -151,24 +151,46 @@
       width: 100%;
       margin-top: 4px;
     }
+    .voice-cmd-cell-wake {
+      display: table-cell;
+      width: 38%;
+      padding-right: 2px;
+    }
     .voice-cmd-cell-left {
       display: table-cell;
-      width: 55%;
-      padding-right: 3px;
+      width: 36%;
+      padding-left: 2px;
+      padding-right: 2px;
     }
     .voice-cmd-cell-right {
       display: table-cell;
-      width: 45%;
-      padding-left: 3px;
+      width: 26%;
+      padding-left: 2px;
+    }
+    .autowake-btn {
+      width: 100%;
+      background: #143d22;
+      border: 1px solid #2ea043;
+      color: #3fb950;
+      padding: 6px 3px;
+      font-weight: bold;
+      font-size: 10.5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .autowake-btn.off {
+      background: #3b1818;
+      border-color: #da3633;
+      color: #ff7b72;
     }
     .mic-cmd-btn {
       width: 100%;
       background: #231738;
       border: 1px solid #a371f7;
       color: #e2c5ff;
-      padding: 6px 4px;
+      padding: 6px 3px;
       font-weight: bold;
-      font-size: 11px;
+      font-size: 10.5px;
       border-radius: 6px;
       cursor: pointer;
     }
@@ -177,9 +199,9 @@
       background: #1c2536;
       border: 1px solid #58a6ff;
       color: #79c0ff;
-      padding: 6px 4px;
+      padding: 6px 3px;
       font-weight: bold;
-      font-size: 11px;
+      font-size: 10.5px;
       border-radius: 6px;
       cursor: pointer;
     }
@@ -698,18 +720,21 @@
       <div class="robo-title">Batman Robo Assistant</div>
       <div id="roboStatus" class="robo-status-line" style="color:#ff9900;">Status: Ready</div>
 
-      <!-- Voice Command Row: Direct Mic + Command Center Modal -->
+      <!-- Voice Command Row: Auto-Wake Toggle + Direct Mic + Command Center Modal -->
       <div class="voice-cmd-row">
+        <div class="voice-cmd-cell-wake">
+          <button id="autoWakeBtn" class="autowake-btn" onclick="toggleAutoWake()">[Auto-Wake: ON]</button>
+        </div>
         <div class="voice-cmd-cell-left">
-          <button id="mainMicBtn" class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Say "Jipsy Listen" / "Wake Up"]</button>
+          <button id="mainMicBtn" class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Mic] Speak Now</button>
         </div>
         <div class="voice-cmd-cell-right">
-          <button class="panel-cmd-btn" onclick="openVoiceModal()">[Cmd] All Commands</button>
+          <button class="panel-cmd-btn" onclick="openVoiceModal()">[Cmd] List</button>
         </div>
       </div>
 
       <div class="speech-box">
-        <div id="speechText" class="speech-bubble">Hands-Free Active: Say <b>"Jipsy listen"</b> or <b>"Wake up"</b>, wait 3s, then speak your command!</div>
+        <div id="speechText" class="speech-bubble">Auto-Wake ON: Say <b>"Jipsy listen"</b> or <b>"Wake up"</b> (auto-stops 1.8s after your last word)!</div>
         <table class="voice-grid">
           <tr>
             <td><button class="recite-btn" onclick="reciteClosestSchedule()">[&gt;] Next Class</button></td>
@@ -1117,11 +1142,49 @@
     return fallback;
   }
 
+  var autoWakeOn = true;
+
   function initConfig() {
     wledIp = storeGet(IP_KEY, '4.3.2.1');
     targetSsid = storeGet(SSID_KEY, 'wledtabletop');
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.isAutoWakeEnabled) {
+        autoWakeOn = !!window.AndroidBridge.isAutoWakeEnabled();
+      }
+    } catch(e) {}
+    syncAutoWakeButtonUi();
     updateWifiBadge();
     updateWeatherUI();
+  }
+
+  function syncAutoWakeButtonUi() {
+    var btn = document.getElementById('autoWakeBtn');
+    if (!btn) return;
+    if (autoWakeOn) {
+      btn.innerHTML = '[Auto-Wake: ON]';
+      btn.className = 'autowake-btn';
+    } else {
+      btn.innerHTML = '[Auto-Wake: OFF]';
+      btn.className = 'autowake-btn off';
+    }
+  }
+
+  function toggleAutoWake() {
+    autoWakeOn = !autoWakeOn;
+    syncAutoWakeButtonUi();
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.setAutoWakeEnabled) {
+        window.AndroidBridge.setAutoWakeEnabled(autoWakeOn);
+      }
+    } catch(e) {}
+    var speechEl = document.getElementById('speechText');
+    if (speechEl) {
+      if (autoWakeOn) {
+        speechEl.innerHTML = 'Auto-Wake ON: Listening continuously for <b>"Jipsy listen"</b> or <b>"Wake up"</b>!';
+      } else {
+        speechEl.innerHTML = 'Auto-Wake OFF: Catch-phrase listening stopped. Tap <b>[Auto-Wake: OFF]</b> to resume or tap <b>[Mic] Speak Now</b>.';
+      }
+    }
   }
 
   function getApiUrl() {
@@ -1287,7 +1350,7 @@
   window.onVoiceCommandResult = function(spokenText) {
     var micBtn = document.getElementById('mainMicBtn');
     if (micBtn) {
-      micBtn.innerHTML = '[Say "Jipsy Listen" / "Wake Up"]';
+      micBtn.innerHTML = '[Mic] Speak Now';
       micBtn.style.background = '#231738';
       micBtn.style.borderColor = '#a371f7';
     }
@@ -1301,7 +1364,7 @@
     var antenna = document.getElementById('robo-antenna');
     if (state === 'PREPARING') {
       if (micBtn) {
-        micBtn.innerHTML = '[Jipsy Waking Up... Wait]';
+        micBtn.innerHTML = '[Wait... Waking Up]';
         micBtn.style.background = '#3d2408';
         micBtn.style.borderColor = '#f5a623';
       }
@@ -1311,7 +1374,7 @@
       if (fb && message) fb.innerHTML = message;
     } else if (state === 'LISTENING' || state === 'SPEAKING') {
       if (micBtn) {
-        micBtn.innerHTML = '[Listening (10s)... Speak Now]';
+        micBtn.innerHTML = '[Done Speaking (Tap)]';
         micBtn.style.background = '#195b28';
         micBtn.style.borderColor = '#3fb950';
       }
@@ -1319,11 +1382,29 @@
       if (speechEl && message) speechEl.innerHTML = message;
       if (fb && message) fb.innerHTML = message;
     } else if (state === 'PARTIAL') {
-      if (speechEl) speechEl.innerHTML = 'Hearing: "' + message + '..."';
-      if (fb) fb.innerHTML = 'Hearing: "' + message + '..."';
-    } else if (state === 'WAKEUP_READY') {
+      if (speechEl) speechEl.innerHTML = 'Hearing: <b>"' + message + '"</b> (Auto-executes after 1.8s silence)';
+      if (fb) fb.innerHTML = 'Hearing: "' + message + '" (Auto-executes after 1.8s silence)';
+    } else if (state === 'SPEAKING_REPLY') {
       if (micBtn) {
-        micBtn.innerHTML = '[Say "Jipsy Listen" / "Wake Up"]';
+        micBtn.innerHTML = '[Jipsy Speaking...]';
+        micBtn.style.background = '#3d2408';
+        micBtn.style.borderColor = '#f5a623';
+      }
+    } else if (state === 'WAKEUP_PAUSED') {
+      autoWakeOn = false;
+      syncAutoWakeButtonUi();
+      if (micBtn) {
+        micBtn.innerHTML = '[Mic] Speak Now';
+        micBtn.style.background = '#231738';
+        micBtn.style.borderColor = '#a371f7';
+      }
+      if (antenna) antenna.setAttribute('fill', '#8b949e');
+      if (fb && message) fb.innerHTML = message;
+    } else if (state === 'WAKEUP_READY') {
+      autoWakeOn = true;
+      syncAutoWakeButtonUi();
+      if (micBtn) {
+        micBtn.innerHTML = '[Mic] Speak Now';
         micBtn.style.background = '#231738';
         micBtn.style.borderColor = '#a371f7';
       }
@@ -1331,7 +1412,7 @@
       if (fb && message) fb.innerHTML = message;
     } else {
       if (micBtn) {
-        micBtn.innerHTML = '[Say "Jipsy Listen" / "Wake Up"]';
+        micBtn.innerHTML = '[Mic] Speak Now';
         micBtn.style.background = '#231738';
         micBtn.style.borderColor = '#a371f7';
       }
