@@ -14,7 +14,7 @@
       background-color: #0d0f12;
       color: #e6edf3;
       margin: 0;
-      padding: 6px 10px;
+      padding: 5px 8px;
       overflow-x: hidden;
       user-select: none;
       -webkit-user-select: none;
@@ -24,7 +24,7 @@
     .top-bar {
       display: table;
       width: 100%;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
     .top-left {
       display: table-cell;
@@ -41,9 +41,9 @@
       border: 1px solid #f5a623;
       color: #f5a623;
       font-weight: bold;
-      padding: 6px 10px;
+      padding: 5px 9px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 11px;
       cursor: pointer;
     }
     .wifi-badge {
@@ -52,7 +52,7 @@
       border: 1px solid #30363d;
       color: #58a6ff;
       font-size: 11px;
-      padding: 4px 8px;
+      padding: 4px 7px;
       border-radius: 5px;
       margin-left: 4px;
       cursor: pointer;
@@ -66,7 +66,7 @@
       font-weight: bold;
       padding: 3px 8px;
       border-radius: 5px;
-      margin-right: 5px;
+      margin-right: 4px;
       cursor: pointer;
     }
     .timer-pill.active {
@@ -83,7 +83,7 @@
       font-weight: bold;
       padding: 3px 8px;
       border-radius: 5px;
-      margin-right: 5px;
+      margin-right: 4px;
       cursor: pointer;
     }
 
@@ -97,27 +97,27 @@
       display: table-cell;
       width: 45%;
       vertical-align: top;
-      padding-right: 7px;
+      padding-right: 6px;
     }
     .col-right {
       display: table-cell;
       width: 55%;
       vertical-align: top;
-      padding-left: 7px;
+      padding-left: 6px;
     }
 
     .card {
       background: #161b22;
       border: 1px solid #30363d;
       border-radius: 8px;
-      padding: 8px 10px;
-      margin-bottom: 6px;
+      padding: 6px 8px;
+      margin-bottom: 5px;
     }
 
-    /* Large Robo Companion Card */
+    /* Robo Companion Card */
     .robo-card {
       text-align: center;
-      padding: 7px 6px;
+      padding: 6px;
     }
     .pulse-animation {
       animation: eyePulse 2.5s infinite ease-in-out;
@@ -137,7 +137,7 @@
       font-size: 13px;
       font-weight: bold;
       color: #ffffff;
-      margin-top: 2px;
+      margin-top: 1px;
     }
     .robo-status-line {
       font-size: 11px;
@@ -145,40 +145,65 @@
       margin-top: 1px;
     }
 
-    /* Voice Command Mic Button */
+    /* Voice Command Buttons Row */
+    .voice-cmd-row {
+      display: table;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .voice-cmd-cell-left {
+      display: table-cell;
+      width: 55%;
+      padding-right: 3px;
+    }
+    .voice-cmd-cell-right {
+      display: table-cell;
+      width: 45%;
+      padding-left: 3px;
+    }
     .mic-cmd-btn {
       width: 100%;
-      margin-top: 5px;
       background: #231738;
       border: 1px solid #a371f7;
       color: #e2c5ff;
-      padding: 7px 6px;
+      padding: 6px 4px;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 11px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .panel-cmd-btn {
+      width: 100%;
+      background: #1c2536;
+      border: 1px solid #58a6ff;
+      color: #79c0ff;
+      padding: 6px 4px;
+      font-weight: bold;
+      font-size: 11px;
       border-radius: 6px;
       cursor: pointer;
     }
 
     /* Recite Schedule & Voice Assistant Box */
     .speech-box {
-      margin-top: 5px;
+      margin-top: 4px;
       background: #0d1117;
       border: 1px solid #30363d;
       border-radius: 6px;
-      padding: 6px;
+      padding: 5px;
       text-align: left;
     }
     .speech-bubble {
       font-size: 11px;
       color: #c9d1d9;
-      min-height: 28px;
+      min-height: 26px;
       line-height: 1.25;
     }
     .voice-grid {
       width: 100%;
       border-collapse: separate;
-      border-spacing: 4px;
-      margin-top: 4px;
+      border-spacing: 3px;
+      margin-top: 3px;
     }
     .voice-grid td {
       width: 50%;
@@ -211,7 +236,7 @@
     .notes-btn-row {
       display: table;
       width: 100%;
-      margin-top: 5px;
+      margin-top: 4px;
     }
     .notes-btn-cell {
       display: table-cell;
@@ -222,7 +247,7 @@
       background: #1c1f24;
       border: 1px dashed #f5a623;
       color: #f5a623;
-      padding: 6px 4px;
+      padding: 5px 4px;
       font-weight: bold;
       font-size: 11px;
       border-radius: 6px;
@@ -234,15 +259,15 @@
       background: #21262d;
       border: 1px solid #363b42;
       color: #ffffff;
-      padding: 7px;
+      padding: 6px;
       border-radius: 6px;
       font-size: 12px;
       cursor: pointer;
     }
     .power-btn {
       width: 100%;
-      padding: 8px;
-      font-size: 14px;
+      padding: 7px;
+      font-size: 13px;
       font-weight: bold;
       background: #21262d;
       border-radius: 6px;
@@ -256,7 +281,7 @@
     .random-row {
       display: table;
       width: 100%;
-      margin-top: 5px;
+      margin-top: 4px;
     }
     .random-cell-left {
       display: table-cell;
@@ -275,7 +300,7 @@
       color: #f5a623;
       font-weight: bold;
       font-size: 11px;
-      padding: 6px 4px;
+      padding: 5px 4px;
       border-radius: 6px;
     }
     .rand-fx-btn {
@@ -285,8 +310,74 @@
       color: #d2a8ff;
       font-weight: bold;
       font-size: 11px;
-      padding: 6px 4px;
+      padding: 5px 4px;
       border-radius: 6px;
+    }
+
+    /* Always-Visible Quick Timer Bar on Right Panel */
+    .quick-timer-card {
+      background: #161b22;
+      border: 1px solid #d29922;
+      border-radius: 8px;
+      padding: 5px 8px;
+      margin-bottom: 5px;
+    }
+    .qt-header {
+      display: table;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+    .qt-title {
+      display: table-cell;
+      vertical-align: middle;
+      font-size: 11px;
+      font-weight: bold;
+      color: #f5a623;
+    }
+    .qt-digits {
+      font-family: monospace, Courier, sans-serif;
+      font-size: 13px;
+      font-weight: bold;
+      color: #ffffff;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+    .qt-right {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+      font-size: 10px;
+      color: #c9d1d9;
+    }
+    .qt-btn-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 3px;
+    }
+    .qt-btn-table td {
+      width: 20%;
+    }
+    .qt-btn {
+      width: 100%;
+      background: #21262d;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      font-weight: bold;
+      padding: 5px 2px;
+      font-size: 11px;
+      border-radius: 5px;
+    }
+    .qt-btn.custom {
+      border-color: #58a6ff;
+      color: #58a6ff;
+    }
+    .qt-btn.stop {
+      background: #491818;
+      border-color: #8b2424;
+      color: #ffa198;
     }
 
     /* Sliders & Rows */
@@ -299,27 +390,27 @@
     .row-right { display: table-cell; text-align: right; vertical-align: middle; }
     input[type=range] {
       width: 100%;
-      margin: 2px 0;
+      margin: 1px 0;
     }
 
-    /* 3-Tab Navigation Bar */
+    /* 2-Tab Navigation Bar */
     .tabs {
       background: #0d1117;
       padding: 2px;
       border-radius: 6px;
       border: 1px solid #30363d;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       display: table;
       width: 100%;
       box-sizing: border-box;
     }
     .tabs button {
       display: table-cell;
-      width: 33.33%;
+      width: 50%;
       background: transparent;
       border: none;
       color: #8b949e;
-      padding: 5px 0;
+      padding: 4px 0;
       font-size: 11px;
     }
     .tabs button.active {
@@ -338,13 +429,13 @@
     }
     .picker-col-left {
       display: table-cell;
-      width: 46%;
+      width: 44%;
       vertical-align: middle;
       text-align: center;
     }
     .picker-col-right {
       display: table-cell;
-      width: 54%;
+      width: 56%;
       vertical-align: middle;
       padding-left: 6px;
     }
@@ -354,7 +445,7 @@
       border-spacing: 4px;
     }
     .color-swatch {
-      height: 28px;
+      height: 26px;
       border-radius: 5px;
       cursor: pointer;
       border: 1px solid #444;
@@ -367,9 +458,9 @@
     }
     .color-preview {
       width: 80%;
-      height: 8px;
+      height: 7px;
       border-radius: 3px;
-      margin: 4px auto 0 auto;
+      margin: 3px auto 0 auto;
       border: 1px solid rgba(255,255,255,0.2);
     }
 
@@ -378,46 +469,7 @@
       border-collapse: separate;
       border-spacing: 4px;
     }
-    .preset-table button { width: 100%; padding: 7px 4px; }
-
-    /* Timer Tab Styles */
-    .timer-display-box {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 6px 10px;
-      margin-bottom: 6px;
-      display: table;
-      width: 100%;
-    }
-    .timer-digits {
-      font-size: 22px;
-      font-weight: bold;
-      color: #f5a623;
-      font-family: monospace, Courier, sans-serif;
-    }
-    .timer-btn-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 4px;
-    }
-    .timer-btn-table td {
-      width: 25%;
-    }
-    .timer-preset-btn {
-      width: 100%;
-      background: #21262d;
-      border: 1px solid #f5a623;
-      color: #f5a623;
-      font-weight: bold;
-      padding: 7px 2px;
-      font-size: 12px;
-    }
-    .timer-custom-row {
-      display: table;
-      width: 100%;
-      margin-top: 5px;
-    }
+    .preset-table button { width: 100%; padding: 6px 4px; }
 
     .status-text {
       font-size: 10px;
@@ -440,7 +492,7 @@
       background: #161b22;
       border: 1px solid #30363d;
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px 12px;
       box-sizing: border-box;
       overflow-y: auto;
     }
@@ -573,13 +625,35 @@
     .cmd-chip {
       display: inline-block;
       background: #21262d;
-      border: 1px solid #30363d;
-      color: #58a6ff;
+      border: 1px solid #388bfd;
+      color: #79c0ff;
       font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 4px;
+      font-weight: bold;
+      padding: 5px 8px;
+      border-radius: 5px;
       margin: 2px;
       cursor: pointer;
+    }
+
+    /* Custom Timer Numpad Table */
+    .numpad-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 5px;
+      margin-top: 6px;
+    }
+    .numpad-table td {
+      width: 25%;
+    }
+    .numpad-btn {
+      width: 100%;
+      padding: 9px 4px;
+      font-size: 14px;
+      font-weight: bold;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #ffffff;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -593,11 +667,11 @@
       <polygon points="50,15 53,15 55,8 57,19 66,19 75,12 88,28 86,45 73,39 67,50 58,43 50,58 42,43 33,50 27,39 14,45 12,28 25,12 34,19 43,19 45,8 47,15" fill="#0d0f12"/>
     </svg>
     <button class="schedule-top-btn" onclick="openSchedule()">[=] Timetable</button>
-    <span class="wifi-badge" id="wifiBadge" onclick="openSettingsModal()">Wi-Fi: wledtabletop ⚙</span>
+    <span class="wifi-badge" id="wifiBadge" onclick="openSettingsModal()">Wi-Fi: wledtabletop [*]</span>
   </div>
   <div class="top-right">
-    <span class="timer-pill" id="topTimerPill" onclick="switchTab('timer')">⏱ Timer: Off</span>
-    <span class="weather-pill" id="weatherPill" onclick="speakWeather()">☀ Patiala: 23°C</span>
+    <span class="timer-pill" id="topTimerPill" onclick="openCustomTimerModal()">[Timer: Off]</span>
+    <span class="weather-pill" id="weatherPill" onclick="speakWeather()">Patiala: 23°C</span>
     <span id="clockDisplay" style="font-size:11px; color:#f5a623; font-weight:bold;"></span>
   </div>
 </div>
@@ -605,11 +679,11 @@
 <!-- Landscape Split -->
 <div class="dashboard-layout">
   
-  <!-- LEFT PANEL: Mascot, Voice Command Mic, Interactive Voice Assistant, Quick Notes & Tasks -->
+  <!-- LEFT PANEL: Mascot, Voice Command Mic & Command Center, Interactive Voice Assistant, Quick Notes & Tasks -->
   <div class="col-left">
     <div class="card robo-card">
       <div onclick="speakFullBriefing()" style="cursor:pointer;" title="Tap Robot for Full Briefing">
-        <svg id="robo-face" width="94" height="76" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg id="robo-face" width="88" height="70" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="2" y="6" width="40" height="30" rx="6" fill="#21262d" stroke="#30363d" stroke-width="2"/>
           <rect x="18" y="2" width="8" height="4" fill="#8b949e"/>
           <circle id="robo-antenna" cx="22" cy="1" r="1.8" fill="#f5a623"/>
@@ -624,19 +698,26 @@
       <div class="robo-title">Batman Robo Assistant</div>
       <div id="roboStatus" class="robo-status-line" style="color:#ff9900;">Status: Ready</div>
 
-      <!-- NEW: Talk to Robot / Give Voice Command Button -->
-      <button class="mic-cmd-btn" onclick="triggerVoiceCommand()">🎤 Give Voice Command to Robot</button>
+      <!-- Voice Command Row: Direct Mic + Command Center Modal -->
+      <div class="voice-cmd-row">
+        <div class="voice-cmd-cell-left">
+          <button class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Mic] Voice Command</button>
+        </div>
+        <div class="voice-cmd-cell-right">
+          <button class="panel-cmd-btn" onclick="openVoiceModal()">[Cmd] All Commands</button>
+        </div>
+      </div>
 
       <div class="speech-box">
-        <div id="speechText" class="speech-bubble">Say "Set timer 15 minutes", "Turn on lights", "Random color", or "Add task..."</div>
+        <div id="speechText" class="speech-bubble">Tap [Mic] or [Cmd] to set timers, toggle lights, add tasks, or ask for weather!</div>
         <table class="voice-grid">
           <tr>
-            <td><button class="recite-btn" onclick="reciteClosestSchedule()">🔊 Next Class</button></td>
-            <td><button class="recite-btn green" onclick="speakWeather()">☀ Weather</button></td>
+            <td><button class="recite-btn" onclick="reciteClosestSchedule()">[&gt;] Next Class</button></td>
+            <td><button class="recite-btn green" onclick="speakWeather()">[*] Weather</button></td>
           </tr>
           <tr>
-            <td><button class="recite-btn amber" onclick="speakTasksAndNotes()">📝 Tasks & Notes</button></td>
-            <td><button class="recite-btn purple" onclick="speakFullBriefing()">🤖 Full Briefing</button></td>
+            <td><button class="recite-btn amber" onclick="speakTasksAndNotes()">[+] Tasks &amp; Notes</button></td>
+            <td><button class="recite-btn purple" onclick="speakFullBriefing()">[!] Full Briefing</button></td>
           </tr>
         </table>
       </div>
@@ -644,28 +725,51 @@
       <!-- Quick Notes & Task Scheduler Launch Buttons -->
       <div class="notes-btn-row">
         <div class="notes-btn-cell" style="padding-right:3px;">
-          <button class="notes-launch-btn" onclick="openNotesModal('notes')">[✎] Edit Notes</button>
+          <button class="notes-launch-btn" onclick="openNotesModal('notes')">[Edit] Quick Notes</button>
         </div>
         <div class="notes-btn-cell" style="padding-left:3px;">
-          <button class="notes-launch-btn" style="border-color:#58a6ff; color:#58a6ff;" onclick="openNotesModal('tasks')">[✓] Task Scheduler</button>
+          <button class="notes-launch-btn" style="border-color:#58a6ff; color:#58a6ff;" onclick="openNotesModal('tasks')">[List] Task Scheduler</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT PANEL: WLED Controls & Timer -->
+  <!-- RIGHT PANEL: WLED Controls + Always-Visible Desk Timer -->
   <div class="col-right">
     <div class="card">
       <button id="toggleBtn" class="power-btn" onclick="togglePower()">Power: Connecting...</button>
       <!-- Random Colour & Random Effect Buttons -->
       <div class="random-row">
         <div class="random-cell-left">
-          <button class="rand-color-btn" onclick="setRandomColor()">🎲 Random Colour</button>
+          <button class="rand-color-btn" onclick="setRandomColor()">[?] Random Colour</button>
         </div>
         <div class="random-cell-right">
-          <button class="rand-fx-btn" onclick="setRandomEffectKeepColor()">✨ Random Effect (Same Col)</button>
+          <button class="rand-fx-btn" onclick="setRandomEffectKeepColor()">[*] Random Effect (Same Col)</button>
         </div>
       </div>
+    </div>
+
+    <!-- ALWAYS-VISIBLE DESK TIMER BAR (10m, 15m, 30m, Custom, Stop) -->
+    <div class="quick-timer-card">
+      <div class="qt-header">
+        <div class="qt-title">
+          DESK TIMER <span class="qt-digits" id="timerDigits">00:00</span>
+        </div>
+        <div class="qt-right">
+          <label style="cursor:pointer;">
+            <input type="checkbox" id="timerTurnOffLeds" style="vertical-align:middle;"> Auto-Off LEDs
+          </label>
+        </div>
+      </div>
+      <table class="qt-btn-table">
+        <tr>
+          <td><button class="qt-btn" onclick="startCountdownTimer(10)">10 Min</button></td>
+          <td><button class="qt-btn" onclick="startCountdownTimer(15)">15 Min</button></td>
+          <td><button class="qt-btn" onclick="startCountdownTimer(30)">30 Min</button></td>
+          <td><button class="qt-btn custom" onclick="openCustomTimerModal()">Custom</button></td>
+          <td><button class="qt-btn stop" onclick="stopCountdownTimer(true)">Stop</button></td>
+        </tr>
+      </table>
     </div>
 
     <!-- Brightness & Intensity Sliders -->
@@ -683,18 +787,17 @@
       <input type="range" id="ixSlider" min="0" max="255" value="128" onchange="setIntensity(this.value)" oninput="previewIx(this.value)">
     </div>
 
-    <!-- 3-Tab Bar: Colour Wheel | Presets | Timer -->
+    <!-- 2-Tab Bar: Colour Wheel | Presets -->
     <div class="tabs">
-      <button id="tabBtnColors" class="active" onclick="switchTab('colors')">🎨 Colours</button>
-      <button id="tabBtnPresets" onclick="switchTab('presets')">⭐ Presets</button>
-      <button id="tabBtnTimer" onclick="switchTab('timer')">⏱ Desk Timer</button>
+      <button id="tabBtnColors" class="active" onclick="switchTab('colors')">Colour Wheel</button>
+      <button id="tabBtnPresets" onclick="switchTab('presets')">Saved Presets (P1-P8)</button>
     </div>
 
     <!-- Tab 1: Colour Wheel & Swatches -->
     <div class="card tab-content active" id="tabColors">
       <div class="picker-split">
         <div class="picker-col-left">
-          <canvas id="colorWheel" width="96" height="96"></canvas>
+          <canvas id="colorWheel" width="86" height="86"></canvas>
           <div id="colorPreview" class="color-preview" style="background:#ff9900"></div>
         </div>
         <div class="picker-col-right">
@@ -732,86 +835,97 @@
       </table>
     </div>
 
-    <!-- Tab 3: Fixed (10, 15, 30 min) + Custom Timer -->
-    <div class="card tab-content" id="tabTimer">
-      <div class="timer-display-box">
-        <div style="display:table-cell; vertical-align:middle;">
-          <div style="font-size:10px; color:#8b949e;" id="timerStatusLabel">COUNTDOWN TIMER</div>
-          <div class="timer-digits" id="timerDigits">00:00</div>
-        </div>
-        <div style="display:table-cell; vertical-align:middle; text-align:right;">
-          <label style="font-size:11px; color:#c9d1d9; display:block; margin-bottom:4px;">
-            <input type="checkbox" id="timerTurnOffLeds"> Turn off LEDs when done
-          </label>
-          <button onclick="stopCountdownTimer(true)" style="background:#5c1d1d; border-color:#8b2424; padding:4px 10px; font-size:11px;">Stop / Reset</button>
-        </div>
-      </div>
-
-      <!-- Fixed 10m, 15m, 30m Buttons + Custom Toggle -->
-      <table class="timer-btn-table">
-        <tr>
-          <td><button class="timer-preset-btn" onclick="startCountdownTimer(10)">10 Min</button></td>
-          <td><button class="timer-preset-btn" onclick="startCountdownTimer(15)">15 Min</button></td>
-          <td><button class="timer-preset-btn" onclick="startCountdownTimer(30)">30 Min</button></td>
-          <td><button class="timer-preset-btn" style="border-color:#58a6ff; color:#58a6ff;" onclick="toggleCustomTimerRow()">Custom</button></td>
-        </tr>
-      </table>
-
-      <!-- Custom Minutes Input Row -->
-      <div id="customTimerRow" class="timer-custom-row" style="display:none;">
-        <div style="display:table-cell; padding-right:6px;">
-          <input type="number" id="customTimerInput" min="1" max="999" placeholder="Enter custom minutes (e.g. 45)" style="width:100%; background:#0d1117; color:#fff; border:1px solid #58a6ff; border-radius:5px; padding:6px 8px; font-size:12px;">
-        </div>
-        <div style="display:table-cell; width:95px;">
-          <button onclick="startCustomTimer()" style="width:100%; background:#195b28; border-color:#2ea043; font-weight:bold; padding:6px;">Start Custom</button>
-        </div>
-      </div>
-    </div>
-
     <div class="status-text" id="status">Syncing with WLED (4.3.2.1)...</div>
   </div>
 
 </div>
 
+<!-- Custom Timer Keypad Modal -->
+<div class="modal-overlay" id="customTimerModal" onclick="closeCustomTimerOverlay(event)">
+  <div class="modal-content" style="top:8%; left:15%; width:70%; height:84%;" onclick="stopProp(event)">
+    <div class="row" style="margin-bottom:6px;">
+      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#f5a623;">Set Custom Countdown Timer</span></div>
+      <div class="row-right"><button onclick="closeCustomTimerDirect()" style="padding:4px 10px;">X</button></div>
+    </div>
+    <div style="background:#0d1117; border:1px solid #f5a623; border-radius:6px; padding:8px 12px; text-align:center; margin-bottom:6px;">
+      <span id="customMinutesDisplay" style="font-size:24px; font-weight:bold; color:#ffffff; font-family:monospace;">25</span>
+      <span style="font-size:14px; color:#f5a623; font-weight:bold;"> MINUTES</span>
+    </div>
+    <div style="margin-bottom:6px; text-align:center;">
+      <span class="cmd-chip" onclick="startCustomAndClose(5)">5 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(10)">10 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(15)">15 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(20)">20 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(30)">30 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(45)">45 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(60)">60 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(90)">90 Min</span>
+    </div>
+    <table class="numpad-table">
+      <tr>
+        <td><button class="numpad-btn" onclick="numpadPress('1')">1</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('2')">2</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('3')">3</button></td>
+        <td><button class="numpad-btn" style="background:#5c1d1d; border-color:#8b2424;" onclick="numpadClear()">Clear</button></td>
+      </tr>
+      <tr>
+        <td><button class="numpad-btn" onclick="numpadPress('4')">4</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('5')">5</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('6')">6</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('0')">0</button></td>
+      </tr>
+      <tr>
+        <td><button class="numpad-btn" onclick="numpadPress('7')">7</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('8')">8</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('9')">9</button></td>
+        <td><button class="numpad-btn" style="background:#195b28; border-color:#2ea043;" onclick="confirmCustomTimerPad()">Start</button></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
 <!-- Voice Command / Natural Language Command Modal -->
 <div class="modal-overlay" id="voiceModal" onclick="closeVoiceOverlay(event)">
-  <div class="modal-content" style="top:10%; left:10%; width:80%; height:80%;" onclick="stopProp(event)">
-    <div class="row" style="margin-bottom:8px;">
-      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#d2a8ff;">🎤 Robot Voice & Command Center</span></div>
+  <div class="modal-content" style="top:6%; left:7%; width:86%; height:88%;" onclick="stopProp(event)">
+    <div class="row" style="margin-bottom:6px;">
+      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#d2a8ff;">Robot Voice &amp; Command Center</span></div>
       <div class="row-right"><button onclick="closeVoiceDirect()" style="padding:4px 10px;">X</button></div>
     </div>
-    <div style="font-size:11px; color:#8b949e; margin-bottom:8px;">
-      Tap <b>🎤 Speak with Mic</b> or type/tap a command below (you can also use the microphone key on your tablet keyboard):
+    <div style="font-size:11px; color:#8b949e; margin-bottom:6px;">
+      Tap any command below to execute immediately, type a custom command, or tap <b>[Mic]</b> (Note: when connected to offline WLED Wi-Fi <b>wledtabletop</b>, Google's cloud mic has no internet, so you can tap or type commands right here!):
     </div>
     <div class="task-input-row">
       <div class="task-input-cell">
-        <input type="text" id="voiceCmdInput" placeholder="e.g. Set timer 15 minutes, Turn on lights, Add task study PID...">
+        <input type="text" id="voiceCmdInput" placeholder="Type command: e.g. timer 20, turn on lights, add task study PID...">
       </div>
       <div class="task-btn-cell" style="width:85px; padding-right:4px;">
-        <button onclick="runTypedVoiceCommand()" style="width:100%; background:#195b28; border-color:#2ea043; font-weight:bold;">Execute</button>
+        <button onclick="runTypedVoiceCommand()" style="width:100%; background:#195b28; border-color:#2ea043; font-weight:bold;">Run</button>
       </div>
-      <div class="task-btn-cell" style="width:95px;">
-        <button onclick="startNativeMicOnly()" style="width:100%; background:#231738; border-color:#a371f7; color:#e2c5ff; font-weight:bold;">🎤 Mic</button>
+      <div class="task-btn-cell" style="width:85px;">
+        <button onclick="startNativeMicOnly()" style="width:100%; background:#231738; border-color:#a371f7; color:#e2c5ff; font-weight:bold;">[Mic]</button>
       </div>
     </div>
-    <div style="font-size:11px; color:#f5a623; margin:6px 0 4px 0; font-weight:bold;">One-Tap Example Voice Commands:</div>
+    <div style="font-size:11px; color:#f5a623; margin:4px 0 4px 0; font-weight:bold;">1-Tap Robot Voice Commands (Works 100% Offline on wledtabletop):</div>
     <div>
-      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 10 minutes')">"Set timer for 10 minutes"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 15 minutes')">"Set timer for 15 minutes"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 30 minutes')">"Set timer for 30 minutes"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('stop timer')">"Stop timer"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('turn on lights')">"Turn on lights"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('turn off lights')">"Turn off lights"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('random color')">"Random color"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('random effect')">"Random effect"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('set color blue')">"Set color blue"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('set color red')">"Set color red"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('what is the weather')">"What is the weather"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('next class')">"Next class"</span>
-      <span class="cmd-chip" onclick="executeVoiceCommand('read my tasks')">"Read my tasks"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 10 minutes')">Timer: 10 Min</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 15 minutes')">Timer: 15 Min</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 30 minutes')">Timer: 30 Min</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('stop timer')">Stop Timer</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('turn on lights')">Turn On Lights</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('turn off lights')">Turn Off Lights</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('random color')">Random Colour</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('random effect')">Random Effect</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color orange')">Colour: Orange</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color blue')">Colour: Blue</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color red')">Colour: Red</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color purple')">Colour: Purple</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('what is the weather')">Speak Weather</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('next class')">Speak Next Class</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('read my tasks')">Read Tasks &amp; Notes</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('full briefing')">Full Briefing</span>
     </div>
-    <div id="voiceCmdFeedback" style="margin-top:10px; padding:8px; background:#0d1117; border:1px solid #30363d; border-radius:6px; font-size:12px; color:#3fb950; min-height:32px;">
-      Waiting for your command...
+    <div id="voiceCmdFeedback" style="margin-top:8px; padding:8px; background:#0d1117; border:1px solid #30363d; border-radius:6px; font-size:12px; color:#3fb950; min-height:30px;">
+      Ready! Tap any command chip above or type a command.
     </div>
   </div>
 </div>
@@ -851,7 +965,7 @@
       <div class="row" style="margin-top: 8px;">
         <div class="row-left">
           <button onclick="clearNotes()" style="background:#5c1d1d; border-color:#8b2424; font-size:11px;">Clear</button>
-          <button onclick="speakNotesOnly()" style="background:#21262d; border-color:#58a6ff; color:#58a6ff; font-size:11px; margin-left:4px;">🔊 Read Notes</button>
+          <button onclick="speakNotesOnly()" style="background:#21262d; border-color:#58a6ff; color:#58a6ff; font-size:11px; margin-left:4px;">[Speak] Read Notes</button>
         </div>
         <div class="row-right">
           <span id="saveStatus" style="font-size:11px; color:#2ea043; margin-right:8px;"></span>
@@ -882,7 +996,7 @@
 <div class="modal-overlay" id="settingsModal" onclick="closeSettingsOverlay(event)">
   <div class="modal-content" style="top:12%; left:12%; width:76%; height:76%;" onclick="stopProp(event)">
     <div class="row" style="margin-bottom:10px;">
-      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#58a6ff;">WLED AP & Wi-Fi Watchdog Settings</span></div>
+      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#58a6ff;">WLED AP &amp; Wi-Fi Watchdog Settings</span></div>
       <div class="row-right"><button onclick="closeSettingsDirect()" style="padding:4px 10px;">X</button></div>
     </div>
     <div style="font-size:12px; margin-bottom:8px;">
@@ -899,7 +1013,7 @@
         <button onclick="fetchLiveWeather(true)" style="background:#21262d; border-color:#2ea043; color:#3fb950; margin-left:4px;">Sync Weather</button>
       </div>
       <div class="row-right">
-        <button onclick="saveWledSettings()" style="background:#195b28; border-color:#2ea043; font-weight:bold;">Save & Connect</button>
+        <button onclick="saveWledSettings()" style="background:#195b28; border-color:#2ea043; font-weight:bold;">Save &amp; Connect</button>
       </div>
     </div>
   </div>
@@ -922,6 +1036,7 @@
   var timerRemainingSecs = 0;
   var timerTotalMins = 0;
   var timerInterval = null;
+  var customPadStr = '25';
 
   var DEFAULT_WEATHER = {
     temp: 22.5,
@@ -1018,7 +1133,7 @@
         if (cur && cur !== '<unknown ssid>') ssidNow = cur;
       }
     } catch(e) {}
-    document.getElementById('wifiBadge').innerHTML = 'Wi-Fi: ' + ssidNow + ' ⚙';
+    document.getElementById('wifiBadge').innerHTML = 'Wi-Fi: ' + ssidNow + ' [*]';
   }
 
   /* ================= DESK & SLEEP TIMER ENGINE (10m, 15m, 30m, Custom) ================= */
@@ -1031,20 +1146,19 @@
   function updateTimerDisplay() {
     var pill = document.getElementById('topTimerPill');
     var digits = document.getElementById('timerDigits');
-    var label = document.getElementById('timerStatusLabel');
     if (timerRemainingSecs > 0) {
       var formatted = formatMmSs(timerRemainingSecs);
       digits.innerHTML = formatted;
-      pill.innerHTML = '⏱ ' + formatted;
+      digits.style.color = '#3fb950';
+      digits.style.borderColor = '#2ea043';
+      pill.innerHTML = '[Timer: ' + formatted + ']';
       pill.className = 'timer-pill active';
-      label.innerHTML = 'RUNNING (' + timerTotalMins + ' MIN TIMER)';
-      label.style.color = '#3fb950';
     } else {
       digits.innerHTML = '00:00';
-      pill.innerHTML = '⏱ Timer: Off';
+      digits.style.color = '#ffffff';
+      digits.style.borderColor = '#30363d';
+      pill.innerHTML = '[Timer: Off]';
       pill.className = 'timer-pill';
-      label.innerHTML = 'COUNTDOWN TIMER';
-      label.style.color = '#8b949e';
     }
   }
 
@@ -1056,7 +1170,7 @@
     timerRemainingSecs = mins * 60;
     updateTimerDisplay();
 
-    var msg = 'Timer set for ' + mins + (mins === 1 ? ' minute.' : ' minutes.');
+    var msg = 'Timer started for ' + mins + (mins === 1 ? ' minute.' : ' minutes.');
     document.getElementById('speechText').innerHTML = msg;
     safeSpeak(msg);
 
@@ -1087,18 +1201,46 @@
     }
   }
 
-  function toggleCustomTimerRow() {
-    var row = document.getElementById('customTimerRow');
-    row.style.display = (row.style.display === 'none') ? 'table' : 'none';
+  function openCustomTimerModal() {
+    customPadStr = '25';
+    document.getElementById('customMinutesDisplay').innerHTML = customPadStr;
+    document.getElementById('customTimerModal').className = 'modal-overlay open';
   }
 
-  function startCustomTimer() {
-    var val = document.getElementById('customTimerInput').value;
-    var mins = parseInt(val, 10);
+  function closeCustomTimerDirect() {
+    document.getElementById('customTimerModal').className = 'modal-overlay';
+  }
+
+  function closeCustomTimerOverlay(e) {
+    if (e.target.id === 'customTimerModal') closeCustomTimerDirect();
+  }
+
+  function numpadPress(digit) {
+    if (customPadStr === '0' || customPadStr.length >= 3) {
+      customPadStr = digit;
+    } else {
+      customPadStr += digit;
+    }
+    document.getElementById('customMinutesDisplay').innerHTML = customPadStr;
+  }
+
+  function numpadClear() {
+    customPadStr = '0';
+    document.getElementById('customMinutesDisplay').innerHTML = '0';
+  }
+
+  function confirmCustomTimerPad() {
+    var mins = parseInt(customPadStr, 10);
     if (isNaN(mins) || mins <= 0) {
       safeSpeak('Please enter a valid number of minutes.');
       return;
     }
+    closeCustomTimerDirect();
+    startCountdownTimer(mins);
+  }
+
+  function startCustomAndClose(mins) {
+    closeCustomTimerDirect();
     startCountdownTimer(mins);
   }
 
@@ -1135,7 +1277,7 @@
       }
     } catch(e) {}
     if (!ok) {
-      document.getElementById('voiceCmdFeedback').innerHTML = 'Offline Mic recognizer unavailable on this network. Tap the text box above and use the keyboard mic or tap any command chip!';
+      document.getElementById('voiceCmdFeedback').innerHTML = 'Offline Mic recognizer unavailable on wledtabletop. Tap any command chip above or type in the box!';
     }
   }
 
@@ -1145,6 +1287,10 @@
 
   window.onVoiceCommandFallback = function() {
     openVoiceModal();
+    var fb = document.getElementById('voiceCmdFeedback');
+    if (fb) {
+      fb.innerHTML = 'Note: Google Voice Search requires internet (tablet is on offline WLED Wi-Fi wledtabletop). Tap any 1-Tap Command above or type your command!';
+    }
   };
 
   function openVoiceModal() {
@@ -1176,7 +1322,7 @@
     // 1. Timer Commands (e.g. "set timer for 15 minutes", "timer 10 min", "stop timer")
     if (text.indexOf('stop timer') !== -1 || text.indexOf('cancel timer') !== -1 || text.indexOf('reset timer') !== -1) {
       stopCountdownTimer(false);
-      reply = 'Heard "' + rawText + '" — Timer stopped.';
+      reply = 'Command: Stop Timer — Timer stopped and reset.';
       finishVoiceExec(reply, feedbackEl);
       return;
     }
@@ -1186,15 +1332,14 @@
       if (text.indexOf('turn off') !== -1 || text.indexOf('sleep') !== -1) {
         document.getElementById('timerTurnOffLeds').checked = true;
       }
-      switchTab('timer');
       startCountdownTimer(mins);
       if (feedbackEl) feedbackEl.innerHTML = 'Executed: Started ' + mins + ' minute timer.';
       return;
     }
 
     // 2. Add Task / Schedule Command (e.g. "add task submit assignment", "schedule lab report")
-    if (text.indexOf('add task') === 0 || text.indexOf('new task') === 0 || text.indexOf('schedule task') === 0) {
-      var taskBody = rawText.replace(/^(add task|new task|schedule task)\s*/i, '');
+    if (text.indexOf('add task') === 0 || text.indexOf('new task') === 0 || text.indexOf('schedule task') === 0 || text.indexOf('schedule ') === 0) {
+      var taskBody = rawText.replace(/^(add task|new task|schedule task|schedule)\s*/i, '');
       if (taskBody) {
         var list = getTasks();
         list.push({ time: 'Voice', text: taskBody, done: false });
@@ -1211,7 +1356,7 @@
       var noteBody = rawText.replace(/^(add note|write note|note)\s*/i, '');
       if (noteBody) {
         var existing = storeGet(NOTES_KEY, '');
-        var updated = existing ? (existing + '\n• ' + noteBody) : ('• ' + noteBody);
+        var updated = existing ? (existing + '\n- ' + noteBody) : ('- ' + noteBody);
         storeSet(NOTES_KEY, updated);
         reply = 'Saved to your quick desk notes: ' + noteBody;
         finishVoiceExec(reply, feedbackEl);
@@ -1317,7 +1462,7 @@
       return;
     }
 
-    reply = 'I heard "' + rawText + '". Try saying "Set timer 15 minutes", "Turn on lights", "Random color", or "Add task..."';
+    reply = 'Heard "' + rawText + '". Try "timer 15", "turn on lights", "random color", or "add task..."';
     finishVoiceExec(reply, feedbackEl);
   }
 
@@ -1354,7 +1499,7 @@
 
   function updateWeatherUI() {
     var w = getWeatherData();
-    document.getElementById('weatherPill').innerHTML = '☀ Patiala: ' + w.temp + '°C';
+    document.getElementById('weatherPill').innerHTML = 'Patiala: ' + w.temp + '°C';
   }
 
   function fetchLiveWeather(speakAfter) {
@@ -1561,7 +1706,7 @@
 
   function setRandomEffectKeepColor() {
     var pick = WLED_EFFECTS[Math.floor(Math.random() * WLED_EFFECTS.length)];
-    document.getElementById('status').innerHTML = 'Effect: ' + pick.name + ' (ID ' + pick.id + ') • Keeping Current Colour';
+    document.getElementById('status').innerHTML = 'Effect: ' + pick.name + ' (ID ' + pick.id + ') - Keeping Current Colour';
     xhrRequest('POST', getApiUrl(), {
       on: true,
       seg: [{
@@ -1714,10 +1859,10 @@
       var timeBadge = t.time ? '<span class="task-time-badge">' + t.time + '</span>' : '';
       html += '<div class="task-item' + (t.done ? ' done' : '') + '">' +
         '<div style="display:table-cell; vertical-align:middle;" onclick="toggleTaskDone(' + i + ')">' +
-          timeBadge + '<span class="task-text">' + (t.done ? '✓ ' : '☐ ') + t.text + '</span>' +
+          timeBadge + '<span class="task-text">' + (t.done ? '[x] ' : '[ ] ') + t.text + '</span>' +
         '</div>' +
         '<div style="display:table-cell; width:40px; text-align:right; vertical-align:middle;">' +
-          '<button onclick="deleteTask(' + i + ')" style="padding:3px 7px; font-size:11px; background:#5c1d1d; border-color:#8b2424;">✕</button>' +
+          '<button onclick="deleteTask(' + i + ')" style="padding:3px 7px; font-size:11px; background:#5c1d1d; border-color:#8b2424;">X</button>' +
         '</div>' +
       '</div>';
     }
@@ -1796,10 +1941,8 @@
   function switchTab(tab) {
     document.getElementById('tabColors').className = 'card tab-content' + (tab === 'colors' ? ' active' : '');
     document.getElementById('tabPresets').className = 'card tab-content' + (tab === 'presets' ? ' active' : '');
-    document.getElementById('tabTimer').className = 'card tab-content' + (tab === 'timer' ? ' active' : '');
     document.getElementById('tabBtnColors').className = (tab === 'colors' ? 'active' : '');
     document.getElementById('tabBtnPresets').className = (tab === 'presets' ? 'active' : '');
-    document.getElementById('tabBtnTimer').className = (tab === 'timer' ? 'active' : '');
   }
 
   function xhrRequest(method, url, data, callback) {
@@ -2007,6 +2150,7 @@
     closeNotesDirect();
     closeSettingsDirect();
     closeVoiceDirect();
+    closeCustomTimerDirect();
   };
 
   canvas.addEventListener('click', pickColor);

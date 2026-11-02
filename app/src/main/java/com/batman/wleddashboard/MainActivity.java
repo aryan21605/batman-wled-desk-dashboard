@@ -142,25 +142,28 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
-    public boolean launchVoiceRecognizer() {
+    public void requestVoiceRecognizerOnUi() {
+        if (watchdogHandler != null) {
+            watchdogHandler.post(new VoiceLaunchRunnable(this));
+        }
+    }
+
+    public void executeVoiceRecognizerNow() {
         try {
             if (tts != null) {
                 tts.stop();
             }
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.US.toString());
-            intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak command to Batman Robot (e.g. 'Set timer 10 minutes', 'Turn on lights', 'Add task...')");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
-            } else {
-                intent.putExtra("android.speech.extra.PREFER_OFFLINE", true);
-            }
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+            intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak command (e.g. 'Timer 15 minutes', 'Lights on', 'Random color')");
+            intent.putExtra("android.speech.extra.PREFER_OFFLINE", true);
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-            return true;
         } catch (Exception e) {
-            return false;
+            if (watchdogHandler != null) {
+                watchdogHandler.postDelayed(new JsCallbackRunnable(webView, "if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}"), 200);
+            }
         }
     }
 
@@ -171,15 +174,26 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             if (resultCode == RESULT_OK && data != null) {
                 ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 if (result != null && result.size() > 0 && result.get(0) != null) {
-                    String spoken = result.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
-                    if (webView != null) {
-                        webView.loadUrl("javascript:if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
+                    String spoken = result.get(0)
+                            .replace("\\", "\\\\")
+                            .replace("'", "\\'")
+                            .replace("\"", "\\\"")
+                            .replace("\n", " ")
+                            .replace("\r", " ");
+                    if (watchdogHandler != null) {
+                        watchdogHandler.postDelayed(
+                                new JsCallbackRunnable(webView, "if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}"),
+                                300
+                        );
                     }
                     return;
                 }
             }
-            if (webView != null) {
-                webView.loadUrl("javascript:if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}");
+            if (watchdogHandler != null) {
+                watchdogHandler.postDelayed(
+                        new JsCallbackRunnable(webView, "if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}"),
+                        300
+                );
             }
         }
     }
@@ -190,6 +204,39 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     public WifiManager getAppWifiManager() {
         return wifiManager;
+    }
+
+    private static class VoiceLaunchRunnable implements Runnable {
+        private final MainActivity activity;
+
+        VoiceLaunchRunnable(MainActivity act) {
+            this.activity = act;
+        }
+
+        @Override
+        public void run() {
+            activity.executeVoiceRecognizerNow();
+        }
+    }
+
+    private static class JsCallbackRunnable implements Runnable {
+        private final WebView targetWebView;
+        private final String jsCode;
+
+        JsCallbackRunnable(WebView wv, String js) {
+            this.targetWebView = wv;
+            this.jsCode = js;
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (targetWebView != null && jsCode != null) {
+                    targetWebView.loadUrl("javascript:" + jsCode);
+                }
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private static class WifiCheckWorker implements Runnable {
@@ -252,7 +299,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         @JavascriptInterface
         public boolean startVoiceRecognition() {
-            return activity.launchVoiceRecognizer();
+            activity.requestVoiceRecognizerOnUi();
+            return true;
         }
 
         @JavascriptInterface
