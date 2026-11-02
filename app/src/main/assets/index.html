@@ -1299,9 +1299,19 @@
     var speechEl = document.getElementById('speechText');
     var fb = document.getElementById('voiceCmdFeedback');
     var antenna = document.getElementById('robo-antenna');
-    if (state === 'LISTENING' || state === 'SPEAKING') {
+    if (state === 'PREPARING') {
       if (micBtn) {
-        micBtn.innerHTML = '[Listening... Speak Command Now]';
+        micBtn.innerHTML = '[Zurich Waking Up... Wait]';
+        micBtn.style.background = '#3d2408';
+        micBtn.style.borderColor = '#f5a623';
+      }
+      if (antenna) antenna.setAttribute('fill', '#f5a623');
+      animateRobotTalking(2200);
+      if (speechEl && message) speechEl.innerHTML = message;
+      if (fb && message) fb.innerHTML = message;
+    } else if (state === 'LISTENING' || state === 'SPEAKING') {
+      if (micBtn) {
+        micBtn.innerHTML = '[Listening (15s)... Speak Now]';
         micBtn.style.background = '#195b28';
         micBtn.style.borderColor = '#3fb950';
       }

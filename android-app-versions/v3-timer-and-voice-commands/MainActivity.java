@@ -48,6 +48,13 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private static final String SEARCH_BATMAN_CMD = "batman_cmd";
     private static final int REQ_CODE_SPEECH_INPUT = 1001;
 
+    /* 15 seconds total listening window for commands */
+    private static final int COMMAND_LISTEN_TIMEOUT_MS = 15000;
+    /* 3.0 seconds delay after wake word ("Yes, I am listening") before opening command mic */
+    private static final long WAKE_GREETING_DELAY_MS = 3000L;
+    /* 2.4 seconds pause after last spoken word before auto-executing command */
+    private static final long END_OF_COMMAND_SILENCE_MS = 2400L;
+
     private WebView webView;
     private TextToSpeech tts;
     private boolean ttsReady = false;
@@ -56,7 +63,11 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private SpeechRecognizer offlineRecognizer;
     private volatile boolean offlineAsrReady = false;
     private volatile String currentSearchMode = "";
+    private volatile String lastHeardCommandPartial = "";
+
     private ResumeWakeupRunnable resumeWakeupRunnable;
+    private StartCommandAfterGreetingRunnable startCommandAfterGreetingRunnable;
+    private FinalizeCommandRunnable finalizeCommandRunnable;
 
     private WifiManager wifiManager;
     private WifiManager.WifiLock wifiLock;
@@ -93,6 +104,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         watchdogHandler = new Handler(Looper.getMainLooper());
         resumeWakeupRunnable = new ResumeWakeupRunnable(this);
+        startCommandAfterGreetingRunnable = new StartCommandAfterGreetingRunnable(this);
+        finalizeCommandRunnable = new FinalizeCommandRunnable(this);
 
         setupWifiLock();
         setupTextToSpeech();
@@ -172,7 +185,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
             this.offlineRecognizer = rec;
             this.offlineAsrReady = true;
-            scheduleResumeWakeup(400);
+            scheduleResumeWakeup(1000L);
         } catch (Exception e) {
             this.offlineAsrReady = false;
         }
@@ -197,6 +210,14 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
+    private void cancelPendingVoiceTimers() {
+        if (watchdogHandler != null) {
+            if (resumeWakeupRunnable != null) watchdogHandler.removeCallbacks(resumeWakeupRunnable);
+            if (startCommandAfterGreetingRunnable != null) watchdogHandler.removeCallbacks(startCommandAfterGreetingRunnable);
+            if (finalizeCommandRunnable != null) watchdogHandler.removeCallbacks(finalizeCommandRunnable);
+        }
+    }
+
     public void scheduleResumeWakeup(long delayMs) {
         if (watchdogHandler != null && resumeWakeupRunnable != null) {
             watchdogHandler.removeCallbacks(resumeWakeupRunnable);
@@ -207,7 +228,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public void startWakeupListeningOnUi() {
         if (!isRunning || !offlineAsrReady || offlineRecognizer == null) return;
         try {
+            cancelPendingVoiceTimers();
             offlineRecognizer.cancel();
+            lastHeardCommandPartial = "";
             currentSearchMode = SEARCH_WAKEUP;
             offlineRecognizer.startListening(SEARCH_WAKEUP);
             sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Hands-Free Active: Say \"Zurich wake up\" or \"Zurich listen\"');}");
@@ -215,23 +238,51 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
-    public void switchToCommandListeningOnUi(boolean fromWakeWord) {
+    /* Called when "Zurich wake up" / "Zurich listen" is spoken or when the button is tapped */
+    public void onWakeWordTriggeredOnUi(boolean speakGreetingFirst) {
         if (!offlineAsrReady || offlineRecognizer == null) return;
         try {
-            if (watchdogHandler != null && resumeWakeupRunnable != null) {
-                watchdogHandler.removeCallbacks(resumeWakeupRunnable);
+            cancelPendingVoiceTimers();
+            currentSearchMode = "GREETING_DELAY";
+            lastHeardCommandPartial = "";
+            offlineRecognizer.cancel();
+
+            if (speakGreetingFirst && tts != null && ttsReady) {
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PREPARING', 'Zurich: \"Yes, I am listening...\" (Wait a moment, then speak)');}");
+                tts.speak("Yes, I am listening.", TextToSpeech.QUEUE_FLUSH, null);
+                watchdogHandler.postDelayed(startCommandAfterGreetingRunnable, WAKE_GREETING_DELAY_MS);
+            } else {
+                if (tts != null) {
+                    tts.stop();
+                }
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PREPARING', 'Get ready to speak command...');}");
+                watchdogHandler.postDelayed(startCommandAfterGreetingRunnable, 1200L);
             }
+        } catch (Exception ignored) {
+        }
+    }
+
+    /* Opens the 15-second command listening window after the wake greeting finishes */
+    public void openCommandMicNowOnUi() {
+        if (!isRunning || !offlineAsrReady || offlineRecognizer == null) return;
+        try {
             if (tts != null) {
                 tts.stop();
             }
             offlineRecognizer.cancel();
+            lastHeardCommandPartial = "";
             currentSearchMode = SEARCH_BATMAN_CMD;
-            offlineRecognizer.startListening(SEARCH_BATMAN_CMD, 7000);
-            String prompt = fromWakeWord
-                    ? "Zurich is awake! Speak your command now (e.g. \"Turn on lights\", \"Write note...\", \"Intensity 80 percent\")..."
-                    : "Listening Offline... Speak your command now!";
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', '" + prompt.replace("'", "\\'") + "');}");
+            offlineRecognizer.startListening(SEARCH_BATMAN_CMD, COMMAND_LISTEN_TIMEOUT_MS);
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', 'Listening Now (15s)... Speak your command clearly!');}");
         } catch (Exception ignored) {
+        }
+    }
+
+    /* Called 2.4 seconds after the user stops speaking a valid command */
+    public void finalizeCommandNowOnUi() {
+        if (offlineRecognizer != null && SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
+            currentSearchMode = "";
+            offlineRecognizer.stop();
         }
     }
 
@@ -269,15 +320,24 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     @Override
     public void onBeginningOfSpeech() {
         if (SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('SPEAKING', 'Hearing your command...');}");
+            if (watchdogHandler != null && finalizeCommandRunnable != null) {
+                watchdogHandler.removeCallbacks(finalizeCommandRunnable);
+            }
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('SPEAKING', 'Hearing your voice... Keep speaking!');}");
         }
     }
 
     @Override
     public void onEndOfSpeech() {
         if (offlineRecognizer != null && SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
-            currentSearchMode = "";
-            offlineRecognizer.stop();
+            /* Only schedule auto-stop if we have actually captured command words;
+               otherwise keep listening for the full 15 seconds! */
+            if (lastHeardCommandPartial != null && lastHeardCommandPartial.length() > 0) {
+                if (watchdogHandler != null && finalizeCommandRunnable != null) {
+                    watchdogHandler.removeCallbacks(finalizeCommandRunnable);
+                    watchdogHandler.postDelayed(finalizeCommandRunnable, END_OF_COMMAND_SILENCE_MS);
+                }
+            }
         }
     }
 
@@ -292,7 +352,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (SEARCH_WAKEUP.equals(currentSearchMode)) {
             if (lower.contains("zurich wake up") || lower.contains("zurich listen")
                     || (lower.contains("zurich") && (lower.contains("wake") || lower.contains("listen")))) {
-                switchToCommandListeningOnUi(true);
+                onWakeWordTriggeredOnUi(true);
             }
             return;
         }
@@ -300,36 +360,59 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
             String clean = normalizeNumbersInSpeech(lower).replace("'", "");
             if (clean.length() > 0) {
+                lastHeardCommandPartial = clean;
                 sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PARTIAL', '" + clean + "');}");
+                /* Reset the 2.4-second post-speech timer every time a new word is spoken */
+                if (watchdogHandler != null && finalizeCommandRunnable != null) {
+                    watchdogHandler.removeCallbacks(finalizeCommandRunnable);
+                    watchdogHandler.postDelayed(finalizeCommandRunnable, END_OF_COMMAND_SILENCE_MS);
+                }
             }
         }
     }
 
     @Override
     public void onResult(Hypothesis hypothesis) {
-        if (hypothesis != null && hypothesis.getHypstr() != null) {
-            String raw = hypothesis.getHypstr().trim().toLowerCase();
-            if (raw.equals("zurich wake up") || raw.equals("zurich listen") || raw.equals("zurich")) {
-                return;
-            }
-            String spoken = normalizeNumbersInSpeech(raw).replace("'", "");
-            if (spoken.length() > 0) {
-                sendJsToWebView("if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
-                scheduleResumeWakeup(4000);
-                return;
-            }
+        if (watchdogHandler != null && finalizeCommandRunnable != null) {
+            watchdogHandler.removeCallbacks(finalizeCommandRunnable);
         }
-        scheduleResumeWakeup(500);
+        String raw = "";
+        if (hypothesis != null && hypothesis.getHypstr() != null) {
+            raw = hypothesis.getHypstr().trim().toLowerCase();
+        }
+        if (raw.equals("zurich wake up") || raw.equals("zurich listen") || raw.equals("zurich")) {
+            return;
+        }
+        String spoken = normalizeNumbersInSpeech(raw).replace("'", "");
+        if (spoken.length() == 0 && lastHeardCommandPartial != null && lastHeardCommandPartial.length() > 0) {
+            spoken = lastHeardCommandPartial;
+        }
+        lastHeardCommandPartial = "";
+
+        if (spoken.length() > 0) {
+            sendJsToWebView("if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
+            /* Wait 6 seconds (or speakOut's own timer + 3s) before re-arming wake word */
+            scheduleResumeWakeup(6000L);
+            return;
+        }
+        scheduleResumeWakeup(1500L);
     }
 
     @Override
     public void onError(Exception error) {
         currentSearchMode = "";
-        scheduleResumeWakeup(2000);
+        scheduleResumeWakeup(2500L);
     }
 
     @Override
     public void onTimeout() {
+        if (SEARCH_BATMAN_CMD.equals(currentSearchMode) && lastHeardCommandPartial != null && lastHeardCommandPartial.length() > 0) {
+            currentSearchMode = "";
+            if (offlineRecognizer != null) {
+                offlineRecognizer.stop();
+            }
+            return;
+        }
         currentSearchMode = "";
         startWakeupListeningOnUi();
     }
@@ -362,12 +445,14 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public void speakOut(String text) {
         if (tts != null && ttsReady && text != null) {
             try {
+                cancelPendingVoiceTimers();
                 if (offlineRecognizer != null) {
                     currentSearchMode = "";
                     offlineRecognizer.cancel();
                 }
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                long speakDurationMs = Math.max(2800L, Math.min(18000L, (long) text.length() * 75L));
+                /* Estimate TTS speaking duration + 3 full seconds of post-speech delay before re-enabling mic */
+                long speakDurationMs = Math.max(3500L, Math.min(20000L, (long) text.length() * 80L)) + 3000L;
                 scheduleResumeWakeup(speakDurationMs);
             } catch (Exception ignored) {
             }
@@ -384,11 +469,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         try {
             if (offlineAsrReady && offlineRecognizer != null) {
                 if (SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
-                    currentSearchMode = "";
-                    offlineRecognizer.stop();
+                    finalizeCommandNowOnUi();
                     return;
                 }
-                switchToCommandListeningOnUi(false);
+                onWakeWordTriggeredOnUi(true);
                 return;
             }
 
@@ -444,6 +528,32 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     public WifiManager getAppWifiManager() {
         return wifiManager;
+    }
+
+    private static class StartCommandAfterGreetingRunnable implements Runnable {
+        private final MainActivity activity;
+
+        StartCommandAfterGreetingRunnable(MainActivity act) {
+            this.activity = act;
+        }
+
+        @Override
+        public void run() {
+            activity.openCommandMicNowOnUi();
+        }
+    }
+
+    private static class FinalizeCommandRunnable implements Runnable {
+        private final MainActivity activity;
+
+        FinalizeCommandRunnable(MainActivity act) {
+            this.activity = act;
+        }
+
+        @Override
+        public void run() {
+            activity.finalizeCommandNowOnUi();
+        }
     }
 
     private static class ResumeWakeupRunnable implements Runnable {
@@ -660,7 +770,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         watchdogHandler.removeCallbacks(this);
         watchdogHandler.post(this);
         if (offlineAsrReady) {
-            scheduleResumeWakeup(600);
+            scheduleResumeWakeup(1000L);
         }
     }
 
@@ -669,9 +779,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         super.onPause();
         isRunning = false;
         watchdogHandler.removeCallbacks(this);
-        if (watchdogHandler != null && resumeWakeupRunnable != null) {
-            watchdogHandler.removeCallbacks(resumeWakeupRunnable);
-        }
+        cancelPendingVoiceTimers();
         if (offlineRecognizer != null) {
             currentSearchMode = "";
             offlineRecognizer.cancel();
@@ -682,9 +790,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     protected void onDestroy() {
         isRunning = false;
         watchdogHandler.removeCallbacks(this);
-        if (watchdogHandler != null && resumeWakeupRunnable != null) {
-            watchdogHandler.removeCallbacks(resumeWakeupRunnable);
-        }
+        cancelPendingVoiceTimers();
         if (wifiLock != null && wifiLock.isHeld()) {
             try {
                 wifiLock.release();
