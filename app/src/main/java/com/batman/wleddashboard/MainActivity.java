@@ -3,6 +3,7 @@ package com.batman.wleddashboard;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -11,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.Window;
 import android.view.WindowManager;
@@ -26,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,6 +36,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     private static final String PREFS_NAME = "BatmanWledPrefs";
     private static final String DEFAULT_SSID = "wledtabletop";
+    private static final int REQ_CODE_SPEECH_INPUT = 1001;
 
     private WebView webView;
     private TextToSpeech tts;
@@ -138,6 +142,48 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
+    public boolean launchVoiceRecognizer() {
+        try {
+            if (tts != null) {
+                tts.stop();
+            }
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.US.toString());
+            intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak command to Batman Robot (e.g. 'Set timer 10 minutes', 'Turn on lights', 'Add task...')");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
+            } else {
+                intent.putExtra("android.speech.extra.PREFER_OFFLINE", true);
+            }
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (result != null && result.size() > 0 && result.get(0) != null) {
+                    String spoken = result.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+                    if (webView != null) {
+                        webView.loadUrl("javascript:if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
+                    }
+                    return;
+                }
+            }
+            if (webView != null) {
+                webView.loadUrl("javascript:if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}");
+            }
+        }
+    }
+
     public SharedPreferences getAppPrefs() {
         return prefs;
     }
@@ -202,6 +248,11 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         @JavascriptInterface
         public void speakText(String text) {
             activity.speakOut(text);
+        }
+
+        @JavascriptInterface
+        public boolean startVoiceRecognition() {
+            return activity.launchVoiceRecognizer();
         }
 
         @JavascriptInterface

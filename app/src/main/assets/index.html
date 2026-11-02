@@ -41,7 +41,7 @@
       border: 1px solid #f5a623;
       color: #f5a623;
       font-weight: bold;
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
       font-size: 12px;
       cursor: pointer;
@@ -54,8 +54,25 @@
       font-size: 11px;
       padding: 4px 8px;
       border-radius: 5px;
-      margin-left: 5px;
+      margin-left: 4px;
       cursor: pointer;
+    }
+    .timer-pill {
+      display: inline-block;
+      background: #161b22;
+      border: 1px solid #d29922;
+      color: #f5a623;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+    .timer-pill.active {
+      background: #3d2408;
+      border-color: #f5a623;
+      color: #ffffff;
     }
     .weather-pill {
       display: inline-block;
@@ -66,7 +83,7 @@
       font-weight: bold;
       padding: 3px 8px;
       border-radius: 5px;
-      margin-right: 6px;
+      margin-right: 5px;
       cursor: pointer;
     }
 
@@ -100,7 +117,7 @@
     /* Large Robo Companion Card */
     .robo-card {
       text-align: center;
-      padding: 8px 6px;
+      padding: 7px 6px;
     }
     .pulse-animation {
       animation: eyePulse 2.5s infinite ease-in-out;
@@ -128,20 +145,34 @@
       margin-top: 1px;
     }
 
+    /* Voice Command Mic Button */
+    .mic-cmd-btn {
+      width: 100%;
+      margin-top: 5px;
+      background: #231738;
+      border: 1px solid #a371f7;
+      color: #e2c5ff;
+      padding: 7px 6px;
+      font-weight: bold;
+      font-size: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
     /* Recite Schedule & Voice Assistant Box */
     .speech-box {
-      margin-top: 6px;
+      margin-top: 5px;
       background: #0d1117;
       border: 1px solid #30363d;
       border-radius: 6px;
-      padding: 7px;
+      padding: 6px;
       text-align: left;
     }
     .speech-bubble {
       font-size: 11px;
       color: #c9d1d9;
-      min-height: 30px;
-      line-height: 1.3;
+      min-height: 28px;
+      line-height: 1.25;
     }
     .voice-grid {
       width: 100%;
@@ -157,7 +188,7 @@
       background: #21262d;
       border: 1px solid #388bfd;
       color: #58a6ff;
-      padding: 6px 4px;
+      padding: 5px 4px;
       font-weight: bold;
       font-size: 11px;
       border-radius: 5px;
@@ -180,7 +211,7 @@
     .notes-btn-row {
       display: table;
       width: 100%;
-      margin-top: 6px;
+      margin-top: 5px;
     }
     .notes-btn-cell {
       display: table-cell;
@@ -191,7 +222,7 @@
       background: #1c1f24;
       border: 1px dashed #f5a623;
       color: #f5a623;
-      padding: 7px 4px;
+      padding: 6px 4px;
       font-weight: bold;
       font-size: 11px;
       border-radius: 6px;
@@ -208,17 +239,9 @@
       font-size: 12px;
       cursor: pointer;
     }
-    .power-row {
-      display: table;
-      width: 100%;
-    }
-    .power-cell {
-      display: table-cell;
-      vertical-align: middle;
-    }
     .power-btn {
       width: 100%;
-      padding: 9px;
+      padding: 8px;
       font-size: 14px;
       font-weight: bold;
       background: #21262d;
@@ -233,7 +256,7 @@
     .random-row {
       display: table;
       width: 100%;
-      margin-top: 6px;
+      margin-top: 5px;
     }
     .random-cell-left {
       display: table-cell;
@@ -252,7 +275,7 @@
       color: #f5a623;
       font-weight: bold;
       font-size: 11px;
-      padding: 7px 4px;
+      padding: 6px 4px;
       border-radius: 6px;
     }
     .rand-fx-btn {
@@ -262,7 +285,7 @@
       color: #d2a8ff;
       font-weight: bold;
       font-size: 11px;
-      padding: 7px 4px;
+      padding: 6px 4px;
       border-radius: 6px;
     }
 
@@ -276,10 +299,10 @@
     .row-right { display: table-cell; text-align: right; vertical-align: middle; }
     input[type=range] {
       width: 100%;
-      margin: 3px 0;
+      margin: 2px 0;
     }
 
-    /* Tabs */
+    /* 3-Tab Navigation Bar */
     .tabs {
       background: #0d1117;
       padding: 2px;
@@ -292,12 +315,12 @@
     }
     .tabs button {
       display: table-cell;
-      width: 50%;
+      width: 33.33%;
       background: transparent;
       border: none;
       color: #8b949e;
       padding: 5px 0;
-      font-size: 12px;
+      font-size: 11px;
     }
     .tabs button.active {
       background: #21262d;
@@ -331,7 +354,7 @@
       border-spacing: 4px;
     }
     .color-swatch {
-      height: 30px;
+      height: 28px;
       border-radius: 5px;
       cursor: pointer;
       border: 1px solid #444;
@@ -357,13 +380,52 @@
     }
     .preset-table button { width: 100%; padding: 7px 4px; }
 
+    /* Timer Tab Styles */
+    .timer-display-box {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      display: table;
+      width: 100%;
+    }
+    .timer-digits {
+      font-size: 22px;
+      font-weight: bold;
+      color: #f5a623;
+      font-family: monospace, Courier, sans-serif;
+    }
+    .timer-btn-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 4px;
+    }
+    .timer-btn-table td {
+      width: 25%;
+    }
+    .timer-preset-btn {
+      width: 100%;
+      background: #21262d;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      font-weight: bold;
+      padding: 7px 2px;
+      font-size: 12px;
+    }
+    .timer-custom-row {
+      display: table;
+      width: 100%;
+      margin-top: 5px;
+    }
+
     .status-text {
       font-size: 10px;
       color: #8b949e;
       text-align: center;
     }
 
-    /* Modals (Timetable, Notes/Tasks, Wi-Fi Config) */
+    /* Modals */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -400,10 +462,6 @@
       font-size: 13px;
       box-sizing: border-box;
       resize: none;
-    }
-    #quickNotesArea:focus {
-      outline: none;
-      border-color: #f5a623;
     }
 
     /* Task List Styles */
@@ -510,6 +568,19 @@
     .tag-lecture { background: #2ea043; }
     .tag-practical { background: #d29922; color: #000000; }
     .tag-tutorial { background: #a371f7; }
+
+    /* Voice Command Chip Helper */
+    .cmd-chip {
+      display: inline-block;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #58a6ff;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin: 2px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -521,7 +592,8 @@
     <span class="wifi-badge" id="wifiBadge" onclick="openSettingsModal()">Wi-Fi: wledtabletop ⚙</span>
   </div>
   <div class="top-right">
-    <span class="weather-pill" id="weatherPill" onclick="speakWeather()">☀ Patiala: 23°C Clear</span>
+    <span class="timer-pill" id="topTimerPill" onclick="switchTab('timer')">⏱ Timer: Off</span>
+    <span class="weather-pill" id="weatherPill" onclick="speakWeather()">☀ Patiala: 23°C</span>
     <span id="clockDisplay" style="font-size:11px; color:#f5a623; font-weight:bold;"></span>
   </div>
 </div>
@@ -529,11 +601,11 @@
 <!-- Landscape Split -->
 <div class="dashboard-layout">
   
-  <!-- LEFT PANEL: Mascot, Interactive Voice Assistant, Quick Notes & Tasks -->
+  <!-- LEFT PANEL: Mascot, Voice Command Mic, Interactive Voice Assistant, Quick Notes & Tasks -->
   <div class="col-left">
     <div class="card robo-card">
       <div onclick="speakFullBriefing()" style="cursor:pointer;" title="Tap Robot for Full Briefing">
-        <svg id="robo-face" width="102" height="82" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg id="robo-face" width="94" height="76" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="2" y="6" width="40" height="30" rx="6" fill="#21262d" stroke="#30363d" stroke-width="2"/>
           <rect x="18" y="2" width="8" height="4" fill="#8b949e"/>
           <circle id="robo-antenna" cx="22" cy="1" r="1.8" fill="#f5a623"/>
@@ -545,11 +617,14 @@
           <path id="robo-mouth" d="M18 28 Q22 31 26 28" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </div>
-      <div class="robo-title">Batman Robo Assistant <span style="font-size:10px; color:#8b949e;">(Tap Face to Talk)</span></div>
+      <div class="robo-title">Batman Robo Assistant</div>
       <div id="roboStatus" class="robo-status-line" style="color:#ff9900;">Status: Ready</div>
 
+      <!-- NEW: Talk to Robot / Give Voice Command Button -->
+      <button class="mic-cmd-btn" onclick="triggerVoiceCommand()">🎤 Give Voice Command to Robot</button>
+
       <div class="speech-box">
-        <div id="speechText" class="speech-bubble">Tap my face or any voice button below to hear your weather, classes, tasks, or notes!</div>
+        <div id="speechText" class="speech-bubble">Say "Set timer 15 minutes", "Turn on lights", "Random color", or "Add task..."</div>
         <table class="voice-grid">
           <tr>
             <td><button class="recite-btn" onclick="reciteClosestSchedule()">🔊 Next Class</button></td>
@@ -574,7 +649,7 @@
     </div>
   </div>
 
-  <!-- RIGHT PANEL: WLED Controls -->
+  <!-- RIGHT PANEL: WLED Controls & Timer -->
   <div class="col-right">
     <div class="card">
       <button id="toggleBtn" class="power-btn" onclick="togglePower()">Power: Connecting...</button>
@@ -604,15 +679,18 @@
       <input type="range" id="ixSlider" min="0" max="255" value="128" onchange="setIntensity(this.value)" oninput="previewIx(this.value)">
     </div>
 
+    <!-- 3-Tab Bar: Colour Wheel | Presets | Timer -->
     <div class="tabs">
-      <button id="tabBtnColors" class="active" onclick="switchTab('colors')">Colour Wheel & Swatches</button>
-      <button id="tabBtnPresets" onclick="switchTab('presets')">Saved Presets (P1-P8)</button>
+      <button id="tabBtnColors" class="active" onclick="switchTab('colors')">🎨 Colours</button>
+      <button id="tabBtnPresets" onclick="switchTab('presets')">⭐ Presets</button>
+      <button id="tabBtnTimer" onclick="switchTab('timer')">⏱ Desk Timer</button>
     </div>
 
+    <!-- Tab 1: Colour Wheel & Swatches -->
     <div class="card tab-content active" id="tabColors">
       <div class="picker-split">
         <div class="picker-col-left">
-          <canvas id="colorWheel" width="100" height="100"></canvas>
+          <canvas id="colorWheel" width="96" height="96"></canvas>
           <div id="colorPreview" class="color-preview" style="background:#ff9900"></div>
         </div>
         <div class="picker-col-right">
@@ -632,6 +710,7 @@
       </div>
     </div>
 
+    <!-- Tab 2: Saved Presets -->
     <div class="card tab-content" id="tabPresets">
       <table class="preset-table">
         <tr>
@@ -649,9 +728,88 @@
       </table>
     </div>
 
+    <!-- Tab 3: Fixed (10, 15, 30 min) + Custom Timer -->
+    <div class="card tab-content" id="tabTimer">
+      <div class="timer-display-box">
+        <div style="display:table-cell; vertical-align:middle;">
+          <div style="font-size:10px; color:#8b949e;" id="timerStatusLabel">COUNTDOWN TIMER</div>
+          <div class="timer-digits" id="timerDigits">00:00</div>
+        </div>
+        <div style="display:table-cell; vertical-align:middle; text-align:right;">
+          <label style="font-size:11px; color:#c9d1d9; display:block; margin-bottom:4px;">
+            <input type="checkbox" id="timerTurnOffLeds"> Turn off LEDs when done
+          </label>
+          <button onclick="stopCountdownTimer(true)" style="background:#5c1d1d; border-color:#8b2424; padding:4px 10px; font-size:11px;">Stop / Reset</button>
+        </div>
+      </div>
+
+      <!-- Fixed 10m, 15m, 30m Buttons + Custom Toggle -->
+      <table class="timer-btn-table">
+        <tr>
+          <td><button class="timer-preset-btn" onclick="startCountdownTimer(10)">10 Min</button></td>
+          <td><button class="timer-preset-btn" onclick="startCountdownTimer(15)">15 Min</button></td>
+          <td><button class="timer-preset-btn" onclick="startCountdownTimer(30)">30 Min</button></td>
+          <td><button class="timer-preset-btn" style="border-color:#58a6ff; color:#58a6ff;" onclick="toggleCustomTimerRow()">Custom</button></td>
+        </tr>
+      </table>
+
+      <!-- Custom Minutes Input Row -->
+      <div id="customTimerRow" class="timer-custom-row" style="display:none;">
+        <div style="display:table-cell; padding-right:6px;">
+          <input type="number" id="customTimerInput" min="1" max="999" placeholder="Enter custom minutes (e.g. 45)" style="width:100%; background:#0d1117; color:#fff; border:1px solid #58a6ff; border-radius:5px; padding:6px 8px; font-size:12px;">
+        </div>
+        <div style="display:table-cell; width:95px;">
+          <button onclick="startCustomTimer()" style="width:100%; background:#195b28; border-color:#2ea043; font-weight:bold; padding:6px;">Start Custom</button>
+        </div>
+      </div>
+    </div>
+
     <div class="status-text" id="status">Syncing with WLED (4.3.2.1)...</div>
   </div>
 
+</div>
+
+<!-- Voice Command / Natural Language Command Modal -->
+<div class="modal-overlay" id="voiceModal" onclick="closeVoiceOverlay(event)">
+  <div class="modal-content" style="top:10%; left:10%; width:80%; height:80%;" onclick="stopProp(event)">
+    <div class="row" style="margin-bottom:8px;">
+      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#d2a8ff;">🎤 Robot Voice & Command Center</span></div>
+      <div class="row-right"><button onclick="closeVoiceDirect()" style="padding:4px 10px;">X</button></div>
+    </div>
+    <div style="font-size:11px; color:#8b949e; margin-bottom:8px;">
+      Tap <b>🎤 Speak with Mic</b> or type/tap a command below (you can also use the microphone key on your tablet keyboard):
+    </div>
+    <div class="task-input-row">
+      <div class="task-input-cell">
+        <input type="text" id="voiceCmdInput" placeholder="e.g. Set timer 15 minutes, Turn on lights, Add task study PID...">
+      </div>
+      <div class="task-btn-cell" style="width:85px; padding-right:4px;">
+        <button onclick="runTypedVoiceCommand()" style="width:100%; background:#195b28; border-color:#2ea043; font-weight:bold;">Execute</button>
+      </div>
+      <div class="task-btn-cell" style="width:95px;">
+        <button onclick="startNativeMicOnly()" style="width:100%; background:#231738; border-color:#a371f7; color:#e2c5ff; font-weight:bold;">🎤 Mic</button>
+      </div>
+    </div>
+    <div style="font-size:11px; color:#f5a623; margin:6px 0 4px 0; font-weight:bold;">One-Tap Example Voice Commands:</div>
+    <div>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 10 minutes')">"Set timer for 10 minutes"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 15 minutes')">"Set timer for 15 minutes"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 30 minutes')">"Set timer for 30 minutes"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('stop timer')">"Stop timer"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('turn on lights')">"Turn on lights"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('turn off lights')">"Turn off lights"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('random color')">"Random color"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('random effect')">"Random effect"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color blue')">"Set color blue"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color red')">"Set color red"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('what is the weather')">"What is the weather"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('next class')">"Next class"</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('read my tasks')">"Read my tasks"</span>
+    </div>
+    <div id="voiceCmdFeedback" style="margin-top:10px; padding:8px; background:#0d1117; border:1px solid #30363d; border-radius:6px; font-size:12px; color:#3fb950; min-height:32px;">
+      Waiting for your command...
+    </div>
+  </div>
 </div>
 
 <!-- Timetable Modal -->
@@ -756,18 +914,20 @@
   var currentRgb = [255, 153, 0];
   var mouthAnimTimer = null;
 
-  /* Pre-loaded Patiala, Punjab Weather Baseline (plus live Open-Meteo sync whenever internet is reachable) */
+  /* Timer State */
+  var timerRemainingSecs = 0;
+  var timerTotalMins = 0;
+  var timerInterval = null;
+
   var DEFAULT_WEATHER = {
     temp: 22.5,
     high: 28.7,
     low: 17.7,
     humidity: 66,
     wind: 7.4,
-    cond: 'Clear sky',
-    updated: 'Patiala Forecast'
+    cond: 'Clear'
   };
 
-  /* WLED Curated Effect Names for Speech Feedback */
   var WLED_EFFECTS = [
     { id: 0, name: 'Solid' },
     { id: 1, name: 'Blink' },
@@ -857,14 +1017,319 @@
     document.getElementById('wifiBadge').innerHTML = 'Wi-Fi: ' + ssidNow + ' ⚙';
   }
 
-  /* Weather Engine (Live + Offline Diurnal Curve for Patiala) */
+  /* ================= DESK & SLEEP TIMER ENGINE (10m, 15m, 30m, Custom) ================= */
+  function formatMmSs(totalSecs) {
+    var m = Math.floor(totalSecs / 60);
+    var s = totalSecs % 60;
+    return (m < 10 ? '0' + m : '' + m) + ':' + (s < 10 ? '0' + s : '' + s);
+  }
+
+  function updateTimerDisplay() {
+    var pill = document.getElementById('topTimerPill');
+    var digits = document.getElementById('timerDigits');
+    var label = document.getElementById('timerStatusLabel');
+    if (timerRemainingSecs > 0) {
+      var formatted = formatMmSs(timerRemainingSecs);
+      digits.innerHTML = formatted;
+      pill.innerHTML = '⏱ ' + formatted;
+      pill.className = 'timer-pill active';
+      label.innerHTML = 'RUNNING (' + timerTotalMins + ' MIN TIMER)';
+      label.style.color = '#3fb950';
+    } else {
+      digits.innerHTML = '00:00';
+      pill.innerHTML = '⏱ Timer: Off';
+      pill.className = 'timer-pill';
+      label.innerHTML = 'COUNTDOWN TIMER';
+      label.style.color = '#8b949e';
+    }
+  }
+
+  function startCountdownTimer(minutes) {
+    var mins = parseInt(minutes, 10);
+    if (isNaN(mins) || mins <= 0) return;
+    if (timerInterval) clearInterval(timerInterval);
+    timerTotalMins = mins;
+    timerRemainingSecs = mins * 60;
+    updateTimerDisplay();
+
+    var msg = 'Timer set for ' + mins + (mins === 1 ? ' minute.' : ' minutes.');
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+
+    timerInterval = setInterval(function() {
+      if (timerRemainingSecs > 0) {
+        timerRemainingSecs--;
+        updateTimerDisplay();
+        if (timerRemainingSecs === 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          onTimerFinished();
+        }
+      }
+    }, 1000);
+  }
+
+  function stopCountdownTimer(speakConfirm) {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    timerRemainingSecs = 0;
+    updateTimerDisplay();
+    if (speakConfirm) {
+      var msg = 'Timer stopped and reset.';
+      document.getElementById('speechText').innerHTML = msg;
+      safeSpeak(msg);
+    }
+  }
+
+  function toggleCustomTimerRow() {
+    var row = document.getElementById('customTimerRow');
+    row.style.display = (row.style.display === 'none') ? 'table' : 'none';
+  }
+
+  function startCustomTimer() {
+    var val = document.getElementById('customTimerInput').value;
+    var mins = parseInt(val, 10);
+    if (isNaN(mins) || mins <= 0) {
+      safeSpeak('Please enter a valid number of minutes.');
+      return;
+    }
+    startCountdownTimer(mins);
+  }
+
+  function onTimerFinished() {
+    updateTimerDisplay();
+    var turnOffLeds = document.getElementById('timerTurnOffLeds').checked;
+    var finishMsg = 'Attention! Your ' + timerTotalMins + ' minute timer has finished!';
+    if (turnOffLeds) {
+      finishMsg += ' Turning off your Batman logo now.';
+      xhrRequest('POST', getApiUrl(), { on: false, v: true }, updateUI);
+    }
+    document.getElementById('speechText').innerHTML = finishMsg;
+    safeSpeak(finishMsg);
+  }
+
+  /* ================= VOICE COMMAND RECOGNITION & PARSER ENGINE ================= */
+  function triggerVoiceCommand() {
+    var startedNative = false;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.startVoiceRecognition) {
+        startedNative = window.AndroidBridge.startVoiceRecognition();
+      }
+    } catch(e) {}
+    if (!startedNative) {
+      openVoiceModal();
+    }
+  }
+
+  function startNativeMicOnly() {
+    var ok = false;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.startVoiceRecognition) {
+        ok = window.AndroidBridge.startVoiceRecognition();
+      }
+    } catch(e) {}
+    if (!ok) {
+      document.getElementById('voiceCmdFeedback').innerHTML = 'Offline Mic recognizer unavailable on this network. Tap the text box above and use the keyboard mic or tap any command chip!';
+    }
+  }
+
+  window.onVoiceCommandResult = function(spokenText) {
+    executeVoiceCommand(spokenText);
+  };
+
+  window.onVoiceCommandFallback = function() {
+    openVoiceModal();
+  };
+
+  function openVoiceModal() {
+    document.getElementById('voiceModal').className = 'modal-overlay open';
+  }
+
+  function closeVoiceDirect() {
+    document.getElementById('voiceModal').className = 'modal-overlay';
+  }
+
+  function closeVoiceOverlay(e) {
+    if (e.target.id === 'voiceModal') closeVoiceDirect();
+  }
+
+  function runTypedVoiceCommand() {
+    var input = document.getElementById('voiceCmdInput');
+    var cmd = input.value.replace(/^\s+|\s+$/g, '');
+    if (!cmd) return;
+    input.value = '';
+    executeVoiceCommand(cmd);
+  }
+
+  function executeVoiceCommand(rawText) {
+    if (!rawText) return;
+    var text = rawText.toLowerCase().replace(/^\s+|\s+$/g, '');
+    var feedbackEl = document.getElementById('voiceCmdFeedback');
+    var reply = '';
+
+    // 1. Timer Commands (e.g. "set timer for 15 minutes", "timer 10 min", "stop timer")
+    if (text.indexOf('stop timer') !== -1 || text.indexOf('cancel timer') !== -1 || text.indexOf('reset timer') !== -1) {
+      stopCountdownTimer(false);
+      reply = 'Heard "' + rawText + '" — Timer stopped.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+    if (text.indexOf('timer') !== -1) {
+      var numMatch = text.match(/(\d+)/);
+      var mins = numMatch ? parseInt(numMatch[1], 10) : 10;
+      if (text.indexOf('turn off') !== -1 || text.indexOf('sleep') !== -1) {
+        document.getElementById('timerTurnOffLeds').checked = true;
+      }
+      switchTab('timer');
+      startCountdownTimer(mins);
+      if (feedbackEl) feedbackEl.innerHTML = 'Executed: Started ' + mins + ' minute timer.';
+      return;
+    }
+
+    // 2. Add Task / Schedule Command (e.g. "add task submit assignment", "schedule lab report")
+    if (text.indexOf('add task') === 0 || text.indexOf('new task') === 0 || text.indexOf('schedule task') === 0) {
+      var taskBody = rawText.replace(/^(add task|new task|schedule task)\s*/i, '');
+      if (taskBody) {
+        var list = getTasks();
+        list.push({ time: 'Voice', text: taskBody, done: false });
+        saveTasksList(list);
+        renderTasks();
+        reply = 'Added task to your scheduler: ' + taskBody;
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 3. Add Note Command (e.g. "add note check pin 14", "write note...")
+    if (text.indexOf('add note') === 0 || text.indexOf('write note') === 0 || text.indexOf('note ') === 0) {
+      var noteBody = rawText.replace(/^(add note|write note|note)\s*/i, '');
+      if (noteBody) {
+        var existing = storeGet(NOTES_KEY, '');
+        var updated = existing ? (existing + '\n• ' + noteBody) : ('• ' + noteBody);
+        storeSet(NOTES_KEY, updated);
+        reply = 'Saved to your quick desk notes: ' + noteBody;
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 4. Power On / Off Commands
+    if (text.indexOf('turn on') !== -1 || text.indexOf('lights on') !== -1 || text.indexOf('logo on') !== -1 || text.indexOf('power on') !== -1) {
+      xhrRequest('POST', getApiUrl(), { on: true, v: true }, updateUI);
+      reply = 'Turning on the Batman WLED logo.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+    if (text.indexOf('turn off') !== -1 || text.indexOf('lights off') !== -1 || text.indexOf('logo off') !== -1 || text.indexOf('power off') !== -1) {
+      xhrRequest('POST', getApiUrl(), { on: false, v: true }, updateUI);
+      reply = 'Turning off the Batman WLED logo.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+
+    // 5. Random Colour / Random Effect
+    if (text.indexOf('random color') !== -1 || text.indexOf('random colour') !== -1) {
+      setRandomColor();
+      reply = 'Applied a new random colour to your Batman logo.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+    if (text.indexOf('random effect') !== -1 || text.indexOf('change effect') !== -1 || text.indexOf('next effect') !== -1) {
+      setRandomEffectKeepColor();
+      reply = 'Switched to a random WLED animation while keeping your current colour.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+
+    // 6. Named Colours
+    var colorMap = {
+      'orange': [255, 153, 0],
+      'yellow': [255, 220, 0],
+      'gold': [255, 180, 0],
+      'red': [255, 20, 0],
+      'blue': [0, 119, 255],
+      'cyan': [0, 242, 254],
+      'purple': [136, 0, 255],
+      'violet': [160, 32, 240],
+      'green': [0, 230, 64],
+      'pink': [255, 40, 140],
+      'white': [255, 255, 255]
+    };
+    for (var cName in colorMap) {
+      if (text.indexOf(cName) !== -1) {
+        setFastColor(colorMap[cName]);
+        reply = 'Changed Batman logo colour to ' + cName + '.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 7. Preset Command (e.g. "preset 3")
+    if (text.indexOf('preset') !== -1) {
+      var pMatch = text.match(/(\d+)/);
+      if (pMatch) {
+        var pid = parseInt(pMatch[1], 10);
+        setPreset(pid);
+        reply = 'Activated WLED preset ' + pid + '.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 8. Brightness Command (e.g. "brightness 80")
+    if (text.indexOf('brightness') !== -1) {
+      var bMatch = text.match(/(\d+)/);
+      if (bMatch) {
+        var pct = Math.min(100, Math.max(1, parseInt(bMatch[1], 10)));
+        var bVal = Math.round((pct / 100) * 255);
+        setBrightness(bVal);
+        reply = 'Set brightness to ' + pct + ' percent.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 9. Weather / Timetable / Tasks / Briefing Queries
+    if (text.indexOf('weather') !== -1 || text.indexOf('temperature') !== -1) {
+      speakWeather();
+      if (feedbackEl) feedbackEl.innerHTML = 'Speaking Patiala weather report...';
+      return;
+    }
+    if (text.indexOf('class') !== -1 || text.indexOf('timetable') !== -1 || text.indexOf('lecture') !== -1) {
+      reciteClosestSchedule();
+      if (feedbackEl) feedbackEl.innerHTML = 'Speaking next scheduled class...';
+      return;
+    }
+    if (text.indexOf('task') !== -1 || text.indexOf('note') !== -1) {
+      speakTasksAndNotes();
+      if (feedbackEl) feedbackEl.innerHTML = 'Reading your tasks and desk notes...';
+      return;
+    }
+    if (text.indexOf('briefing') !== -1 || text.indexOf('status') !== -1 || text.indexOf('hello') !== -1) {
+      speakFullBriefing();
+      if (feedbackEl) feedbackEl.innerHTML = 'Speaking full desk briefing...';
+      return;
+    }
+
+    reply = 'I heard "' + rawText + '". Try saying "Set timer 15 minutes", "Turn on lights", "Random color", or "Add task..."';
+    finishVoiceExec(reply, feedbackEl);
+  }
+
+  function finishVoiceExec(reply, feedbackEl) {
+    document.getElementById('speechText').innerHTML = reply;
+    if (feedbackEl) feedbackEl.innerHTML = reply;
+    safeSpeak(reply);
+  }
+
+  /* Weather Engine */
   function getWeatherData() {
     var raw = storeGet(WEATHER_KEY, '');
     var w = DEFAULT_WEATHER;
     if (raw) {
       try { w = JSON.parse(raw); } catch(e) {}
     }
-    // Estimate current Patiala hour temperature smoothly between daily min (18C at 6AM) and max (28.7C at 2PM) if offline
     var hr = new Date().getHours();
     var estTemp = w.temp;
     if (hr >= 6 && hr <= 15) {
@@ -879,13 +1344,13 @@
       high: Math.round(w.high),
       low: Math.round(w.low),
       humidity: w.humidity || 66,
-      cond: w.cond || 'Clear sky'
+      cond: w.cond || 'Clear'
     };
   }
 
   function updateWeatherUI() {
     var w = getWeatherData();
-    document.getElementById('weatherPill').innerHTML = '☀ Patiala: ' + w.temp + '°C ' + w.cond;
+    document.getElementById('weatherPill').innerHTML = '☀ Patiala: ' + w.temp + '°C';
   }
 
   function fetchLiveWeather(speakAfter) {
@@ -920,7 +1385,7 @@
   /* Robot Voice Assistant Functions */
   function speakWeather() {
     var w = getWeatherData();
-    var msg = 'In Patiala Punjab, it is currently ' + w.temp + ' degrees Celsius with ' + w.cond + '. Today\'s high is ' + w.high + ' degrees and the low is ' + w.low + ' degrees, with ' + w.humidity + ' percent humidity.';
+    var msg = 'In Patiala Punjab, it is currently ' + w.temp + ' degrees Celsius with ' + w.cond + ' skies. Today\'s high is ' + w.high + ' degrees and the low is ' + w.low + ' degrees, with ' + w.humidity + ' percent humidity.';
     document.getElementById('speechText').innerHTML = msg;
     safeSpeak(msg);
   }
@@ -998,6 +1463,9 @@
     var notes = storeGet(NOTES_KEY, '').replace(/^\s+|\s+$/g, '');
 
     var msg = greet + ' In Patiala it is ' + w.temp + ' degrees and ' + w.cond + '. ' + classMsg + ' ';
+    if (timerRemainingSecs > 0) {
+      msg += 'You have a timer running with ' + Math.ceil(timerRemainingSecs / 60) + ' minutes remaining. ';
+    }
     if (pendingCount > 0) {
       msg += 'You have ' + pendingCount + ' pending task' + (pendingCount > 1 ? 's' : '') + ' on your list. ';
     } else {
@@ -1090,7 +1558,6 @@
   function setRandomEffectKeepColor() {
     var pick = WLED_EFFECTS[Math.floor(Math.random() * WLED_EFFECTS.length)];
     document.getElementById('status').innerHTML = 'Effect: ' + pick.name + ' (ID ' + pick.id + ') • Keeping Current Colour';
-    // Explicitly send fx + pal:0 (Default palette uses primary colour) + currentRgb so WLED keeps the exact LED colour!
     xhrRequest('POST', getApiUrl(), {
       on: true,
       seg: [{
@@ -1325,8 +1792,10 @@
   function switchTab(tab) {
     document.getElementById('tabColors').className = 'card tab-content' + (tab === 'colors' ? ' active' : '');
     document.getElementById('tabPresets').className = 'card tab-content' + (tab === 'presets' ? ' active' : '');
+    document.getElementById('tabTimer').className = 'card tab-content' + (tab === 'timer' ? ' active' : '');
     document.getElementById('tabBtnColors').className = (tab === 'colors' ? 'active' : '');
     document.getElementById('tabBtnPresets').className = (tab === 'presets' ? 'active' : '');
+    document.getElementById('tabBtnTimer').className = (tab === 'timer' ? 'active' : '');
   }
 
   function xhrRequest(method, url, data, callback) {
@@ -1533,6 +2002,7 @@
     closeScheduleDirect();
     closeNotesDirect();
     closeSettingsDirect();
+    closeVoiceDirect();
   };
 
   canvas.addEventListener('click', pickColor);

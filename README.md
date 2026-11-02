@@ -5,19 +5,20 @@ A complete hardware-software desk companion project that transforms a legacy **S
 ![Platform](https://img.shields.io/badge/Android-4.2.2%2B%20(API%2017)-3DDC84?logo=android)
 ![Hardware](https://img.shields.io/badge/Hardware-ESP32%20%2B%20WS2812B-f5a623)
 ![Network](https://img.shields.io/badge/Wi--Fi%20AP-wledtabletop%20(4.3.2.1)-58a6ff)
-![APK Versions](https://img.shields.io/badge/Android%20APKs-v1%20(25KB)%20%26%20v2%20(29KB)-a371f7)
+![APK Versions](https://img.shields.io/badge/Android%20APKs-v1%20%7C%20v2%20%7C%20v3%20(33KB)-a371f7)
 
 ---
 
 ## 📖 Table of Contents
 1. [Project Overview](#-project-overview)
-2. [Complete Version History (4 Web Versions + 2 Android App Versions)](#-complete-version-history-4-web-versions--2-android-app-versions)
+2. [Complete Version History (4 Web Versions + 3 Android App Versions)](#-complete-version-history-4-web-versions--3-android-app-versions)
    - [Web Version 1 (`dashboard.htm` / Tag `v1.0`) — Initial Modern Web Prototype](#web-version-1-dashboardhtm--tag-v10--initial-modern-web-prototype)
    - [Web Version 2 (`dashboard1.htm` / Tag `v2.0`) — Android 4.2 WebKit Compatibility & Timetable](#web-version-2-dashboard1htm--tag-v20--android-42-webkit-compatibility--timetable)
    - [Web Version 3 (`dashboard2.htm` / Tag `v3.0`) — Landscape Split-Screen, Robo Companion & Canvas Colour Wheel](#web-version-3-dashboard2htm--tag-v30--landscape-split-screen-robo-companion--canvas-colour-wheel)
    - [Web Version 4 (`dashboard3.htm` / Tag `v4.0`) — LocalStorage Desk Scratchpad & Android TTS Bridge Hook](#web-version-4-dashboard3htm--tag-v40--localstorage-desk-scratchpad--android-tts-bridge-hook)
    - [Android App Version 1 (`BatmanWledDashboard-v1.apk` / Tag `v5.0`) — Native Kiosk Wrapper, Wi-Fi Auto-Reconnect Watchdog, Intensity Slider & Task Scheduler](#android-app-version-1-batmanwleddashboard-v1apk--tag-v50--native-kiosk-wrapper-wi-fi-auto-reconnect-watchdog-intensity-slider--task-scheduler)
    - [Android App Version 2 (`BatmanWledDashboard-v2.apk` / Tag `v6.0`) — Interactive Talking Robot (Weather, Tasks, Notes, Full Briefing) & Colour/Effect Randomizers](#android-app-version-2-batmanwleddashboard-v2apk--tag-v60--interactive-talking-robot-weather-tasks-notes-full-briefing--coloureffect-randomizers)
+   - [Android App Version 3 (`BatmanWledDashboard-v3.apk` / Tag `v7.0`) — Desk & Sleep Countdown Timer (`10m`/`15m`/`30m`/`Custom`) + Voice Command Recognition (`🎤 Talk to Robot`)](#android-app-version-3-batmanwleddashboard-v3apk--tag-v70--desk--sleep-countdown-timer-10m15m30mcustom--voice-command-recognition--talk-to-robot)
 3. [Deep Dive: Solving the Android 4.2 WLED AP Wi-Fi Disconnect & Captive Portal Bug](#-deep-dive-solving-the-android-42-wled-ap-wi-fi-disconnect--captive-portal-bug)
 4. [Repository Structure](#-repository-structure)
 5. [Building & Installing on Android 4.2](#-building--installing-on-android-42)
@@ -36,7 +37,7 @@ This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** a
 
 ---
 
-## 🚀 Complete Version History (4 Web Versions + 2 Android App Versions)
+## 🚀 Complete Version History (4 Web Versions + 3 Android App Versions)
 
 | Stage / Tag | Version Name | Artifact / Directory | Key Improvements Over Previous Version |
 | :--- | :--- | :--- | :--- |
@@ -46,6 +47,7 @@ This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** a
 | **Tag `v4.0`** | **Web Dashboard v4** | [`web-dashboard-versions/v4-dashboard3.htm`](web-dashboard-versions/v4-dashboard3.htm) | Added **Quick Desk Notes Scratchpad Modal** (`localStorage` persistence) and `window.AndroidBridge.speakText()` hook for native Android TTS. |
 | **Tag `v5.0`** | **Android App v1** | [`android-app-versions/v1-kiosk-wifi-watchdog/`](android-app-versions/v1-kiosk-wifi-watchdog/) (`25 KB` APK) | Wrapped in **Fullscreen Android 4.2 Kiosk APK**; added **Wi-Fi Auto-Reconnect Watchdog (`wledtabletop`)**, **Dual XHR + Java HTTP Bridge**, **Effect Intensity (`ix`) Slider**, **36-Wedge Colour Wheel**, and **Task Scheduler**. |
 | **Tag `v6.0`** | **Android App v2** | [`android-app-versions/v2-talking-robo-randomizers/`](android-app-versions/v2-talking-robo-randomizers/) (`29 KB` APK) | Upgraded into an **Interactive Talking Robot** (speaks **Patiala Weather**, **Pending Tasks & Notes**, **Next Class**, and **Full Briefing** with animated talking mouth/antenna) + added **`🎲 Random Colour`** & **`✨ Random Effect (Same Colour)`** generators. |
+| **Tag `v7.0`** | **Android App v3** | [`android-app-versions/v3-timer-and-voice-commands/`](android-app-versions/v3-timer-and-voice-commands/) (`33 KB` APK) | Added **Desk & Sleep Countdown Timer (`10m`, `15m`, `30m`, + `Custom` minutes)** with optional auto-LED shutoff + **Two-Way Voice Commands (`🎤 Give Voice Command to Robot`)** via native Android `RecognizerIntent` (`RECORD_AUDIO`) & Natural Language Command Parser. |
 
 ---
 
@@ -117,6 +119,24 @@ This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** a
 
 ---
 
+### Android App Version 3 (`BatmanWledDashboard-v3.apk` / Tag `v7.0`) — Desk & Sleep Countdown Timer (`10m`/`15m`/`30m`/`Custom`) + Voice Command Recognition (`🎤 Talk to Robot`)
+- **Directory**: [`android-app-versions/v3-timer-and-voice-commands/`](android-app-versions/v3-timer-and-voice-commands/) (and root [`BatmanWledDashboard.apk`](BatmanWledDashboard.apk))
+- **APK File**: [`BatmanWledDashboard-v3.apk`](android-app-versions/v3-timer-and-voice-commands/BatmanWledDashboard-v3.apk) (`33,308 bytes`)
+- **What was improved over Android App v2**:
+  1. **⏱ Desk & Sleep Countdown Timer Tab (`10 Min`, `15 Min`, `30 Min`, + `Custom`)**:
+     - Added a dedicated **`⏱ Desk Timer`** tab and a live top-bar countdown badge (`⏱ MM:SS`).
+     - Includes fixed one-tap buttons for **`10 Min`**, **`15 Min`**, and **`30 Min`**, plus a **`Custom`** button that opens a custom minute input (`1–999` minutes).
+     - Includes a **`Turn off LEDs when done`** checkbox: when checked, the timer acts as a WLED hardware sleep timer that automatically powers off the Batman logo (`{ on: false }`) and announces completion via the Robot's voice when the countdown reaches `00:00`.
+  2. **🎤 Two-Way Voice Command System (`🎤 Give Voice Command to Robot`)**:
+     - Added `android.permission.RECORD_AUDIO` and native `RecognizerIntent.ACTION_RECOGNIZE_SPEECH` (`EXTRA_PREFER_OFFLINE = true`) in [`MainActivity.java`](app/src/main/java/com/batman/wleddashboard/MainActivity.java) (`AndroidBridge.startVoiceRecognition()`), plus an interactive **Robot Voice & Command Center modal** with quick-tap command chips and keyboard-mic support when running offline on the `wledtabletop` AP.
+     - Built a natural-language command parser (`executeVoiceCommand()`) that understands and executes:
+       - **Timer Voice Commands**: *"Set timer for 10 minutes"*, *"Set timer 25 minutes"*, *"Stop timer"*
+       - **Lighting Voice Commands**: *"Turn on lights"*, *"Turn off Batman logo"*, *"Random color"*, *"Random effect"*, *"Set color blue/red/orange/purple/cyan/green/white"*, *"Brightness 80"*, *"Preset 3"*
+       - **Task & Note Voice Commands**: *"Add task submit lab report"* (adds directly to Task Scheduler), *"Add note check GPIO 14"* (appends directly to Quick Desk Notes)
+       - **Assistant Queries**: *"What is the weather"*, *"Next class"*, *"Read my tasks"*, *"Full briefing"*
+
+---
+
 ## 📶 Deep Dive: Solving the Android 4.2 WLED AP Wi-Fi Disconnect & Captive Portal Bug
 
 ### The Problem
@@ -167,14 +187,18 @@ When loading a dashboard from `file:///android_asset/index.html`, legacy WebView
 │   ├── v2-dashboard1.htm                                # Web v2: Android 4.2 table layout + XHR + Timetable modal
 │   ├── v3-dashboard2.htm                                # Web v3: Landscape split + SVG Robot + Canvas Colour Wheel
 │   └── v4-dashboard3.htm                                # Web v4: LocalStorage Quick Notes + AndroidBridge TTS hook
-├── android-app-versions/                                # Both Native Android Kiosk App iterations (Tags v5.0 & v6.0)
+├── android-app-versions/                                # All 3 Native Android Kiosk App iterations (Tags v5.0, v6.0 & v7.0)
 │   ├── v1-kiosk-wifi-watchdog/                          # Android App v1 (Tag v5.0): Kiosk + Wi-Fi Watchdog + Tasks + Intensity
 │   │   ├── BatmanWledDashboard-v1.apk                   # Compiled App v1 APK (25 KB)
 │   │   └── index.html                                   # App v1 dashboard asset
-│   └── v2-talking-robo-randomizers/                     # Android App v2 (Tag v6.0): Talking Robot + Weather + Randomizers
-│       ├── BatmanWledDashboard-v2.apk                   # Compiled App v2 APK (29 KB)
-│       └── index.html                                   # App v2 dashboard asset
-└── app/                                                 # Active Android Gradle/CLI Source Tree
+│   ├── v2-talking-robo-randomizers/                     # Android App v2 (Tag v6.0): Talking Robot + Weather + Randomizers
+│   │   ├── BatmanWledDashboard-v2.apk                   # Compiled App v2 APK (29 KB)
+│   │   └── index.html                                   # App v2 dashboard asset
+│   └── v3-timer-and-voice-commands/                     # Android App v3 (Tag v7.0): 10/15/30/Custom Timer + Voice Commands
+│       ├── BatmanWledDashboard-v3.apk                   # Compiled App v3 APK (33 KB)
+│       ├── MainActivity.java                            # App v3 Java host with SpeechRecognizer + TTS + Wi-Fi Watchdog
+│       └── index.html                                   # App v3 dashboard asset
+└── app/                                                 # Active Android Gradle/CLI Source Tree (v3 / Tag v7.0)
     ├── build.gradle                                     # Android app module config (minSdkVersion 17)
     └── src/main/
         ├── AndroidManifest.xml                          # Permissions (INTERNET, WIFI, WAKE_LOCK) & Kiosk config
