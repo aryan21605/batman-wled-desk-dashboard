@@ -210,7 +210,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             offlineRecognizer.cancel();
             currentSearchMode = SEARCH_WAKEUP;
             offlineRecognizer.startListening(SEARCH_WAKEUP);
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Hands-Free Active: Say \"Hey Batman\" or \"Hello Robot\"');}");
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Hands-Free Active: Say \"Zurich\" (or \"Hey Zurich\")');}");
         } catch (Exception ignored) {
         }
     }
@@ -228,7 +228,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             currentSearchMode = SEARCH_BATMAN_CMD;
             offlineRecognizer.startListening(SEARCH_BATMAN_CMD, 7000);
             String prompt = fromWakeWord
-                    ? "Heard \"Hey Batman\"! Speak your command now (e.g. \"Turn on lights\", \"Set timer 15 minutes\")..."
+                    ? "Heard \"Zurich\"! Speak your command now (e.g. \"Write note...\", \"Intensity 80 percent\", \"Timer 15 minutes\")..."
                     : "Listening Offline... Speak your command now!";
             sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', '" + prompt.replace("'", "\\'") + "');}");
         } catch (Exception ignored) {
@@ -238,16 +238,20 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private String normalizeNumbersInSpeech(String raw) {
         if (raw == null) return "";
         String s = " " + raw.toLowerCase() + " ";
-        s = s.replace(" hey batman ", " ")
-                .replace(" hello robot ", " ")
+        s = s.replace(" hey zurich ", " ")
+                .replace(" hello zurich ", " ")
+                .replace(" zurich ", " ")
                 .replace(" fifteen ", " 15 ")
                 .replace(" twenty ", " 20 ")
                 .replace(" thirty ", " 30 ")
                 .replace(" forty ", " 40 ")
                 .replace(" fifty ", " 50 ")
                 .replace(" sixty ", " 60 ")
+                .replace(" seventy ", " 70 ")
+                .replace(" eighty ", " 80 ")
                 .replace(" ninety ", " 90 ")
                 .replace(" hundred ", " 100 ")
+                .replace(" zero ", " 0 ")
                 .replace(" ten ", " 10 ")
                 .replace(" five ", " 5 ")
                 .replace(" one ", " 1 ")
@@ -284,7 +288,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (lower.length() == 0) return;
 
         if (SEARCH_WAKEUP.equals(currentSearchMode)) {
-            if (lower.contains("hey batman") || lower.contains("hello robot")) {
+            if (lower.contains("zurich")) {
                 switchToCommandListeningOnUi(true);
             }
             return;
@@ -302,7 +306,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public void onResult(Hypothesis hypothesis) {
         if (hypothesis != null && hypothesis.getHypstr() != null) {
             String raw = hypothesis.getHypstr().trim().toLowerCase();
-            if (raw.equals("hey batman") || raw.equals("hello robot")) {
+            if (raw.equals("zurich") || raw.equals("hey zurich") || raw.equals("hello zurich")) {
                 return;
             }
             String spoken = normalizeNumbersInSpeech(raw).replace("'", "");

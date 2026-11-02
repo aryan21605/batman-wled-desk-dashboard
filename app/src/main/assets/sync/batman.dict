@@ -2,45 +2,79 @@ add AE D
 animation AE N AH M EY SH AH N
 assignment AH S AY N M AH N T
 batman B AE T M AE N
+battery B AE T ER IY
 blue B L UW
 briefing B R IY F IH NG
 brightness B R AY T N AH S
+bug B AH G
+buy B AY
+cable K EY B AH L
+call K AO L
 cancel K AE N S AH L
 change CH EY N JH
+check CH EH K
+circuit S ER K AH T
 class K L AE S
+code K OW D
+coffee K AA F IY
+coffee(2) K AO F IY
 color K AH L ER
 color(2) K AO L ER
 cyan S AY AE N
+dad D AE D
+deadline D EH D L AY N
+doctor D AA K T ER
+doctor(2) D AO K T ER
 effect IH F EH K T
 effect(2) IY F EH K T
 effect(3) AH F EH K T
 eight EY T
+eighty EY T IY
 enable EH N EY B AH L
 enable(2) IH N EY B AH L
+evening IY V N IH NG
+exam IH G Z AE M
 fifteen F IH F T IY N
 fifty F IH F T IY
 five F AY V
+fix F IH K S
+food F UW D
 for F AO R
 for(2) F ER
 forty F AO R T IY
 four F AO R
+friday F R AY D IY
+friday(2) F R AY D EY
+friend F R EH N D
 full F UH L
 gold G OW L D
 green G R IY N
 hello HH AH L OW
 hello(2) HH EH L OW
 hey HH EY
+home HH OW M
 homework HH OW M W ER K
 hundred HH AH N D R AH D
 hundred(2) HH AH N D R IH D
+important IH M P AO R T AH N T
+intensity IH N T EH N S AH T IY
+intensity(2) IH N T EH N S IH T IY
 is IH Z
 lab L AE B
 lecture L EH K CH ER
+led L EH D
 light L AY T
 lights L AY T S
 logo L OW G OW
+matrix M EY T R IH K S
+meeting M IY T IH NG
+milk M IH L K
 minute M IH N AH T
 minutes M IH N AH T S
+mom M AA M
+monday M AH N D IY
+monday(2) M AH N D EY
+morning M AO R N IH NG
 my M AY
 new N UW
 new(2) N Y UW
@@ -56,21 +90,34 @@ one W AH N
 orange AO R AH N JH
 orange(2) AO R IH N JH
 percent P ER S EH N T
+pin P IH N
 pink P IH NG K
 power P AW ER
 preset P R IY S EH T
+professor P R AH F EH S ER
+project P R AA JH EH K T
+project(2) P R AH JH EH K T
 purple P ER P AH L
+quick K W IH K
+quiz K W IH Z
 random R AE N D AH M
 read R EH D
 read(2) R IY D
 red R EH D
+remember R IH M EH M B ER
+remember(2) R IY M EH M B ER
+report R IY P AO R T
+report(2) R IH P AO R T
 reset R IY S EH T
 robot R OW B AA T
 robot(2) R OW B AH T
 schedule S K EH JH UH L
 schedule(2) S K EH JH UW L
+sensor S EH N S ER
 set S EH T
 seven S EH V AH N
+seventy S EH V AH N T IY
+seventy(2) S EH V AH N IY
 show SH OW
 six S IH K S
 sixty S IH K S T IY
@@ -78,25 +125,59 @@ start S T AA R T
 status S T AE T AH S
 status(2) S T EY T AH S
 stop S T AA P
+strip S T R IH P
 study S T AH D IY
+submit S AH B M IH T
+take T EY K
 task T AE S K
 tasks T AE S K S
+teacher T IY CH ER
 temperature T EH M P R AH CH ER
 temperature(2) T EH M P ER AH CH ER
 ten T EH N
+test T EH S T
 the DH AH
 the(2) DH IY
 thirty TH ER D IY
 thirty(2) TH ER T IY
 three TH R IY
+thursday TH ER Z D EY
+thursday(2) TH ER Z D IY
 timer T AY M ER
 timetable T AY M T EY B AH L
+to T UW
+to(2) T IH
+to(3) T AH
+today T AH D EY
+today(2) T UW D EY
+tomorrow T AH M AA R OW
+tomorrow(2) T UW M AA R OW
+tonight T AH N AY T
+tonight(2) T UH N AY T
+tuesday T UW Z D IY
+tuesday(2) T UW Z D EY
 turn T ER N
 twenty T W EH N T IY
 twenty(2) T W EH N IY
 two T UW
+update AH P D EY T
+urgent ER JH AH N T
 violet V AY AH L IH T
+voltage V OW L T AH JH
+voltage(2) V OW L T IH JH
+water W AO T ER
 weather W EH DH ER
+wednesday W EH N Z D IY
+wednesday(2) W EH N Z D EY
 what W AH T
 white W AY T
+wire W AY ER
+write R AY T
 yellow Y EH L OW
+zero Z IH R OW
+zero(2) Z IY R OW
+zurich Z UH R IH K
+zurich(2) Z ER IH K
+zurich(3) Z UW R IH K
+zurich(4) Z Y UH R IH K
+zurich(5) JH UH R IH K

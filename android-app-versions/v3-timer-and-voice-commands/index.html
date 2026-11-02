@@ -701,7 +701,7 @@
       <!-- Voice Command Row: Direct Mic + Command Center Modal -->
       <div class="voice-cmd-row">
         <div class="voice-cmd-cell-left">
-          <button id="mainMicBtn" class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Hands-Free] Say "Hey Batman"</button>
+          <button id="mainMicBtn" class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Hands-Free] Say "Zurich"</button>
         </div>
         <div class="voice-cmd-cell-right">
           <button class="panel-cmd-btn" onclick="openVoiceModal()">[Cmd] All Commands</button>
@@ -709,7 +709,7 @@
       </div>
 
       <div class="speech-box">
-        <div id="speechText" class="speech-bubble">Hands-Free Active: Just say <b>"Hey Batman"</b> (or <b>"Hello Robot"</b>), then speak your command!</div>
+        <div id="speechText" class="speech-bubble">Hands-Free Active: Just say <b>"Zurich"</b>, then speak your command!</div>
         <table class="voice-grid">
           <tr>
             <td><button class="recite-btn" onclick="reciteClosestSchedule()">[&gt;] Next Class</button></td>
@@ -919,6 +919,9 @@
       <span class="cmd-chip" onclick="executeVoiceCommand('set color blue')">Colour: Blue</span>
       <span class="cmd-chip" onclick="executeVoiceCommand('set color red')">Colour: Red</span>
       <span class="cmd-chip" onclick="executeVoiceCommand('set color purple')">Colour: Purple</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set effect intensity 80 percent')">Intensity: 80%</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set effect intensity 40 percent')">Intensity: 40%</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('write note check sensor pin')">Write Note: Sensor Pin</span>
       <span class="cmd-chip" onclick="executeVoiceCommand('what is the weather')">Speak Weather</span>
       <span class="cmd-chip" onclick="executeVoiceCommand('next class')">Speak Next Class</span>
       <span class="cmd-chip" onclick="executeVoiceCommand('read my tasks')">Read Tasks &amp; Notes</span>
@@ -1284,7 +1287,7 @@
   window.onVoiceCommandResult = function(spokenText) {
     var micBtn = document.getElementById('mainMicBtn');
     if (micBtn) {
-      micBtn.innerHTML = '[Hands-Free] Say "Hey Batman"';
+      micBtn.innerHTML = '[Hands-Free] Say "Zurich"';
       micBtn.style.background = '#231738';
       micBtn.style.borderColor = '#a371f7';
     }
@@ -1310,7 +1313,7 @@
       if (fb) fb.innerHTML = 'Hearing: "' + message + '..."';
     } else if (state === 'WAKEUP_READY') {
       if (micBtn) {
-        micBtn.innerHTML = '[Hands-Free] Say "Hey Batman"';
+        micBtn.innerHTML = '[Hands-Free] Say "Zurich"';
         micBtn.style.background = '#231738';
         micBtn.style.borderColor = '#a371f7';
       }
@@ -1318,7 +1321,7 @@
       if (fb && message) fb.innerHTML = message;
     } else {
       if (micBtn) {
-        micBtn.innerHTML = '[Hands-Free] Say "Hey Batman"';
+        micBtn.innerHTML = '[Hands-Free] Say "Zurich"';
         micBtn.style.background = '#231738';
         micBtn.style.borderColor = '#a371f7';
       }
@@ -1394,14 +1397,16 @@
       }
     }
 
-    // 3. Add Note Command (e.g. "add note check pin 14", "write note...")
-    if (text.indexOf('add note') === 0 || text.indexOf('write note') === 0 || text.indexOf('note ') === 0) {
-      var noteBody = rawText.replace(/^(add note|write note|note)\s*/i, '');
+    // 3. Write / Add Quick Note Command (e.g. "write note exam tomorrow", "quick note check sensor pin")
+    if (text.indexOf('add note') === 0 || text.indexOf('write note') === 0 || text.indexOf('quick note') === 0 || text.indexOf('take note') === 0 || text.indexOf('new note') === 0 || text.indexOf('note ') === 0) {
+      var noteBody = rawText.replace(/^(add|write|quick|take|new)?\s*notes?\s*/i, '');
       if (noteBody) {
         var existing = storeGet(NOTES_KEY, '');
         var updated = existing ? (existing + '\n- ' + noteBody) : ('- ' + noteBody);
         storeSet(NOTES_KEY, updated);
-        reply = 'Saved to your quick desk notes: ' + noteBody;
+        var notesArea = document.getElementById('quickNotesArea');
+        if (notesArea) notesArea.value = updated;
+        reply = 'Wrote in your quick notes: ' + noteBody;
         finishVoiceExec(reply, feedbackEl);
         return;
       }
@@ -1470,14 +1475,29 @@
       }
     }
 
-    // 8. Brightness Command (e.g. "brightness 80")
+    // 8. Brightness Command (e.g. "brightness 80", "set brightness to 50 percent")
     if (text.indexOf('brightness') !== -1) {
       var bMatch = text.match(/(\d+)/);
       if (bMatch) {
         var pct = Math.min(100, Math.max(1, parseInt(bMatch[1], 10)));
         var bVal = Math.round((pct / 100) * 255);
+        document.getElementById('briSlider').value = bVal;
         setBrightness(bVal);
         reply = 'Set brightness to ' + pct + ' percent.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 8b. Effect Intensity Command (e.g. "set effect intensity to 80 percent", "intensity 50 percent")
+    if (text.indexOf('intensity') !== -1) {
+      var ixMatch = text.match(/(\d+)/);
+      if (ixMatch) {
+        var ixPct = Math.min(100, Math.max(0, parseInt(ixMatch[1], 10)));
+        var ixVal = Math.round((ixPct / 100) * 255);
+        document.getElementById('ixSlider').value = ixVal;
+        setIntensity(ixVal);
+        reply = 'Set effect intensity to ' + ixPct + ' percent.';
         finishVoiceExec(reply, feedbackEl);
         return;
       }
