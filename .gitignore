@@ -1,0 +1,9 @@
+# Build intermediates
+build_apk/
+.gradle/
+build/
+app/build/
+local.properties
+*.keystore
+*.jks
+classes.dex
