@@ -2,7 +2,7 @@
 
 grammar batman;
 
-<wake> = ( zurich | hey zurich | hello zurich );
+<wake> = ( zurich wake up | zurich listen | zurich );
 
 <power_cmd> = ( turn on | turn off | power on | power off | lights on | lights off | logo on | logo off ) [ the ] [ lights | light | batman | logo ];
 
