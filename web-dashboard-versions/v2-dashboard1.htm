@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batman WLED Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d0f12;
+      color: #e6edf3;
+      margin: 0;
+      padding: 12px;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      color: #ffffff;
+    }
+    .row {
+      display: table;
+      width: 100%;
+      margin-bottom: 6px;
+    }
+    .row-left { display: table-cell; text-align: left; vertical-align: middle; }
+    .row-right { display: table-cell; text-align: right; vertical-align: middle; }
+    
+    button {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #ffffff;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .schedule-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1c1f24;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      font-weight: bold;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .power-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      background: #21262d;
+    }
+    .power-btn.on {
+      background: #195b28;
+      border-color: #2ea043;
+    }
+
+    /* Tabs */
+    .tabs {
+      background: #0d1117;
+      padding: 3px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      margin-bottom: 10px;
+      display: table;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .tabs button {
+      display: table-cell;
+      width: 50%;
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      padding: 8px 0;
+    }
+    .tabs button.active {
+      background: #21262d;
+      color: #ffffff;
+      border-radius: 4px;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    input[type=range] {
+      width: 100%;
+      margin: 8px 0;
+    }
+    .swatch-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 6px;
+    }
+    .color-swatch {
+      height: 40px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #444;
+    }
+    .preset-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 6px;
+      margin-bottom: 8px;
+    }
+    .preset-table button { width: 100%; }
+
+    .status-text {
+      font-size: 12px;
+      color: #8b949e;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* Timetable Modal (Pure CSS fallback compatible with Jelly Bean) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+    }
+    .modal-overlay.open { display: block; }
+    .modal-content {
+      position: absolute;
+      bottom: 0; left: 0; width: 100%;
+      max-height: 80%;
+      background: #161b22;
+      border-top: 1px solid #30363d;
+      padding: 12px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    .day-selector {
+      display: table;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .day-selector button {
+      display: table-cell;
+      padding: 6px 2px;
+      font-size: 12px;
+    }
+    .day-selector button.active {
+      background: #f5a623;
+      color: #000;
+      font-weight: bold;
+    }
+    .period-item {
+      background: #0d1117;
+      padding: 8px 10px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      display: table;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .period-left { display: table-cell; vertical-align: middle; }
+    .period-right { display: table-cell; text-align: right; vertical-align: middle; width: 70px; }
+    .period-time { font-size: 11px; color: #8b949e; }
+    .period-title { font-size: 13px; font-weight: bold; margin-top: 2px; }
+    .period-tag {
+      font-size: 10px;
+      font-weight: bold;
+      padding: 3px 5px;
+      border-radius: 3px;
+      color: #ffffff;
+      display: inline-block;
+    }
+    .tag-lecture { background: #2ea043; }
+    .tag-practical { background: #d29922; color: #000000; }
+    .tag-tutorial { background: #a371f7; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <button class="schedule-btn" onclick="openSchedule()">[=] View Daily Timetable</button>
+
+  <div class="card">
+    <button id="toggleBtn" class="power-btn" onclick="togglePower()">Power: Connecting...</button>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="row-left"><h3>Brightness</h3></div>
+      <div class="row-right"><span id="briVal">--</span></div>
+    </div>
+    <input type="range" id="briSlider" min="1" max="255" value="128" onchange="setBrightness(this.value)">
+  </div>
+
+  <div class="tabs">
+    <button id="tabBtnColors" class="active" onclick="switchTab('colors')">Palette & Colors</button>
+    <button id="tabBtnPresets" onclick="switchTab('presets')">Presets Tab</button>
+  </div>
+
+  <div class="card tab-content active" id="tabColors">
+    <h3>Quick Tones</h3>
+    <table class="swatch-table">
+      <tr>
+        <td class="color-swatch" style="background:#ff9900" onclick="setColor([255,153,0])"></td>
+        <td class="color-swatch" style="background:#ff3300" onclick="setColor([255,51,0])"></td>
+        <td class="color-swatch" style="background:#ffffff" onclick="setColor([255,255,255])"></td>
+      </tr>
+      <tr>
+        <td class="color-swatch" style="background:#0077ff" onclick="setColor([0,119,255])"></td>
+        <td class="color-swatch" style="background:#8800ff" onclick="setColor([136,0,255])"></td>
+        <td class="color-swatch" style="background:#00f2fe" onclick="setColor([0,242,254])"></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card tab-content" id="tabPresets">
+    <h3>Quick Presets</h3>
+    <table class="preset-table">
+      <tr>
+        <td><button onclick="setPreset(1)">P 1</button></td>
+        <td><button onclick="setPreset(2)">P 2</button></td>
+        <td><button onclick="setPreset(3)">P 3</button></td>
+        <td><button onclick="setPreset(4)">P 4</button></td>
+      </tr>
+      <tr>
+        <td><button onclick="setPreset(5)">P 5</button></td>
+        <td><button onclick="setPreset(6)">P 6</button></td>
+        <td><button onclick="setPreset(7)">P 7</button></td>
+        <td><button onclick="setPreset(8)">P 8</button></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="status-text" id="status">Syncing with WLED...</div>
+</div>
+
+<div class="modal-overlay" id="scheduleModal" onclick="closeSchedule(event)">
+  <div class="modal-content" onclick="stopProp(event)">
+    <div class="row">
+      <div class="row-left"><h3 style="margin:0;">Academic Timetable</h3></div>
+      <div class="row-right"><button onclick="closeScheduleDirect()" style="padding:4px 8px;">X</button></div>
+    </div>
+    <div class="day-selector" style="margin-top:8px;">
+      <button id="dayBtn1" onclick="showDay(1)">Mon</button>
+      <button id="dayBtn2" onclick="showDay(2)">Tue</button>
+      <button id="dayBtn3" onclick="showDay(3)">Wed</button>
+      <button id="dayBtn4" onclick="showDay(4)">Thu</button>
+      <button id="dayBtn5" onclick="showDay(5)">Fri</button>
+    </div>
+    <div id="scheduleDisplay"></div>
+  </div>
+</div>
+
+<script>
+  var API_URL = '/json/state';
+  var isPoweredOn = false;
+
+  var TIMETABLE = {
+    1: [
+      { time: '08:50 AM - 09:40 AM', name: 'Industrial Instrumentation (E102)', type: 'Lecture' },
+      { time: '09:40 AM - 10:30 AM', name: 'Bio-Medical Instrumentation Lab', type: 'Practical' },
+      { time: '10:30 AM - 11:20 AM', name: 'Bio-Medical Instrumentation Lab', type: 'Practical' },
+      { time: '11:20 AM - 12:10 PM', name: 'Process Dynamics and Control Lab', type: 'Practical' },
+      { time: '12:10 PM - 01:00 PM', name: 'Process Dynamics and Control Lab', type: 'Practical' },
+      { time: '02:45 PM - 03:30 PM', name: 'Industrial Instrumentation (I304)', type: 'Tutorial' },
+      { time: '03:30 PM - 04:20 PM', name: 'Bio-Medical Instrumentation (E103)', type: 'Lecture' },
+      { time: '04:20 PM - 05:10 PM', name: 'UEIXXX (E101)', type: 'Lecture' }
+    ],
+    2: [
+      { time: '08:00 AM - 08:50 AM', name: 'Process Dynamics and Control (E102)', type: 'Lecture' },
+      { time: '08:50 AM - 09:40 AM', name: 'Network Analysis (E102)', type: 'Lecture' },
+      { time: '09:40 AM - 10:30 AM', name: 'Bio-Medical Instrumentation', type: 'Lecture' },
+      { time: '10:30 AM - 11:20 AM', name: 'UEIXXX (E102)', type: 'Tutorial' },
+      { time: '11:20 AM - 12:10 PM', name: 'Industrial Instrumentation (E102)', type: 'Lecture' },
+      { time: '01:55 PM - 02:45 PM', name: 'UEIXXX Lab', type: 'Practical' },
+      { time: '02:45 PM - 03:35 PM', name: 'UEIXXX Lab', type: 'Practical' }
+    ],
+    3: [
+      { time: '09:40 AM - 10:30 AM', name: 'Industrial Instrumentation Lab', type: 'Practical' },
+      { time: '10:30 AM - 11:20 AM', name: 'Industrial Instrumentation Lab', type: 'Practical' },
+      { time: '01:55 PM - 02:45 PM', name: 'UEIXXX (E102)', type: 'Lecture' },
+      { time: '02:45 PM - 03:35 PM', name: 'UEIXXX (E102)', type: 'Lecture' },
+      { time: '03:30 PM - 04:20 PM', name: 'Network Analysis (E102)', type: 'Lecture' },
+      { time: '04:20 PM - 05:10 PM', name: 'Process Dynamics and Control (E102)', type: 'Lecture' }
+    ],
+    4: [
+      { time: '09:40 AM - 10:30 AM', name: 'Network Analysis (F315)', type: 'Tutorial' },
+      { time: '10:30 AM - 11:20 AM', name: 'Process Dynamics and Control (F315)', type: 'Tutorial' },
+      { time: '11:20 AM - 12:10 PM', name: 'Innovation and Entrepreneurship (E102)', type: 'Lecture' },
+      { time: '01:55 PM - 02:45 PM', name: 'UEIXXX Lab', type: 'Practical' },
+      { time: '02:45 PM - 03:35 PM', name: 'UEIXXX Lab', type: 'Practical' },
+      { time: '03:30 PM - 04:20 PM', name: 'Innovation and Entrepreneurship Lab', type: 'Practical' },
+      { time: '04:20 PM - 05:10 PM', name: 'Innovation and Entrepreneurship Lab', type: 'Practical' }
+    ],
+    5: [
+      { time: '08:50 AM - 09:40 AM', name: 'UEIXXX (E102)', type: 'Tutorial' },
+      { time: '09:40 AM - 10:30 AM', name: 'Industrial Instrumentation (E102)', type: 'Lecture' },
+      { time: '10:30 AM - 11:20 AM', name: 'Bio-Medical Instrumentation (E102)', type: 'Lecture' },
+      { time: '11:20 AM - 12:10 PM', name: 'UEIXXX (E102)', type: 'Lecture' },
+      { time: '12:10 PM - 01:00 PM', name: 'Process Dynamics and Control (E102)', type: 'Lecture' }
+    ]
+  };
+
+  function stopProp(e) {
+    if (e.stopPropagation) e.stopPropagation();
+    else e.cancelBubble = true;
+  }
+
+  function openSchedule() {
+    document.getElementById('scheduleModal').className = 'modal-overlay open';
+    var d = new Date().getDay();
+    showDay(d >= 1 && d <= 5 ? d : 1);
+  }
+
+  function closeScheduleDirect() {
+    document.getElementById('scheduleModal').className = 'modal-overlay';
+  }
+
+  function closeSchedule(e) {
+    if (e.target.id === 'scheduleModal') closeScheduleDirect();
+  }
+
+  function showDay(dayNum) {
+    for (var i = 1; i <= 5; i++) {
+      document.getElementById('dayBtn' + i).className = (i === dayNum) ? 'active' : '';
+    }
+    var container = document.getElementById('scheduleDisplay');
+    container.innerHTML = '';
+    var list = TIMETABLE[dayNum] || [];
+    for (var j = 0; j < list.length; j++) {
+      var p = list[j];
+      var tagClass = p.type === 'Lecture' ? 'tag-lecture' : p.type === 'Practical' ? 'tag-practical' : 'tag-tutorial';
+      container.innerHTML += '<div class="period-item">' +
+        '<div class="period-left">' +
+          '<div class="period-time">' + p.time + '</div>' +
+          '<div class="period-title">' + p.name + '</div>' +
+        '</div>' +
+        '<div class="period-right">' +
+          '<span class="period-tag ' + tagClass + '">' + p.type + '</span>' +
+        '</div>' +
+      '</div>';
+    }
+  }
+
+  function switchTab(tab) {
+    document.getElementById('tabColors').className = 'card tab-content' + (tab === 'colors' ? ' active' : '');
+    document.getElementById('tabPresets').className = 'card tab-content' + (tab === 'presets' ? ' active' : '');
+    document.getElementById('tabBtnColors').className = (tab === 'colors' ? 'active' : '');
+    document.getElementById('tabBtnPresets').className = (tab === 'presets' ? 'active' : '');
+  }
+
+  // Pure XMLHttpRequest for Android 4.2 WebKit
+  function xhrRequest(method, url, data, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200 && callback) {
+          try {
+            var json = JSON.parse(xhr.responseText);
+            callback(json);
+          } catch(e) {}
+        }
+      }
+    };
+    xhr.send(data ? JSON.stringify(data) : null);
+  }
+
+  function fetchState() {
+    xhrRequest('GET', API_URL, null, function(data) {
+      isPoweredOn = data.on;
+      updateUI(data);
+    });
+  }
+
+  function updateUI(data) {
+    var btn = document.getElementById('toggleBtn');
+    btn.innerHTML = data.on ? 'Turn Off Logo' : 'Turn On Logo';
+    btn.className = 'power-btn' + (data.on ? ' on' : '');
+    document.getElementById('briSlider').value = data.bri;
+    document.getElementById('briVal').innerHTML = Math.round((data.bri / 255) * 100) + '%';
+    document.getElementById('status').innerHTML = 'WLED Connected';
+  }
+
+  function togglePower() {
+    xhrRequest('POST', API_URL, { on: !isPoweredOn }, updateUI);
+  }
+
+  function setBrightness(val) {
+    document.getElementById('briVal').innerHTML = Math.round((val / 255) * 100) + '%';
+    xhrRequest('POST', API_URL, { bri: parseInt(val) }, updateUI);
+  }
+
+  function setColor(rgb) {
+    xhrRequest('POST', API_URL, { seg: [{ col: [rgb] }] }, updateUI);
+  }
+
+  function setPreset(id) {
+    xhrRequest('POST', API_URL, { ps: parseInt(id) }, updateUI);
+  }
+
+  fetchState();
+  setInterval(fetchState, 4000);
+</script>
+
+</body>
+</html>
