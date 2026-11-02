@@ -14,7 +14,7 @@ New-Item -ItemType Directory -Force -Path "$outDir\gen", "$outDir\obj", "$outDir
 
 Write-Host "1. Packaging resources and assets with aapt..."
 & "$buildTools\aapt.exe" package -f -m `
-    -0 mdef -0 sendump -0 means -0 variances -0 dict -0 gram `
+    -0 mdef -0 sendump -0 means -0 variances -0 dict -0 gram -0 keys `
     -J "$outDir\gen" `
     -M "$PSScriptRoot\app\src\main\AndroidManifest.xml" `
     -S "$PSScriptRoot\app\src\main\res" `

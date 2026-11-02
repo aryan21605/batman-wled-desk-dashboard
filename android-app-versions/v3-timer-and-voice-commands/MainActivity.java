@@ -44,6 +44,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     private static final String PREFS_NAME = "BatmanWledPrefs";
     private static final String DEFAULT_SSID = "wledtabletop";
+    private static final String SEARCH_WAKEUP = "wakeup";
     private static final String SEARCH_BATMAN_CMD = "batman_cmd";
     private static final int REQ_CODE_SPEECH_INPUT = 1001;
 
@@ -54,7 +55,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     private SpeechRecognizer offlineRecognizer;
     private volatile boolean offlineAsrReady = false;
-    private volatile boolean offlineListening = false;
+    private volatile String currentSearchMode = "";
+    private ResumeWakeupRunnable resumeWakeupRunnable;
 
     private WifiManager wifiManager;
     private WifiManager.WifiLock wifiLock;
@@ -90,6 +92,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         watchdogHandler = new Handler(Looper.getMainLooper());
+        resumeWakeupRunnable = new ResumeWakeupRunnable(this);
 
         setupWifiLock();
         setupTextToSpeech();
@@ -155,16 +158,21 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             File gramFile = new File(syncDir, "batman.gram");
             copyAssetFile(am, "sync/batman.gram", gramFile);
 
+            File wakeupFile = new File(syncDir, "wakeup.keys");
+            copyAssetFile(am, "sync/wakeup.keys", wakeupFile);
+
             SpeechRecognizer rec = SpeechRecognizerSetup.defaultSetup()
                     .setAcousticModel(ptmDir)
                     .setDictionary(dictFile)
+                    .setKeywordThreshold(1e-20f)
                     .getRecognizer();
             rec.addListener(this);
+            rec.addKeywordSearch(SEARCH_WAKEUP, wakeupFile);
             rec.addGrammarSearch(SEARCH_BATMAN_CMD, gramFile);
 
             this.offlineRecognizer = rec;
             this.offlineAsrReady = true;
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('READY', 'Offline Voice Engine Ready');}");
+            scheduleResumeWakeup(400);
         } catch (Exception e) {
             this.offlineAsrReady = false;
         }
@@ -189,10 +197,50 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
+    public void scheduleResumeWakeup(long delayMs) {
+        if (watchdogHandler != null && resumeWakeupRunnable != null) {
+            watchdogHandler.removeCallbacks(resumeWakeupRunnable);
+            watchdogHandler.postDelayed(resumeWakeupRunnable, delayMs);
+        }
+    }
+
+    public void startWakeupListeningOnUi() {
+        if (!isRunning || !offlineAsrReady || offlineRecognizer == null) return;
+        try {
+            offlineRecognizer.cancel();
+            currentSearchMode = SEARCH_WAKEUP;
+            offlineRecognizer.startListening(SEARCH_WAKEUP);
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Hands-Free Active: Say \"Hey Batman\" or \"Hello Robot\"');}");
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void switchToCommandListeningOnUi(boolean fromWakeWord) {
+        if (!offlineAsrReady || offlineRecognizer == null) return;
+        try {
+            if (watchdogHandler != null && resumeWakeupRunnable != null) {
+                watchdogHandler.removeCallbacks(resumeWakeupRunnable);
+            }
+            if (tts != null) {
+                tts.stop();
+            }
+            offlineRecognizer.cancel();
+            currentSearchMode = SEARCH_BATMAN_CMD;
+            offlineRecognizer.startListening(SEARCH_BATMAN_CMD, 7000);
+            String prompt = fromWakeWord
+                    ? "Heard \"Hey Batman\"! Speak your command now (e.g. \"Turn on lights\", \"Set timer 15 minutes\")..."
+                    : "Listening Offline... Speak your command now!";
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', '" + prompt.replace("'", "\\'") + "');}");
+        } catch (Exception ignored) {
+        }
+    }
+
     private String normalizeNumbersInSpeech(String raw) {
         if (raw == null) return "";
         String s = " " + raw.toLowerCase() + " ";
-        s = s.replace(" fifteen ", " 15 ")
+        s = s.replace(" hey batman ", " ")
+                .replace(" hello robot ", " ")
+                .replace(" fifteen ", " 15 ")
                 .replace(" twenty ", " 20 ")
                 .replace(" thirty ", " 30 ")
                 .replace(" forty ", " 40 ")
@@ -214,13 +262,15 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     @Override
     public void onBeginningOfSpeech() {
-        sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('SPEAKING', 'Hearing your voice...');}");
+        if (SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('SPEAKING', 'Hearing your command...');}");
+        }
     }
 
     @Override
     public void onEndOfSpeech() {
-        if (offlineRecognizer != null && offlineListening) {
-            offlineListening = false;
+        if (offlineRecognizer != null && SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
+            currentSearchMode = "";
             offlineRecognizer.stop();
         }
     }
@@ -229,37 +279,52 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public void onPartialResult(Hypothesis hypothesis) {
         if (hypothesis == null) return;
         String partial = hypothesis.getHypstr();
-        if (partial != null && partial.trim().length() > 0) {
-            String clean = normalizeNumbersInSpeech(partial).replace("'", "");
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PARTIAL', '" + clean + "');}");
+        if (partial == null) return;
+        String lower = partial.trim().toLowerCase();
+        if (lower.length() == 0) return;
+
+        if (SEARCH_WAKEUP.equals(currentSearchMode)) {
+            if (lower.contains("hey batman") || lower.contains("hello robot")) {
+                switchToCommandListeningOnUi(true);
+            }
+            return;
+        }
+
+        if (SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
+            String clean = normalizeNumbersInSpeech(lower).replace("'", "");
+            if (clean.length() > 0) {
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PARTIAL', '" + clean + "');}");
+            }
         }
     }
 
     @Override
     public void onResult(Hypothesis hypothesis) {
-        offlineListening = false;
-        if (hypothesis != null && hypothesis.getHypstr() != null && hypothesis.getHypstr().trim().length() > 0) {
-            String spoken = normalizeNumbersInSpeech(hypothesis.getHypstr()).replace("'", "");
-            sendJsToWebView("if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
-        } else {
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('IDLE', 'Did not catch that. Tap [Mic] and speak clearly!');}");
+        if (hypothesis != null && hypothesis.getHypstr() != null) {
+            String raw = hypothesis.getHypstr().trim().toLowerCase();
+            if (raw.equals("hey batman") || raw.equals("hello robot")) {
+                return;
+            }
+            String spoken = normalizeNumbersInSpeech(raw).replace("'", "");
+            if (spoken.length() > 0) {
+                sendJsToWebView("if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
+                scheduleResumeWakeup(4000);
+                return;
+            }
         }
+        scheduleResumeWakeup(500);
     }
 
     @Override
     public void onError(Exception error) {
-        offlineListening = false;
-        sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('ERROR', 'Mic error. Opening Command Center...');}");
-        sendJsToWebView("if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}");
+        currentSearchMode = "";
+        scheduleResumeWakeup(2000);
     }
 
     @Override
     public void onTimeout() {
-        offlineListening = false;
-        if (offlineRecognizer != null) {
-            offlineRecognizer.stop();
-        }
-        sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('IDLE', 'Mic timeout. Tap [Mic] to speak again.');}");
+        currentSearchMode = "";
+        startWakeupListeningOnUi();
     }
 
     private void setupWifiLock() {
@@ -290,7 +355,13 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     public void speakOut(String text) {
         if (tts != null && ttsReady && text != null) {
             try {
+                if (offlineRecognizer != null) {
+                    currentSearchMode = "";
+                    offlineRecognizer.cancel();
+                }
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                long speakDurationMs = Math.max(2800L, Math.min(18000L, (long) text.length() * 75L));
+                scheduleResumeWakeup(speakDurationMs);
             } catch (Exception ignored) {
             }
         }
@@ -304,22 +375,19 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     public void executeVoiceRecognizerNow() {
         try {
-            if (tts != null) {
-                tts.stop();
-            }
             if (offlineAsrReady && offlineRecognizer != null) {
-                if (offlineListening) {
-                    offlineListening = false;
+                if (SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
+                    currentSearchMode = "";
                     offlineRecognizer.stop();
                     return;
                 }
-                offlineListening = true;
-                offlineRecognizer.cancel();
-                offlineRecognizer.startListening(SEARCH_BATMAN_CMD, 7000);
-                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', 'Listening Offline... Speak command now!');}");
+                switchToCommandListeningOnUi(false);
                 return;
             }
 
+            if (tts != null) {
+                tts.stop();
+            }
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
@@ -369,6 +437,19 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     public WifiManager getAppWifiManager() {
         return wifiManager;
+    }
+
+    private static class ResumeWakeupRunnable implements Runnable {
+        private final MainActivity activity;
+
+        ResumeWakeupRunnable(MainActivity act) {
+            this.activity = act;
+        }
+
+        @Override
+        public void run() {
+            activity.startWakeupListeningOnUi();
+        }
     }
 
     private static class PocketSphinxInitWorker implements Runnable {
@@ -571,6 +652,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
         watchdogHandler.removeCallbacks(this);
         watchdogHandler.post(this);
+        if (offlineAsrReady) {
+            scheduleResumeWakeup(600);
+        }
     }
 
     @Override
@@ -578,9 +662,12 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         super.onPause();
         isRunning = false;
         watchdogHandler.removeCallbacks(this);
-        if (offlineRecognizer != null && offlineListening) {
-            offlineListening = false;
-            offlineRecognizer.stop();
+        if (watchdogHandler != null && resumeWakeupRunnable != null) {
+            watchdogHandler.removeCallbacks(resumeWakeupRunnable);
+        }
+        if (offlineRecognizer != null) {
+            currentSearchMode = "";
+            offlineRecognizer.cancel();
         }
     }
 
@@ -588,6 +675,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     protected void onDestroy() {
         isRunning = false;
         watchdogHandler.removeCallbacks(this);
+        if (watchdogHandler != null && resumeWakeupRunnable != null) {
+            watchdogHandler.removeCallbacks(resumeWakeupRunnable);
+        }
         if (wifiLock != null && wifiLock.isHeld()) {
             try {
                 wifiLock.release();

@@ -2,6 +2,8 @@
 
 grammar batman;
 
+<wake> = ( hey batman | hello robot | batman );
+
 <power_cmd> = ( turn on | turn off | power on | power off | lights on | lights off | logo on | logo off ) [ the ] [ lights | light | batman | logo ];
 
 <timer_num> = ( five | ten | fifteen | twenty | thirty | forty | sixty | ninety );
@@ -23,4 +25,4 @@ grammar batman;
 
 <info_cmd> = [ what is ] [ the ] ( weather | temperature ) | next ( class | lecture ) | [ show ] timetable | [ read ] [ my ] ( tasks | notes ) | [ full ] ( briefing | status ) | hello [ robot ];
 
-public <command> = <power_cmd> | <timer_cmd> | <rand_cmd> | <color_cmd> | <preset_cmd> | <bri_cmd> | <task_cmd> | <info_cmd>;
+public <command> = [ <wake> ] ( <power_cmd> | <timer_cmd> | <rand_cmd> | <color_cmd> | <preset_cmd> | <bri_cmd> | <task_cmd> | <info_cmd> );
