@@ -14,7 +14,7 @@
       background-color: #0d0f12;
       color: #e6edf3;
       margin: 0;
-      padding: 8px 12px;
+      padding: 6px 10px;
       overflow-x: hidden;
       user-select: none;
       -webkit-user-select: none;
@@ -24,7 +24,7 @@
     .top-bar {
       display: table;
       width: 100%;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .top-left {
       display: table-cell;
@@ -41,9 +41,9 @@
       border: 1px solid #f5a623;
       color: #f5a623;
       font-weight: bold;
-      padding: 7px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
     }
     .wifi-badge {
@@ -54,7 +54,19 @@
       font-size: 11px;
       padding: 4px 8px;
       border-radius: 5px;
-      margin-left: 6px;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+    .weather-pill {
+      display: inline-block;
+      background: #161b22;
+      border: 1px solid #2ea043;
+      color: #3fb950;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-right: 6px;
       cursor: pointer;
     }
 
@@ -68,27 +80,27 @@
       display: table-cell;
       width: 45%;
       vertical-align: top;
-      padding-right: 8px;
+      padding-right: 7px;
     }
     .col-right {
       display: table-cell;
       width: 55%;
       vertical-align: top;
-      padding-left: 8px;
+      padding-left: 7px;
     }
 
     .card {
       background: #161b22;
       border: 1px solid #30363d;
       border-radius: 8px;
-      padding: 9px 10px;
-      margin-bottom: 8px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
     }
 
     /* Large Robo Companion Card */
     .robo-card {
       text-align: center;
-      padding: 10px 6px;
+      padding: 8px 6px;
     }
     .pulse-animation {
       animation: eyePulse 2.5s infinite ease-in-out;
@@ -105,49 +117,70 @@
       100% { opacity: 0.7; }
     }
     .robo-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
       color: #ffffff;
-      margin-top: 4px;
-    }
-    .robo-status-line {
-      font-size: 12px;
-      font-weight: bold;
       margin-top: 2px;
     }
+    .robo-status-line {
+      font-size: 11px;
+      font-weight: bold;
+      margin-top: 1px;
+    }
 
-    /* Recite Schedule Box */
+    /* Recite Schedule & Voice Assistant Box */
     .speech-box {
-      margin-top: 8px;
+      margin-top: 6px;
       background: #0d1117;
       border: 1px solid #30363d;
       border-radius: 6px;
-      padding: 8px;
+      padding: 7px;
       text-align: left;
     }
     .speech-bubble {
       font-size: 11px;
-      color: #8b949e;
-      min-height: 28px;
+      color: #c9d1d9;
+      min-height: 30px;
+      line-height: 1.3;
+    }
+    .voice-grid {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 4px;
+      margin-top: 4px;
+    }
+    .voice-grid td {
+      width: 50%;
     }
     .recite-btn {
       width: 100%;
-      margin-top: 6px;
       background: #21262d;
       border: 1px solid #388bfd;
       color: #58a6ff;
-      padding: 7px;
+      padding: 6px 4px;
       font-weight: bold;
       font-size: 11px;
       border-radius: 5px;
       cursor: pointer;
+    }
+    .recite-btn.green {
+      border-color: #2ea043;
+      color: #3fb950;
+    }
+    .recite-btn.amber {
+      border-color: #d29922;
+      color: #f5a623;
+    }
+    .recite-btn.purple {
+      border-color: #8957e5;
+      color: #d2a8ff;
     }
 
     /* Quick Notes & Tasks Buttons (Below Robot) */
     .notes-btn-row {
       display: table;
       width: 100%;
-      margin-top: 8px;
+      margin-top: 6px;
     }
     .notes-btn-cell {
       display: table-cell;
@@ -158,9 +191,9 @@
       background: #1c1f24;
       border: 1px dashed #f5a623;
       color: #f5a623;
-      padding: 8px 4px;
+      padding: 7px 4px;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 11px;
       border-radius: 6px;
       cursor: pointer;
     }
@@ -170,15 +203,23 @@
       background: #21262d;
       border: 1px solid #363b42;
       color: #ffffff;
-      padding: 8px;
+      padding: 7px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
+    }
+    .power-row {
+      display: table;
+      width: 100%;
+    }
+    .power-cell {
+      display: table-cell;
+      vertical-align: middle;
     }
     .power-btn {
       width: 100%;
-      padding: 11px;
-      font-size: 15px;
+      padding: 9px;
+      font-size: 14px;
       font-weight: bold;
       background: #21262d;
       border-radius: 6px;
@@ -188,17 +229,54 @@
       border-color: #2ea043;
     }
 
+    /* Randomizer Row */
+    .random-row {
+      display: table;
+      width: 100%;
+      margin-top: 6px;
+    }
+    .random-cell-left {
+      display: table-cell;
+      width: 50%;
+      padding-right: 3px;
+    }
+    .random-cell-right {
+      display: table-cell;
+      width: 50%;
+      padding-left: 3px;
+    }
+    .rand-color-btn {
+      width: 100%;
+      background: #1f242c;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      font-weight: bold;
+      font-size: 11px;
+      padding: 7px 4px;
+      border-radius: 6px;
+    }
+    .rand-fx-btn {
+      width: 100%;
+      background: #1f242c;
+      border: 1px solid #a371f7;
+      color: #d2a8ff;
+      font-weight: bold;
+      font-size: 11px;
+      padding: 7px 4px;
+      border-radius: 6px;
+    }
+
     /* Sliders & Rows */
     .row {
       display: table;
       width: 100%;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
     .row-left { display: table-cell; text-align: left; vertical-align: middle; }
     .row-right { display: table-cell; text-align: right; vertical-align: middle; }
     input[type=range] {
       width: 100%;
-      margin: 4px 0;
+      margin: 3px 0;
     }
 
     /* Tabs */
@@ -207,7 +285,7 @@
       padding: 2px;
       border-radius: 6px;
       border: 1px solid #30363d;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: table;
       width: 100%;
       box-sizing: border-box;
@@ -218,12 +296,14 @@
       background: transparent;
       border: none;
       color: #8b949e;
-      padding: 6px 0;
+      padding: 5px 0;
+      font-size: 12px;
     }
     .tabs button.active {
       background: #21262d;
       color: #ffffff;
       border-radius: 4px;
+      font-weight: bold;
     }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -235,15 +315,15 @@
     }
     .picker-col-left {
       display: table-cell;
-      width: 48%;
+      width: 46%;
       vertical-align: middle;
       text-align: center;
     }
     .picker-col-right {
       display: table-cell;
-      width: 52%;
+      width: 54%;
       vertical-align: middle;
-      padding-left: 8px;
+      padding-left: 6px;
     }
     .swatch-table {
       width: 100%;
@@ -251,7 +331,7 @@
       border-spacing: 4px;
     }
     .color-swatch {
-      height: 32px;
+      height: 30px;
       border-radius: 5px;
       cursor: pointer;
       border: 1px solid #444;
@@ -264,7 +344,7 @@
     }
     .color-preview {
       width: 80%;
-      height: 10px;
+      height: 8px;
       border-radius: 3px;
       margin: 4px auto 0 auto;
       border: 1px solid rgba(255,255,255,0.2);
@@ -273,12 +353,12 @@
     .preset-table {
       width: 100%;
       border-collapse: separate;
-      border-spacing: 5px;
+      border-spacing: 4px;
     }
-    .preset-table button { width: 100%; padding: 8px 4px; }
+    .preset-table button { width: 100%; padding: 7px 4px; }
 
     .status-text {
-      font-size: 11px;
+      font-size: 10px;
       color: #8b949e;
       text-align: center;
     }
@@ -437,46 +517,57 @@
 <!-- Top Bar -->
 <div class="top-bar">
   <div class="top-left">
-    <button class="schedule-top-btn" onclick="openSchedule()">[=] View Timetable</button>
-    <span class="wifi-badge" id="wifiBadge" onclick="openSettingsModal()">Wi-Fi: wledtabletop (4.3.2.1) ⚙</span>
+    <button class="schedule-top-btn" onclick="openSchedule()">[=] Timetable</button>
+    <span class="wifi-badge" id="wifiBadge" onclick="openSettingsModal()">Wi-Fi: wledtabletop ⚙</span>
   </div>
   <div class="top-right">
-    <span style="font-size:12px; font-weight:bold;">Patiala • Punjab</span>
-    <span id="clockDisplay" style="font-size:11px; color:#f5a623; margin-left:6px; font-weight:bold;"></span>
+    <span class="weather-pill" id="weatherPill" onclick="speakWeather()">☀ Patiala: 23°C Clear</span>
+    <span id="clockDisplay" style="font-size:11px; color:#f5a623; font-weight:bold;"></span>
   </div>
 </div>
 
 <!-- Landscape Split -->
 <div class="dashboard-layout">
   
-  <!-- LEFT PANEL: Mascot, Speech Recital, Quick Notes & Tasks -->
+  <!-- LEFT PANEL: Mascot, Interactive Voice Assistant, Quick Notes & Tasks -->
   <div class="col-left">
     <div class="card robo-card">
-      <svg id="robo-face" width="110" height="90" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="6" width="40" height="30" rx="6" fill="#21262d" stroke="#30363d" stroke-width="2"/>
-        <rect x="18" y="2" width="8" height="4" fill="#8b949e"/>
-        <circle cx="22" cy="1" r="1.5" fill="#f5a623"/>
-        <path d="M5 36 H39" stroke="#30363d" stroke-width="2"/>
-        <path d="M12 36 L16 39" stroke="#30363d" stroke-width="2"/>
-        <path d="M32 36 L28 39" stroke="#30363d" stroke-width="2"/>
-        <circle id="robo-eye-l" class="pulse-animation" cx="14" cy="20" r="4.8" fill="#ff9900"/>
-        <circle id="robo-eye-r" class="pulse-animation" cx="30" cy="20" r="4.8" fill="#ff9900"/>
-        <path id="robo-mouth" d="M18 28 Q22 31 26 28" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <div class="robo-title">Batman WLED Companion</div>
-      <div id="roboStatus" class="robo-status-line" style="color:#ff9900;">Status: Connecting...</div>
+      <div onclick="speakFullBriefing()" style="cursor:pointer;" title="Tap Robot for Full Briefing">
+        <svg id="robo-face" width="102" height="82" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="6" width="40" height="30" rx="6" fill="#21262d" stroke="#30363d" stroke-width="2"/>
+          <rect x="18" y="2" width="8" height="4" fill="#8b949e"/>
+          <circle id="robo-antenna" cx="22" cy="1" r="1.8" fill="#f5a623"/>
+          <path d="M5 36 H39" stroke="#30363d" stroke-width="2"/>
+          <path d="M12 36 L16 39" stroke="#30363d" stroke-width="2"/>
+          <path d="M32 36 L28 39" stroke="#30363d" stroke-width="2"/>
+          <circle id="robo-eye-l" class="pulse-animation" cx="14" cy="20" r="4.8" fill="#ff9900"/>
+          <circle id="robo-eye-r" class="pulse-animation" cx="30" cy="20" r="4.8" fill="#ff9900"/>
+          <path id="robo-mouth" d="M18 28 Q22 31 26 28" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="robo-title">Batman Robo Assistant <span style="font-size:10px; color:#8b949e;">(Tap Face to Talk)</span></div>
+      <div id="roboStatus" class="robo-status-line" style="color:#ff9900;">Status: Ready</div>
 
       <div class="speech-box">
-        <div id="speechText" class="speech-bubble">Tap below to check your closest class.</div>
-        <button class="recite-btn" onclick="reciteClosestSchedule()">[Speak] Recite Upcoming Class</button>
+        <div id="speechText" class="speech-bubble">Tap my face or any voice button below to hear your weather, classes, tasks, or notes!</div>
+        <table class="voice-grid">
+          <tr>
+            <td><button class="recite-btn" onclick="reciteClosestSchedule()">🔊 Next Class</button></td>
+            <td><button class="recite-btn green" onclick="speakWeather()">☀ Weather</button></td>
+          </tr>
+          <tr>
+            <td><button class="recite-btn amber" onclick="speakTasksAndNotes()">📝 Tasks & Notes</button></td>
+            <td><button class="recite-btn purple" onclick="speakFullBriefing()">🤖 Full Briefing</button></td>
+          </tr>
+        </table>
       </div>
 
       <!-- Quick Notes & Task Scheduler Launch Buttons -->
       <div class="notes-btn-row">
-        <div class="notes-btn-cell" style="padding-right:4px;">
-          <button class="notes-launch-btn" onclick="openNotesModal('notes')">[✎] Quick Notes</button>
+        <div class="notes-btn-cell" style="padding-right:3px;">
+          <button class="notes-launch-btn" onclick="openNotesModal('notes')">[✎] Edit Notes</button>
         </div>
-        <div class="notes-btn-cell" style="padding-left:4px;">
+        <div class="notes-btn-cell" style="padding-left:3px;">
           <button class="notes-launch-btn" style="border-color:#58a6ff; color:#58a6ff;" onclick="openNotesModal('tasks')">[✓] Task Scheduler</button>
         </div>
       </div>
@@ -487,32 +578,41 @@
   <div class="col-right">
     <div class="card">
       <button id="toggleBtn" class="power-btn" onclick="togglePower()">Power: Connecting...</button>
+      <!-- Random Colour & Random Effect Buttons -->
+      <div class="random-row">
+        <div class="random-cell-left">
+          <button class="rand-color-btn" onclick="setRandomColor()">🎲 Random Colour</button>
+        </div>
+        <div class="random-cell-right">
+          <button class="rand-fx-btn" onclick="setRandomEffectKeepColor()">✨ Random Effect (Same Col)</button>
+        </div>
+      </div>
     </div>
 
     <!-- Brightness & Intensity Sliders -->
     <div class="card">
       <div class="row">
-        <div class="row-left"><span style="font-size:12px; font-weight:bold;">Brightness</span></div>
-        <div class="row-right"><span id="briVal" style="font-size:12px; color:#f5a623;">50%</span></div>
+        <div class="row-left"><span style="font-size:11px; font-weight:bold;">Brightness</span></div>
+        <div class="row-right"><span id="briVal" style="font-size:11px; color:#f5a623;">50%</span></div>
       </div>
       <input type="range" id="briSlider" min="1" max="255" value="128" onchange="setBrightness(this.value)" oninput="previewBri(this.value)">
 
-      <div class="row" style="margin-top:4px;">
-        <div class="row-left"><span style="font-size:12px; font-weight:bold;">Effect Intensity</span></div>
-        <div class="row-right"><span id="ixVal" style="font-size:12px; color:#58a6ff;">50%</span></div>
+      <div class="row" style="margin-top:2px;">
+        <div class="row-left"><span style="font-size:11px; font-weight:bold;">Effect Intensity</span></div>
+        <div class="row-right"><span id="ixVal" style="font-size:11px; color:#58a6ff;">50%</span></div>
       </div>
       <input type="range" id="ixSlider" min="0" max="255" value="128" onchange="setIntensity(this.value)" oninput="previewIx(this.value)">
     </div>
 
     <div class="tabs">
-      <button id="tabBtnColors" class="active" onclick="switchTab('colors')">Colour & Intensity Wheel</button>
-      <button id="tabBtnPresets" onclick="switchTab('presets')">Presets Tab</button>
+      <button id="tabBtnColors" class="active" onclick="switchTab('colors')">Colour Wheel & Swatches</button>
+      <button id="tabBtnPresets" onclick="switchTab('presets')">Saved Presets (P1-P8)</button>
     </div>
 
     <div class="card tab-content active" id="tabColors">
       <div class="picker-split">
         <div class="picker-col-left">
-          <canvas id="colorWheel" width="108" height="108"></canvas>
+          <canvas id="colorWheel" width="100" height="100"></canvas>
           <div id="colorPreview" class="color-preview" style="background:#ff9900"></div>
         </div>
         <div class="picker-col-right">
@@ -589,6 +689,7 @@
       <div class="row" style="margin-top: 8px;">
         <div class="row-left">
           <button onclick="clearNotes()" style="background:#5c1d1d; border-color:#8b2424; font-size:11px;">Clear</button>
+          <button onclick="speakNotesOnly()" style="background:#21262d; border-color:#58a6ff; color:#58a6ff; font-size:11px; margin-left:4px;">🔊 Read Notes</button>
         </div>
         <div class="row-right">
           <span id="saveStatus" style="font-size:11px; color:#2ea043; margin-right:8px;"></span>
@@ -617,7 +718,7 @@
 
 <!-- WLED & Wi-Fi Settings Modal -->
 <div class="modal-overlay" id="settingsModal" onclick="closeSettingsOverlay(event)">
-  <div class="modal-content" style="top:15%; left:15%; width:70%; height:70%;" onclick="stopProp(event)">
+  <div class="modal-content" style="top:12%; left:12%; width:76%; height:76%;" onclick="stopProp(event)">
     <div class="row" style="margin-bottom:10px;">
       <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#58a6ff;">WLED AP & Wi-Fi Watchdog Settings</span></div>
       <div class="row-right"><button onclick="closeSettingsDirect()" style="padding:4px 10px;">X</button></div>
@@ -632,7 +733,8 @@
     </div>
     <div class="row">
       <div class="row-left">
-        <button onclick="triggerManualReconnect()" style="background:#21262d; border-color:#58a6ff; color:#58a6ff;">Force Wi-Fi Reconnect Now</button>
+        <button onclick="triggerManualReconnect()" style="background:#21262d; border-color:#58a6ff; color:#58a6ff;">Force Wi-Fi Reconnect</button>
+        <button onclick="fetchLiveWeather(true)" style="background:#21262d; border-color:#2ea043; color:#3fb950; margin-left:4px;">Sync Weather</button>
       </div>
       <div class="row-right">
         <button onclick="saveWledSettings()" style="background:#195b28; border-color:#2ea043; font-weight:bold;">Save & Connect</button>
@@ -644,12 +746,71 @@
 <script>
   var NOTES_KEY = 'desk_dashboard_notes';
   var TASKS_KEY = 'desk_dashboard_tasks';
+  var WEATHER_KEY = 'patiala_weather_cache';
   var IP_KEY = 'wled_host_ip';
   var SSID_KEY = 'target_ssid';
 
   var wledIp = '4.3.2.1';
   var targetSsid = 'wledtabletop';
   var isPoweredOn = false;
+  var currentRgb = [255, 153, 0];
+  var mouthAnimTimer = null;
+
+  /* Pre-loaded Patiala, Punjab Weather Baseline (plus live Open-Meteo sync whenever internet is reachable) */
+  var DEFAULT_WEATHER = {
+    temp: 22.5,
+    high: 28.7,
+    low: 17.7,
+    humidity: 66,
+    wind: 7.4,
+    cond: 'Clear sky',
+    updated: 'Patiala Forecast'
+  };
+
+  /* WLED Curated Effect Names for Speech Feedback */
+  var WLED_EFFECTS = [
+    { id: 0, name: 'Solid' },
+    { id: 1, name: 'Blink' },
+    { id: 2, name: 'Breathe' },
+    { id: 3, name: 'Wipe' },
+    { id: 6, name: 'Sweep' },
+    { id: 8, name: 'Colorloop' },
+    { id: 9, name: 'Rainbow' },
+    { id: 10, name: 'Scan' },
+    { id: 11, name: 'Dual Scan' },
+    { id: 12, name: 'Fade' },
+    { id: 13, name: 'Theater Chase' },
+    { id: 15, name: 'Running' },
+    { id: 17, name: 'Twinkle' },
+    { id: 18, name: 'Dissolve' },
+    { id: 20, name: 'Sparkle' },
+    { id: 21, name: 'Dark Sparkle' },
+    { id: 26, name: 'Android' },
+    { id: 28, name: 'Chase' },
+    { id: 33, name: 'Aurora' },
+    { id: 38, name: 'Red and Blue' },
+    { id: 41, name: 'Lighthouse' },
+    { id: 42, name: 'Fireworks' },
+    { id: 43, name: 'Rain' },
+    { id: 46, name: 'Twinklefox' },
+    { id: 49, name: 'Fairy' },
+    { id: 51, name: 'Gradual' },
+    { id: 57, name: 'Lightning' },
+    { id: 63, name: 'Pride' },
+    { id: 65, name: 'Palette' },
+    { id: 66, name: 'Fire 2012' },
+    { id: 67, name: 'Colorwaves' },
+    { id: 73, name: 'Colortwinkles' },
+    { id: 74, name: 'Lake' },
+    { id: 75, name: 'Meteor' },
+    { id: 76, name: 'Smooth Meteor' },
+    { id: 79, name: 'Ripple' },
+    { id: 87, name: 'Glitter' },
+    { id: 88, name: 'Candle' },
+    { id: 90, name: 'Starburst' },
+    { id: 101, name: 'Pacifica' },
+    { id: 110, name: 'Flow' }
+  ];
 
   function storeSet(key, val) {
     try { localStorage.setItem(key, val); } catch(e) {}
@@ -678,6 +839,7 @@
     wledIp = storeGet(IP_KEY, '4.3.2.1');
     targetSsid = storeGet(SSID_KEY, 'wledtabletop');
     updateWifiBadge();
+    updateWeatherUI();
   }
 
   function getApiUrl() {
@@ -692,7 +854,252 @@
         if (cur && cur !== '<unknown ssid>') ssidNow = cur;
       }
     } catch(e) {}
-    document.getElementById('wifiBadge').innerHTML = 'Wi-Fi: ' + ssidNow + ' (' + wledIp + ') ⚙';
+    document.getElementById('wifiBadge').innerHTML = 'Wi-Fi: ' + ssidNow + ' ⚙';
+  }
+
+  /* Weather Engine (Live + Offline Diurnal Curve for Patiala) */
+  function getWeatherData() {
+    var raw = storeGet(WEATHER_KEY, '');
+    var w = DEFAULT_WEATHER;
+    if (raw) {
+      try { w = JSON.parse(raw); } catch(e) {}
+    }
+    // Estimate current Patiala hour temperature smoothly between daily min (18C at 6AM) and max (28.7C at 2PM) if offline
+    var hr = new Date().getHours();
+    var estTemp = w.temp;
+    if (hr >= 6 && hr <= 15) {
+      estTemp = Math.round(w.low + ((hr - 6) / 9) * (w.high - w.low));
+    } else if (hr > 15) {
+      estTemp = Math.round(w.high - ((hr - 15) / 14) * (w.high - w.low));
+    } else {
+      estTemp = Math.round(w.low + 1);
+    }
+    return {
+      temp: estTemp,
+      high: Math.round(w.high),
+      low: Math.round(w.low),
+      humidity: w.humidity || 66,
+      cond: w.cond || 'Clear sky'
+    };
+  }
+
+  function updateWeatherUI() {
+    var w = getWeatherData();
+    document.getElementById('weatherPill').innerHTML = '☀ Patiala: ' + w.temp + '°C ' + w.cond;
+  }
+
+  function fetchLiveWeather(speakAfter) {
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=30.3398&longitude=76.3869&current=temperature_2m,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto';
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.httpRequest) {
+        var res = window.AndroidBridge.httpRequest('GET', url, '');
+        if (res) {
+          var j = JSON.parse(res);
+          if (j && j.current) {
+            var code = j.current.weather_code || 0;
+            var condStr = code === 0 ? 'Clear' : (code <= 3 ? 'Partly Cloudy' : (code <= 48 ? 'Hazy' : 'Rainy'));
+            var saved = {
+              temp: j.current.temperature_2m,
+              humidity: j.current.relative_humidity_2m,
+              high: (j.daily && j.daily.temperature_2m_max) ? j.daily.temperature_2m_max[0] : 28.7,
+              low: (j.daily && j.daily.temperature_2m_min) ? j.daily.temperature_2m_min[0] : 17.7,
+              cond: condStr
+            };
+            storeSet(WEATHER_KEY, JSON.stringify(saved));
+            updateWeatherUI();
+            if (speakAfter) speakWeather();
+            return;
+          }
+        }
+      }
+    } catch(e) {}
+    updateWeatherUI();
+    if (speakAfter) speakWeather();
+  }
+
+  /* Robot Voice Assistant Functions */
+  function speakWeather() {
+    var w = getWeatherData();
+    var msg = 'In Patiala Punjab, it is currently ' + w.temp + ' degrees Celsius with ' + w.cond + '. Today\'s high is ' + w.high + ' degrees and the low is ' + w.low + ' degrees, with ' + w.humidity + ' percent humidity.';
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+  }
+
+  function speakTasksAndNotes() {
+    var tasks = getTasks();
+    var pending = [];
+    for (var i = 0; i < tasks.length; i++) {
+      if (!tasks[i].done) pending.push(tasks[i]);
+    }
+    var notes = storeGet(NOTES_KEY, '').replace(/^\s+|\s+$/g, '');
+    var parts = [];
+
+    if (pending.length === 0) {
+      parts.push('You have no pending tasks scheduled.');
+    } else {
+      parts.push('You have ' + pending.length + (pending.length === 1 ? ' pending task: ' : ' pending tasks: '));
+      for (var j = 0; j < pending.length; j++) {
+        var t = pending[j];
+        parts.push((j + 1) + ', ' + (t.time ? 'at ' + t.time + ', ' : '') + t.text + '.');
+      }
+    }
+
+    if (notes) {
+      parts.push('Your quick desk notes say: ' + notes);
+    } else {
+      parts.push('Your quick desk scratchpad is currently empty.');
+    }
+
+    var fullMsg = parts.join(' ');
+    document.getElementById('speechText').innerHTML = fullMsg;
+    safeSpeak(fullMsg);
+  }
+
+  function speakNotesOnly() {
+    var notes = storeGet(NOTES_KEY, '').replace(/^\s+|\s+$/g, '');
+    var msg = notes ? ('Your desk notes say: ' + notes) : 'Your quick notes scratchpad is empty.';
+    safeSpeak(msg);
+  }
+
+  function getClosestClassMsg() {
+    var now = new Date();
+    var day = now.getDay();
+    var mins = (now.getHours() * 60) + now.getMinutes();
+
+    if (day < 1 || day > 5) {
+      return 'It is the weekend! No scheduled classes today.';
+    }
+    var list = TIMETABLE[day] || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].start >= mins) {
+        return 'Next class at ' + list[i].time + ' is ' + list[i].name + ' (' + list[i].type + ').';
+      }
+    }
+    return 'All academic classes are completed for today!';
+  }
+
+  function reciteClosestSchedule() {
+    var msg = getClosestClassMsg();
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+  }
+
+  function speakFullBriefing() {
+    var d = new Date();
+    var hr = d.getHours();
+    var greet = hr < 12 ? 'Good morning!' : (hr < 17 ? 'Good afternoon!' : 'Good evening!');
+    var w = getWeatherData();
+    var classMsg = getClosestClassMsg();
+    var tasks = getTasks();
+    var pendingCount = 0;
+    for (var i = 0; i < tasks.length; i++) {
+      if (!tasks[i].done) pendingCount++;
+    }
+    var notes = storeGet(NOTES_KEY, '').replace(/^\s+|\s+$/g, '');
+
+    var msg = greet + ' In Patiala it is ' + w.temp + ' degrees and ' + w.cond + '. ' + classMsg + ' ';
+    if (pendingCount > 0) {
+      msg += 'You have ' + pendingCount + ' pending task' + (pendingCount > 1 ? 's' : '') + ' on your list. ';
+    } else {
+      msg += 'All scheduled tasks are clear. ';
+    }
+    if (notes) {
+      msg += 'Note reminder: ' + notes;
+    }
+
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+  }
+
+  function animateRobotTalking(durationMs) {
+    var mouth = document.getElementById('robo-mouth');
+    var antenna = document.getElementById('robo-antenna');
+    if (mouthAnimTimer) clearInterval(mouthAnimTimer);
+    var open = false;
+    var elapsed = 0;
+    mouthAnimTimer = setInterval(function() {
+      elapsed += 180;
+      open = !open;
+      if (open) {
+        mouth.setAttribute('d', 'M16 27 Q22 35 28 27');
+        antenna.setAttribute('fill', '#3fb950');
+      } else {
+        mouth.setAttribute('d', 'M18 29 Q22 30 26 29');
+        antenna.setAttribute('fill', '#f5a623');
+      }
+      if (elapsed >= durationMs) {
+        clearInterval(mouthAnimTimer);
+        mouth.setAttribute('d', isPoweredOn ? 'M16 28 Q22 32 28 28' : 'M18 30 H26');
+        antenna.setAttribute('fill', '#f5a623');
+      }
+    }, 180);
+  }
+
+  function safeSpeak(text) {
+    var estMs = Math.max(2000, Math.min(18000, text.length * 65));
+    animateRobotTalking(estMs);
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.speakText) {
+        window.AndroidBridge.speakText(text);
+        return;
+      }
+      if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
+        window.speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+      }
+    } catch(err) {}
+  }
+
+  /* Random Colour & Random Effect (Keep Same Colour) Generators */
+  function hslToRgb(h, s, l) {
+    var r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      var hue2rgb = function(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  function setRandomColor() {
+    var randomHue = Math.random();
+    var rgb = hslToRgb(randomHue, 1.0, 0.5);
+    currentRgb = rgb;
+    var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+    document.getElementById('colorPreview').style.backgroundColor = rgbStr;
+    document.getElementById('robo-eye-l').setAttribute('fill', rgbStr);
+    document.getElementById('robo-eye-r').setAttribute('fill', rgbStr);
+    document.getElementById('status').innerHTML = 'Random Colour: RGB(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+    xhrRequest('POST', getApiUrl(), { on: true, seg: [{ col: [rgb] }], v: true }, updateUI);
+  }
+
+  function setRandomEffectKeepColor() {
+    var pick = WLED_EFFECTS[Math.floor(Math.random() * WLED_EFFECTS.length)];
+    document.getElementById('status').innerHTML = 'Effect: ' + pick.name + ' (ID ' + pick.id + ') • Keeping Current Colour';
+    // Explicitly send fx + pal:0 (Default palette uses primary colour) + currentRgb so WLED keeps the exact LED colour!
+    xhrRequest('POST', getApiUrl(), {
+      on: true,
+      seg: [{
+        fx: pick.id,
+        pal: 0,
+        col: [currentRgb]
+      }],
+      v: true
+    }, updateUI);
   }
 
   var TIMETABLE = {
@@ -741,6 +1148,7 @@
     ]
   };
 
+  /* Local Scratchpad & Task Scheduler Functions */
   function openNotesModal(tab) {
     document.getElementById('quickNotesArea').value = storeGet(NOTES_KEY, '');
     document.getElementById('saveStatus').innerHTML = '';
@@ -845,6 +1253,7 @@
     container.innerHTML = html;
   }
 
+  /* Settings Modal */
   function openSettingsModal() {
     document.getElementById('wledIpInput').value = wledIp;
     document.getElementById('wledSsidInput').value = targetSsid;
@@ -874,54 +1283,6 @@
       }
     } catch(e) {}
     document.getElementById('status').innerHTML = 'Forcing Wi-Fi reconnect to ' + targetSsid + '...';
-  }
-
-  function reciteClosestSchedule() {
-    var now = new Date();
-    var day = now.getDay();
-    var mins = (now.getHours() * 60) + now.getMinutes();
-    var bubble = document.getElementById('speechText');
-
-    if (day < 1 || day > 5) {
-      var msg = "It is the weekend! No scheduled classes today.";
-      bubble.innerHTML = msg;
-      safeSpeak(msg);
-      return;
-    }
-
-    var list = TIMETABLE[day] || [];
-    var upcoming = null;
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].start >= mins) {
-        upcoming = list[i];
-        break;
-      }
-    }
-
-    if (upcoming) {
-      var text = "Next up at " + upcoming.time + ": " + upcoming.name;
-      bubble.innerHTML = text;
-      safeSpeak(text);
-    } else {
-      var doneMsg = "Classes are completed for today!";
-      bubble.innerHTML = doneMsg;
-      safeSpeak(doneMsg);
-    }
-  }
-
-  function safeSpeak(text) {
-    try {
-      if (window.AndroidBridge && window.AndroidBridge.speakText) {
-        window.AndroidBridge.speakText(text);
-        return;
-      }
-      if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
-        window.speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(text);
-        u.rate = 0.95;
-        window.speechSynthesis.speak(u);
-      }
-    } catch(err) {}
   }
 
   function stopProp(e) {
@@ -992,7 +1353,6 @@
             }
           }
         } catch(err) {}
-        document.getElementById('status').innerHTML = 'WLED Offline - Checking ' + targetSsid + '...';
       }
     };
     try {
@@ -1037,13 +1397,14 @@
     var rMouth = document.getElementById('robo-mouth');
     
     if (data.on) {
-      rStatus.innerHTML = 'Status: Awake!';
+      rStatus.innerHTML = 'Status: Awake & Online!';
       rStatus.style.color = '#2ea043';
       rMouth.setAttribute('d', 'M16 28 Q22 32 28 28');
       
       try {
         var rgb = data.seg[0].col[0];
         if (rgb) {
+          currentRgb = [rgb[0], rgb[1], rgb[2]];
           var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
           rEyeL.setAttribute('fill', rgbStr);
           rEyeR.setAttribute('fill', rgbStr);
@@ -1051,7 +1412,7 @@
         }
       } catch (e) {}
     } else {
-      rStatus.innerHTML = 'Status: Asleep...';
+      rStatus.innerHTML = 'Status: Logo Asleep...';
       rStatus.style.color = '#8b949e';
       rEyeL.setAttribute('fill', '#444c56');
       rEyeR.setAttribute('fill', '#444c56');
@@ -1082,10 +1443,12 @@
   }
 
   function setColor(rgb) {
+    currentRgb = [rgb[0], rgb[1], rgb[2]];
     xhrRequest('POST', getApiUrl(), { on: true, seg: [{ col: [rgb] }], v: true }, updateUI);
   }
 
   function setFastColor(rgb) {
+    currentRgb = [rgb[0], rgb[1], rgb[2]];
     var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
     document.getElementById('colorPreview').style.backgroundColor = rgbStr;
     document.getElementById('robo-eye-l').setAttribute('fill', rgbStr);
@@ -1142,6 +1505,7 @@
     var pixel = ctx.getImageData(pos.x, pos.y, 1, 1).data;
     if (pixel[3] > 0) {
       var rgb = [pixel[0], pixel[1], pixel[2]];
+      currentRgb = rgb;
       var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
       document.getElementById('colorPreview').style.backgroundColor = rgbStr;
       document.getElementById('robo-eye-l').setAttribute('fill', rgbStr);
@@ -1162,6 +1526,7 @@
     if (hh === 0) hh = 12;
     var mmStr = mm < 10 ? '0' + mm : '' + mm;
     document.getElementById('clockDisplay').innerHTML = hh + ':' + mmStr + ' ' + ampm;
+    updateWeatherUI();
   }
 
   window.handleAndroidBack = function() {
