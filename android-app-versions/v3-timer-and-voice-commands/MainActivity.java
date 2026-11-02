@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
@@ -42,14 +43,15 @@ import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
 
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener, Runnable, RecognitionListener {
 
+    private static final String TAG = "BatmanASR";
     private static final String PREFS_NAME = "BatmanWledPrefs";
     private static final String DEFAULT_SSID = "wledtabletop";
     private static final String SEARCH_WAKEUP = "wakeup";
     private static final String SEARCH_BATMAN_CMD = "batman_cmd";
     private static final int REQ_CODE_SPEECH_INPUT = 1001;
 
-    /* 15 seconds total listening window for commands */
-    private static final int COMMAND_LISTEN_TIMEOUT_MS = 15000;
+    /* 10 seconds total listening window for commands */
+    private static final int COMMAND_LISTEN_TIMEOUT_MS = 10000;
     /* 3.0 seconds delay after wake word ("Yes, I am listening") before opening command mic */
     private static final long WAKE_GREETING_DELAY_MS = 3000L;
     /* 2.4 seconds pause after last spoken word before auto-executing command */
@@ -160,24 +162,27 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             for (int i = 0; i < ptmFiles.length; i++) {
                 String name = ptmFiles[i];
                 File dest = new File(ptmDir, name);
-                if (!dest.exists() || dest.length() == 0) {
-                    copyAssetFile(am, "sync/en-us-ptm/" + name, dest);
+                if (name.equals("feat.params") || name.equals("noisedict") || name.equals("README")) {
+                    copyTextAssetUnixLf(am, "sync/en-us-ptm/" + name, dest);
+                } else if (!dest.exists() || dest.length() == 0) {
+                    copyBinaryAssetFile(am, "sync/en-us-ptm/" + name, dest);
                 }
             }
 
+            /* Strip any Windows \r characters so PocketSphinx C parser gets pure Unix \n */
             File dictFile = new File(syncDir, "batman.dict");
-            copyAssetFile(am, "sync/batman.dict", dictFile);
+            copyTextAssetUnixLf(am, "sync/batman.dict", dictFile);
 
             File gramFile = new File(syncDir, "batman.gram");
-            copyAssetFile(am, "sync/batman.gram", gramFile);
+            copyTextAssetUnixLf(am, "sync/batman.gram", gramFile);
 
             File wakeupFile = new File(syncDir, "wakeup.keys");
-            copyAssetFile(am, "sync/wakeup.keys", wakeupFile);
+            copyTextAssetUnixLf(am, "sync/wakeup.keys", wakeupFile);
 
             SpeechRecognizer rec = SpeechRecognizerSetup.defaultSetup()
                     .setAcousticModel(ptmDir)
                     .setDictionary(dictFile)
-                    .setKeywordThreshold(1e-20f)
+                    .setKeywordThreshold(1e-6f)
                     .getRecognizer();
             rec.addListener(this);
             rec.addKeywordSearch(SEARCH_WAKEUP, wakeupFile);
@@ -185,19 +190,43 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
             this.offlineRecognizer = rec;
             this.offlineAsrReady = true;
+            Log.i(TAG, "PocketSphinx Offline ASR initialized successfully!");
             scheduleResumeWakeup(1000L);
         } catch (Exception e) {
+            Log.e(TAG, "PocketSphinx init error: " + e.getMessage(), e);
             this.offlineAsrReady = false;
         }
     }
 
-    private void copyAssetFile(AssetManager am, String assetPath, File outFile) throws Exception {
+    private void copyBinaryAssetFile(AssetManager am, String assetPath, File outFile) throws Exception {
         InputStream in = am.open(assetPath);
         FileOutputStream out = new FileOutputStream(outFile);
         byte[] buf = new byte[8192];
         int read;
         while ((read = in.read(buf)) != -1) {
             out.write(buf, 0, read);
+        }
+        out.flush();
+        out.close();
+        in.close();
+    }
+
+    private void copyTextAssetUnixLf(AssetManager am, String assetPath, File outFile) throws Exception {
+        InputStream in = am.open(assetPath);
+        FileOutputStream out = new FileOutputStream(outFile);
+        byte[] inBuf = new byte[8192];
+        byte[] outBuf = new byte[8192];
+        int read;
+        while ((read = in.read(inBuf)) != -1) {
+            int outIdx = 0;
+            for (int i = 0; i < read; i++) {
+                if (inBuf[i] != '\r') {
+                    outBuf[outIdx++] = inBuf[i];
+                }
+            }
+            if (outIdx > 0) {
+                out.write(outBuf, 0, outIdx);
+            }
         }
         out.flush();
         out.close();
@@ -233,12 +262,13 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             lastHeardCommandPartial = "";
             currentSearchMode = SEARCH_WAKEUP;
             offlineRecognizer.startListening(SEARCH_WAKEUP);
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Hands-Free Active: Say \"Zurich wake up\" or \"Zurich listen\"');}");
+            Log.i(TAG, "Started KWS wakeup listening (jipsy listen / wake up)");
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('WAKEUP_READY', 'Hands-Free Active: Say \"Jipsy listen\" or \"Wake up\"');}");
         } catch (Exception ignored) {
         }
     }
 
-    /* Called when "Zurich wake up" / "Zurich listen" is spoken or when the button is tapped */
+    /* Called when "Jipsy listen" / "Wake up" is spoken or when the button is tapped */
     public void onWakeWordTriggeredOnUi(boolean speakGreetingFirst) {
         if (!offlineAsrReady || offlineRecognizer == null) return;
         try {
@@ -248,7 +278,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             offlineRecognizer.cancel();
 
             if (speakGreetingFirst && tts != null && ttsReady) {
-                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PREPARING', 'Zurich: \"Yes, I am listening...\" (Wait a moment, then speak)');}");
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PREPARING', 'Jipsy: \"Yes, I am listening...\" (Wait a moment, then speak)');}");
                 tts.speak("Yes, I am listening.", TextToSpeech.QUEUE_FLUSH, null);
                 watchdogHandler.postDelayed(startCommandAfterGreetingRunnable, WAKE_GREETING_DELAY_MS);
             } else {
@@ -262,7 +292,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
-    /* Opens the 15-second command listening window after the wake greeting finishes */
+    /* Opens the 10-second command listening window after the wake greeting finishes */
     public void openCommandMicNowOnUi() {
         if (!isRunning || !offlineAsrReady || offlineRecognizer == null) return;
         try {
@@ -273,7 +303,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             lastHeardCommandPartial = "";
             currentSearchMode = SEARCH_BATMAN_CMD;
             offlineRecognizer.startListening(SEARCH_BATMAN_CMD, COMMAND_LISTEN_TIMEOUT_MS);
-            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', 'Listening Now (15s)... Speak your command clearly!');}");
+            Log.i(TAG, "Started 10s command grammar listening");
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', 'Listening Now (10s)... Speak your command clearly!');}");
         } catch (Exception ignored) {
         }
     }
@@ -289,11 +320,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private String normalizeNumbersInSpeech(String raw) {
         if (raw == null) return "";
         String s = " " + raw.toLowerCase() + " ";
-        s = s.replace(" zurich wake up ", " ")
-                .replace(" zurich listen ", " ")
-                .replace(" hey zurich ", " ")
-                .replace(" hello zurich ", " ")
-                .replace(" zurich ", " ")
+        s = s.replace(" jipsy wake up ", " ")
+                .replace(" jipsy listen ", " ")
+                .replace(" wake up ", " ")
+                .replace(" jipsy ", " ")
                 .replace(" fifteen ", " 15 ")
                 .replace(" twenty ", " 20 ")
                 .replace(" thirty ", " 30 ")
@@ -330,8 +360,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     @Override
     public void onEndOfSpeech() {
         if (offlineRecognizer != null && SEARCH_BATMAN_CMD.equals(currentSearchMode)) {
-            /* Only schedule auto-stop if we have actually captured command words;
-               otherwise keep listening for the full 15 seconds! */
             if (lastHeardCommandPartial != null && lastHeardCommandPartial.length() > 0) {
                 if (watchdogHandler != null && finalizeCommandRunnable != null) {
                     watchdogHandler.removeCallbacks(finalizeCommandRunnable);
@@ -349,9 +377,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         String lower = partial.trim().toLowerCase();
         if (lower.length() == 0) return;
 
+        Log.i(TAG, "Partial [" + currentSearchMode + "]: " + lower);
+
         if (SEARCH_WAKEUP.equals(currentSearchMode)) {
-            if (lower.contains("zurich wake up") || lower.contains("zurich listen")
-                    || (lower.contains("zurich") && (lower.contains("wake") || lower.contains("listen")))) {
+            if (lower.contains("jipsy") || lower.contains("wake up") || lower.contains("listen")) {
                 onWakeWordTriggeredOnUi(true);
             }
             return;
@@ -362,7 +391,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             if (clean.length() > 0) {
                 lastHeardCommandPartial = clean;
                 sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PARTIAL', '" + clean + "');}");
-                /* Reset the 2.4-second post-speech timer every time a new word is spoken */
                 if (watchdogHandler != null && finalizeCommandRunnable != null) {
                     watchdogHandler.removeCallbacks(finalizeCommandRunnable);
                     watchdogHandler.postDelayed(finalizeCommandRunnable, END_OF_COMMAND_SILENCE_MS);
@@ -380,7 +408,8 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (hypothesis != null && hypothesis.getHypstr() != null) {
             raw = hypothesis.getHypstr().trim().toLowerCase();
         }
-        if (raw.equals("zurich wake up") || raw.equals("zurich listen") || raw.equals("zurich")) {
+        Log.i(TAG, "Final Result: " + raw);
+        if (raw.equals("jipsy listen") || raw.equals("jipsy wake up") || raw.equals("wake up") || raw.equals("jipsy")) {
             return;
         }
         String spoken = normalizeNumbersInSpeech(raw).replace("'", "");
@@ -391,7 +420,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         if (spoken.length() > 0) {
             sendJsToWebView("if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
-            /* Wait 6 seconds (or speakOut's own timer + 3s) before re-arming wake word */
             scheduleResumeWakeup(6000L);
             return;
         }
@@ -400,6 +428,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     @Override
     public void onError(Exception error) {
+        Log.e(TAG, "ASR Error: " + error.getMessage());
         currentSearchMode = "";
         scheduleResumeWakeup(2500L);
     }
@@ -451,7 +480,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                     offlineRecognizer.cancel();
                 }
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                /* Estimate TTS speaking duration + 3 full seconds of post-speech delay before re-enabling mic */
                 long speakDurationMs = Math.max(3500L, Math.min(20000L, (long) text.length() * 80L)) + 3000L;
                 scheduleResumeWakeup(speakDurationMs);
             } catch (Exception ignored) {

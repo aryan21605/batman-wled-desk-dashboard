@@ -701,7 +701,7 @@
       <!-- Voice Command Row: Direct Mic + Command Center Modal -->
       <div class="voice-cmd-row">
         <div class="voice-cmd-cell-left">
-          <button id="mainMicBtn" class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Say "Zurich Wake Up"]</button>
+          <button id="mainMicBtn" class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Say "Jipsy Listen" / "Wake Up"]</button>
         </div>
         <div class="voice-cmd-cell-right">
           <button class="panel-cmd-btn" onclick="openVoiceModal()">[Cmd] All Commands</button>
@@ -709,7 +709,7 @@
       </div>
 
       <div class="speech-box">
-        <div id="speechText" class="speech-bubble">Hands-Free Active: Say <b>"Zurich wake up"</b> or <b>"Zurich listen"</b>, then speak your command!</div>
+        <div id="speechText" class="speech-bubble">Hands-Free Active: Say <b>"Jipsy listen"</b> or <b>"Wake up"</b>, wait 3s, then speak your command!</div>
         <table class="voice-grid">
           <tr>
             <td><button class="recite-btn" onclick="reciteClosestSchedule()">[&gt;] Next Class</button></td>
@@ -1287,7 +1287,7 @@
   window.onVoiceCommandResult = function(spokenText) {
     var micBtn = document.getElementById('mainMicBtn');
     if (micBtn) {
-      micBtn.innerHTML = '[Say "Zurich Wake Up"]';
+      micBtn.innerHTML = '[Say "Jipsy Listen" / "Wake Up"]';
       micBtn.style.background = '#231738';
       micBtn.style.borderColor = '#a371f7';
     }
@@ -1301,7 +1301,7 @@
     var antenna = document.getElementById('robo-antenna');
     if (state === 'PREPARING') {
       if (micBtn) {
-        micBtn.innerHTML = '[Zurich Waking Up... Wait]';
+        micBtn.innerHTML = '[Jipsy Waking Up... Wait]';
         micBtn.style.background = '#3d2408';
         micBtn.style.borderColor = '#f5a623';
       }
@@ -1311,7 +1311,7 @@
       if (fb && message) fb.innerHTML = message;
     } else if (state === 'LISTENING' || state === 'SPEAKING') {
       if (micBtn) {
-        micBtn.innerHTML = '[Listening (15s)... Speak Now]';
+        micBtn.innerHTML = '[Listening (10s)... Speak Now]';
         micBtn.style.background = '#195b28';
         micBtn.style.borderColor = '#3fb950';
       }
@@ -1323,7 +1323,7 @@
       if (fb) fb.innerHTML = 'Hearing: "' + message + '..."';
     } else if (state === 'WAKEUP_READY') {
       if (micBtn) {
-        micBtn.innerHTML = '[Say "Zurich Wake Up"]';
+        micBtn.innerHTML = '[Say "Jipsy Listen" / "Wake Up"]';
         micBtn.style.background = '#231738';
         micBtn.style.borderColor = '#a371f7';
       }
@@ -1331,7 +1331,7 @@
       if (fb && message) fb.innerHTML = message;
     } else {
       if (micBtn) {
-        micBtn.innerHTML = '[Say "Zurich Wake Up"]';
+        micBtn.innerHTML = '[Say "Jipsy Listen" / "Wake Up"]';
         micBtn.style.background = '#231738';
         micBtn.style.borderColor = '#a371f7';
       }

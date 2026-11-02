@@ -2,7 +2,7 @@
 
 grammar batman;
 
-<wake> = ( zurich wake up | zurich listen | zurich );
+<wake> = ( jipsy listen | jipsy wake up | wake up | jipsy );
 
 <power_cmd> = ( turn on | turn off | power on | power off | lights on | lights off | logo on | logo off ) [ the ] [ lights | light | batman | logo ];
 
@@ -27,6 +27,6 @@ grammar batman;
 <task_cmd> = ( add | new | schedule ) task <note_phrase>;
 <note_cmd> = ( add | write | quick | take | new ) ( note | notes ) <note_phrase>;
 
-<info_cmd> = [ what is ] [ the ] ( weather | temperature ) | next ( class | lecture ) | [ show ] timetable | [ read ] [ my ] ( tasks | notes ) | [ full ] ( briefing | status ) | hello [ zurich | robot ];
+<info_cmd> = [ what is ] [ the ] ( weather | temperature ) | next ( class | lecture ) | [ show ] timetable | [ read ] [ my ] ( tasks | notes ) | [ full ] ( briefing | status ) | hello [ jipsy | robot ];
 
 public <command> = [ <wake> ] ( <power_cmd> | <timer_cmd> | <rand_cmd> | <color_cmd> | <preset_cmd> | <bri_cmd> | <ix_cmd> | <task_cmd> | <note_cmd> | <info_cmd> );
