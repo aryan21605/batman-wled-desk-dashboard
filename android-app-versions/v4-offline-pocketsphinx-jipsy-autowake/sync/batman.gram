@@ -1,0 +1,32 @@
+#JSGF V1.0;
+
+grammar batman;
+
+<wake> = ( jipsy listen | jipsy wake up | wake up | jipsy );
+
+<power_cmd> = ( turn on | turn off | power on | power off | lights on | lights off | logo on | logo off ) [ the ] [ lights | light | batman | logo ];
+
+<timer_num> = ( five | ten | fifteen | twenty | thirty | forty | sixty | ninety );
+<timer_cmd> = [ set | start | enable ] timer [ for ] <timer_num> [ minute | minutes ] | ( stop | cancel | reset ) timer;
+
+<rand_cmd> = [ set | change ] random ( color | effect | animation ) | next effect;
+
+<color_name> = ( orange | yellow | gold | red | blue | cyan | purple | violet | green | pink | white );
+<color_cmd> = [ set | change ] [ color ] <color_name>;
+
+<preset_num> = ( one | two | three | four | five | six | seven | eight );
+<preset_cmd> = [ set ] preset <preset_num>;
+
+<pct_num> = ( zero | five | ten | fifteen | twenty | thirty | forty | fifty | sixty | seventy | eighty | ninety | hundred );
+<bri_cmd> = [ set ] brightness [ to ] <pct_num> [ percent ];
+<ix_cmd> = [ set ] [ effect ] intensity [ to ] <pct_num> [ percent ];
+
+<note_word> = ( study | homework | assignment | lab | report | project | exam | test | quiz | tomorrow | today | tonight | morning | evening | meeting | class | check | sensor | pin | voltage | circuit | wire | battery | cable | led | strip | code | fix | bug | update | call | mom | dad | friend | home | doctor | professor | teacher | buy | food | water | milk | coffee | remember | important | urgent | deadline | monday | tuesday | wednesday | thursday | friday | one | two | three | four | five | six | seven | eight | ten | fifteen | twenty | thirty | fifty | hundred );
+<note_phrase> = <note_word> [ <note_word> ] [ <note_word> ] [ <note_word> ];
+
+<task_cmd> = ( add | new | schedule ) task <note_phrase>;
+<note_cmd> = ( add | write | quick | take | new ) ( note | notes ) <note_phrase>;
+
+<info_cmd> = [ what is ] [ the ] ( weather | temperature ) | next ( class | lecture ) | [ show ] timetable | [ read ] [ my ] ( tasks | notes ) | [ full ] ( briefing | status ) | hello [ jipsy | robot ];
+
+public <command> = [ <wake> ] ( <power_cmd> | <timer_cmd> | <rand_cmd> | <color_cmd> | <preset_cmd> | <bri_cmd> | <ix_cmd> | <task_cmd> | <note_cmd> | <info_cmd> );

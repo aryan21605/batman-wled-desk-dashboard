@@ -1,0 +1,2323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Batman WLED Landscape Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d0f12;
+      color: #e6edf3;
+      margin: 0;
+      padding: 5px 8px;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Top Utility Bar */
+    .top-bar {
+      display: table;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    .top-left {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: left;
+    }
+    .top-right {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+    }
+    .schedule-top-btn {
+      background: #1c1f24;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      font-weight: bold;
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .wifi-badge {
+      display: inline-block;
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #58a6ff;
+      font-size: 11px;
+      padding: 4px 7px;
+      border-radius: 5px;
+      margin-left: 4px;
+      cursor: pointer;
+    }
+    .timer-pill {
+      display: inline-block;
+      background: #161b22;
+      border: 1px solid #d29922;
+      color: #f5a623;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-right: 4px;
+      cursor: pointer;
+    }
+    .timer-pill.active {
+      background: #3d2408;
+      border-color: #f5a623;
+      color: #ffffff;
+    }
+    .weather-pill {
+      display: inline-block;
+      background: #161b22;
+      border: 1px solid #2ea043;
+      color: #3fb950;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-right: 4px;
+      cursor: pointer;
+    }
+
+    /* 2-Column Landscape Split */
+    .dashboard-layout {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+    .col-left {
+      display: table-cell;
+      width: 45%;
+      vertical-align: top;
+      padding-right: 6px;
+    }
+    .col-right {
+      display: table-cell;
+      width: 55%;
+      vertical-align: top;
+      padding-left: 6px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin-bottom: 5px;
+    }
+
+    /* Robo Companion Card */
+    .robo-card {
+      text-align: center;
+      padding: 6px;
+    }
+    .pulse-animation {
+      animation: eyePulse 2.5s infinite ease-in-out;
+      -webkit-animation: eyePulse 2.5s infinite ease-in-out;
+    }
+    @keyframes eyePulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1.0; }
+      100% { opacity: 0.7; }
+    }
+    @-webkit-keyframes eyePulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1.0; }
+      100% { opacity: 0.7; }
+    }
+    .robo-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #ffffff;
+      margin-top: 1px;
+    }
+    .robo-status-line {
+      font-size: 11px;
+      font-weight: bold;
+      margin-top: 1px;
+    }
+
+    /* Voice Command Buttons Row */
+    .voice-cmd-row {
+      display: table;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .voice-cmd-cell-wake {
+      display: table-cell;
+      width: 38%;
+      padding-right: 2px;
+    }
+    .voice-cmd-cell-left {
+      display: table-cell;
+      width: 36%;
+      padding-left: 2px;
+      padding-right: 2px;
+    }
+    .voice-cmd-cell-right {
+      display: table-cell;
+      width: 26%;
+      padding-left: 2px;
+    }
+    .autowake-btn {
+      width: 100%;
+      background: #143d22;
+      border: 1px solid #2ea043;
+      color: #3fb950;
+      padding: 6px 3px;
+      font-weight: bold;
+      font-size: 10.5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .autowake-btn.off {
+      background: #3b1818;
+      border-color: #da3633;
+      color: #ff7b72;
+    }
+    .mic-cmd-btn {
+      width: 100%;
+      background: #231738;
+      border: 1px solid #a371f7;
+      color: #e2c5ff;
+      padding: 6px 3px;
+      font-weight: bold;
+      font-size: 10.5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .panel-cmd-btn {
+      width: 100%;
+      background: #1c2536;
+      border: 1px solid #58a6ff;
+      color: #79c0ff;
+      padding: 6px 3px;
+      font-weight: bold;
+      font-size: 10.5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Recite Schedule & Voice Assistant Box */
+    .speech-box {
+      margin-top: 4px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 5px;
+      text-align: left;
+    }
+    .speech-bubble {
+      font-size: 11px;
+      color: #c9d1d9;
+      min-height: 26px;
+      line-height: 1.25;
+    }
+    .voice-grid {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 3px;
+      margin-top: 3px;
+    }
+    .voice-grid td {
+      width: 50%;
+    }
+    .recite-btn {
+      width: 100%;
+      background: #21262d;
+      border: 1px solid #388bfd;
+      color: #58a6ff;
+      padding: 5px 4px;
+      font-weight: bold;
+      font-size: 11px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .recite-btn.green {
+      border-color: #2ea043;
+      color: #3fb950;
+    }
+    .recite-btn.amber {
+      border-color: #d29922;
+      color: #f5a623;
+    }
+    .recite-btn.purple {
+      border-color: #8957e5;
+      color: #d2a8ff;
+    }
+
+    /* Quick Notes & Tasks Buttons (Below Robot) */
+    .notes-btn-row {
+      display: table;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .notes-btn-cell {
+      display: table-cell;
+      width: 50%;
+    }
+    .notes-launch-btn {
+      width: 100%;
+      background: #1c1f24;
+      border: 1px dashed #f5a623;
+      color: #f5a623;
+      padding: 5px 4px;
+      font-weight: bold;
+      font-size: 11px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Right Panel Controls */
+    button {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #ffffff;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .power-btn {
+      width: 100%;
+      padding: 7px;
+      font-size: 13px;
+      font-weight: bold;
+      background: #21262d;
+      border-radius: 6px;
+    }
+    .power-btn.on {
+      background: #195b28;
+      border-color: #2ea043;
+    }
+
+    /* Randomizer Row */
+    .random-row {
+      display: table;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .random-cell-left {
+      display: table-cell;
+      width: 50%;
+      padding-right: 3px;
+    }
+    .random-cell-right {
+      display: table-cell;
+      width: 50%;
+      padding-left: 3px;
+    }
+    .rand-color-btn {
+      width: 100%;
+      background: #1f242c;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      font-weight: bold;
+      font-size: 11px;
+      padding: 5px 4px;
+      border-radius: 6px;
+    }
+    .rand-fx-btn {
+      width: 100%;
+      background: #1f242c;
+      border: 1px solid #a371f7;
+      color: #d2a8ff;
+      font-weight: bold;
+      font-size: 11px;
+      padding: 5px 4px;
+      border-radius: 6px;
+    }
+
+    /* Always-Visible Quick Timer Bar on Right Panel */
+    .quick-timer-card {
+      background: #161b22;
+      border: 1px solid #d29922;
+      border-radius: 8px;
+      padding: 5px 8px;
+      margin-bottom: 5px;
+    }
+    .qt-header {
+      display: table;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+    .qt-title {
+      display: table-cell;
+      vertical-align: middle;
+      font-size: 11px;
+      font-weight: bold;
+      color: #f5a623;
+    }
+    .qt-digits {
+      font-family: monospace, Courier, sans-serif;
+      font-size: 13px;
+      font-weight: bold;
+      color: #ffffff;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+    .qt-right {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+      font-size: 10px;
+      color: #c9d1d9;
+    }
+    .qt-btn-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 3px;
+    }
+    .qt-btn-table td {
+      width: 20%;
+    }
+    .qt-btn {
+      width: 100%;
+      background: #21262d;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      font-weight: bold;
+      padding: 5px 2px;
+      font-size: 11px;
+      border-radius: 5px;
+    }
+    .qt-btn.custom {
+      border-color: #58a6ff;
+      color: #58a6ff;
+    }
+    .qt-btn.stop {
+      background: #491818;
+      border-color: #8b2424;
+      color: #ffa198;
+    }
+
+    /* Sliders & Rows */
+    .row {
+      display: table;
+      width: 100%;
+      margin-bottom: 1px;
+    }
+    .row-left { display: table-cell; text-align: left; vertical-align: middle; }
+    .row-right { display: table-cell; text-align: right; vertical-align: middle; }
+    input[type=range] {
+      width: 100%;
+      margin: 1px 0;
+    }
+
+    /* 2-Tab Navigation Bar */
+    .tabs {
+      background: #0d1117;
+      padding: 2px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      margin-bottom: 5px;
+      display: table;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .tabs button {
+      display: table-cell;
+      width: 50%;
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      padding: 4px 0;
+      font-size: 11px;
+    }
+    .tabs button.active {
+      background: #21262d;
+      color: #ffffff;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Color Wheel & Swatches Section */
+    .picker-split {
+      display: table;
+      width: 100%;
+    }
+    .picker-col-left {
+      display: table-cell;
+      width: 44%;
+      vertical-align: middle;
+      text-align: center;
+    }
+    .picker-col-right {
+      display: table-cell;
+      width: 56%;
+      vertical-align: middle;
+      padding-left: 6px;
+    }
+    .swatch-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 4px;
+    }
+    .color-swatch {
+      height: 26px;
+      border-radius: 5px;
+      cursor: pointer;
+      border: 1px solid #444;
+    }
+    canvas {
+      border-radius: 50%;
+      cursor: pointer;
+      display: block;
+      margin: 0 auto;
+    }
+    .color-preview {
+      width: 80%;
+      height: 7px;
+      border-radius: 3px;
+      margin: 3px auto 0 auto;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .preset-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 4px;
+    }
+    .preset-table button { width: 100%; padding: 6px 4px; }
+
+    .status-text {
+      font-size: 10px;
+      color: #8b949e;
+      text-align: center;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+    }
+    .modal-overlay.open { display: block; }
+    .modal-content {
+      position: absolute;
+      top: 5%; left: 5%; width: 90%; height: 90%;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 12px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    .notes-modal-content {
+      top: 6% !important;
+      left: 6% !important;
+      width: 88% !important;
+      height: 88% !important;
+    }
+    #quickNotesArea {
+      width: 100%;
+      height: 62%;
+      background: #0d1117;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 10px;
+      font-family: monospace, Courier, sans-serif;
+      font-size: 13px;
+      box-sizing: border-box;
+      resize: none;
+    }
+
+    /* Task List Styles */
+    .task-input-row {
+      display: table;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .task-input-cell {
+      display: table-cell;
+      padding-right: 6px;
+    }
+    .task-input-cell input {
+      width: 100%;
+      background: #0d1117;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      padding: 7px 8px;
+      font-size: 12px;
+    }
+    .task-time-cell {
+      display: table-cell;
+      width: 90px;
+      padding-right: 6px;
+    }
+    .task-time-cell input {
+      width: 100%;
+      background: #0d1117;
+      color: #f5a623;
+      border: 1px solid #30363d;
+      border-radius: 5px;
+      padding: 7px 6px;
+      font-size: 12px;
+    }
+    .task-btn-cell {
+      display: table-cell;
+      width: 70px;
+    }
+    .task-item {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      padding: 7px 10px;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      display: table;
+      width: 100%;
+    }
+    .task-item.done .task-text {
+      text-decoration: line-through;
+      color: #6e7681;
+    }
+    .task-text {
+      font-size: 12px;
+      color: #e6edf3;
+    }
+    .task-time-badge {
+      font-size: 10px;
+      background: #1c1f24;
+      border: 1px solid #f5a623;
+      color: #f5a623;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+
+    /* Timetable Elements */
+    .day-selector {
+      display: table;
+      width: 100%;
+      margin: 8px 0;
+    }
+    .day-selector button {
+      display: table-cell;
+      padding: 6px;
+      font-size: 12px;
+    }
+    .day-selector button.active {
+      background: #f5a623;
+      color: #000;
+      font-weight: bold;
+    }
+    .period-item {
+      background: #0d1117;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      display: table;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .period-left { display: table-cell; vertical-align: middle; }
+    .period-right { display: table-cell; text-align: right; vertical-align: middle; width: 80px; }
+    .period-time { font-size: 11px; color: #8b949e; }
+    .period-title { font-size: 12px; font-weight: bold; margin-top: 1px; }
+    .period-tag {
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #ffffff;
+      display: inline-block;
+    }
+    .tag-lecture { background: #2ea043; }
+    .tag-practical { background: #d29922; color: #000000; }
+    .tag-tutorial { background: #a371f7; }
+
+    /* Voice Command Chip Helper */
+    .cmd-chip {
+      display: inline-block;
+      background: #21262d;
+      border: 1px solid #388bfd;
+      color: #79c0ff;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 5px 8px;
+      border-radius: 5px;
+      margin: 2px;
+      cursor: pointer;
+    }
+
+    /* Custom Timer Numpad Table */
+    .numpad-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 5px;
+      margin-top: 6px;
+    }
+    .numpad-table td {
+      width: 25%;
+    }
+    .numpad-btn {
+      width: 100%;
+      padding: 9px 4px;
+      font-size: 14px;
+      font-weight: bold;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #ffffff;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-left">
+    <svg width="28" height="18" viewBox="0 0 100 64" style="vertical-align:middle; margin-right:4px;">
+      <ellipse cx="50" cy="32" rx="48" ry="29" fill="#f5b90f" stroke="#111" stroke-width="3"/>
+      <polygon points="50,15 53,15 55,8 57,19 66,19 75,12 88,28 86,45 73,39 67,50 58,43 50,58 42,43 33,50 27,39 14,45 12,28 25,12 34,19 43,19 45,8 47,15" fill="#0d0f12"/>
+    </svg>
+    <button class="schedule-top-btn" onclick="openSchedule()">[=] Timetable</button>
+    <span class="wifi-badge" id="wifiBadge" onclick="openSettingsModal()">Wi-Fi: wledtabletop [*]</span>
+  </div>
+  <div class="top-right">
+    <span class="timer-pill" id="topTimerPill" onclick="openCustomTimerModal()">[Timer: Off]</span>
+    <span class="weather-pill" id="weatherPill" onclick="speakWeather()">Patiala: 23°C</span>
+    <span id="clockDisplay" style="font-size:11px; color:#f5a623; font-weight:bold;"></span>
+  </div>
+</div>
+
+<!-- Landscape Split -->
+<div class="dashboard-layout">
+  
+  <!-- LEFT PANEL: Mascot, Voice Command Mic & Command Center, Interactive Voice Assistant, Quick Notes & Tasks -->
+  <div class="col-left">
+    <div class="card robo-card">
+      <div onclick="speakFullBriefing()" style="cursor:pointer;" title="Tap Robot for Full Briefing">
+        <svg id="robo-face" width="88" height="70" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="6" width="40" height="30" rx="6" fill="#21262d" stroke="#30363d" stroke-width="2"/>
+          <rect x="18" y="2" width="8" height="4" fill="#8b949e"/>
+          <circle id="robo-antenna" cx="22" cy="1" r="1.8" fill="#f5a623"/>
+          <path d="M5 36 H39" stroke="#30363d" stroke-width="2"/>
+          <path d="M12 36 L16 39" stroke="#30363d" stroke-width="2"/>
+          <path d="M32 36 L28 39" stroke="#30363d" stroke-width="2"/>
+          <circle id="robo-eye-l" class="pulse-animation" cx="14" cy="20" r="4.8" fill="#ff9900"/>
+          <circle id="robo-eye-r" class="pulse-animation" cx="30" cy="20" r="4.8" fill="#ff9900"/>
+          <path id="robo-mouth" d="M18 28 Q22 31 26 28" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="robo-title">Batman Robo Assistant</div>
+      <div id="roboStatus" class="robo-status-line" style="color:#ff9900;">Status: Ready</div>
+
+      <!-- Voice Command Row: Auto-Wake Toggle + Direct Mic + Command Center Modal -->
+      <div class="voice-cmd-row">
+        <div class="voice-cmd-cell-wake">
+          <button id="autoWakeBtn" class="autowake-btn" onclick="toggleAutoWake()">[Auto-Wake: ON]</button>
+        </div>
+        <div class="voice-cmd-cell-left">
+          <button id="mainMicBtn" class="mic-cmd-btn" onclick="triggerVoiceCommand()">[Mic] Speak Now</button>
+        </div>
+        <div class="voice-cmd-cell-right">
+          <button class="panel-cmd-btn" onclick="openVoiceModal()">[Cmd] List</button>
+        </div>
+      </div>
+
+      <div class="speech-box">
+        <div id="speechText" class="speech-bubble">Auto-Wake ON: Say <b>"Jipsy listen"</b> or <b>"Wake up"</b> (auto-stops 1.8s after your last word)!</div>
+        <table class="voice-grid">
+          <tr>
+            <td><button class="recite-btn" onclick="reciteClosestSchedule()">[&gt;] Next Class</button></td>
+            <td><button class="recite-btn green" onclick="speakWeather()">[*] Weather</button></td>
+          </tr>
+          <tr>
+            <td><button class="recite-btn amber" onclick="speakTasksAndNotes()">[+] Tasks &amp; Notes</button></td>
+            <td><button class="recite-btn purple" onclick="speakFullBriefing()">[!] Full Briefing</button></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Quick Notes & Task Scheduler Launch Buttons -->
+      <div class="notes-btn-row">
+        <div class="notes-btn-cell" style="padding-right:3px;">
+          <button class="notes-launch-btn" onclick="openNotesModal('notes')">[Edit] Quick Notes</button>
+        </div>
+        <div class="notes-btn-cell" style="padding-left:3px;">
+          <button class="notes-launch-btn" style="border-color:#58a6ff; color:#58a6ff;" onclick="openNotesModal('tasks')">[List] Task Scheduler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: WLED Controls + Always-Visible Desk Timer -->
+  <div class="col-right">
+    <div class="card">
+      <button id="toggleBtn" class="power-btn" onclick="togglePower()">Power: Connecting...</button>
+      <!-- Random Colour & Random Effect Buttons -->
+      <div class="random-row">
+        <div class="random-cell-left">
+          <button class="rand-color-btn" onclick="setRandomColor()">[?] Random Colour</button>
+        </div>
+        <div class="random-cell-right">
+          <button class="rand-fx-btn" onclick="setRandomEffectKeepColor()">[*] Random Effect (Same Col)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALWAYS-VISIBLE DESK TIMER BAR (10m, 15m, 30m, Custom, Stop) -->
+    <div class="quick-timer-card">
+      <div class="qt-header">
+        <div class="qt-title">
+          DESK TIMER <span class="qt-digits" id="timerDigits">00:00</span>
+        </div>
+        <div class="qt-right">
+          <label style="cursor:pointer;">
+            <input type="checkbox" id="timerTurnOffLeds" style="vertical-align:middle;"> Auto-Off LEDs
+          </label>
+        </div>
+      </div>
+      <table class="qt-btn-table">
+        <tr>
+          <td><button class="qt-btn" onclick="startCountdownTimer(10)">10 Min</button></td>
+          <td><button class="qt-btn" onclick="startCountdownTimer(15)">15 Min</button></td>
+          <td><button class="qt-btn" onclick="startCountdownTimer(30)">30 Min</button></td>
+          <td><button class="qt-btn custom" onclick="openCustomTimerModal()">Custom</button></td>
+          <td><button class="qt-btn stop" onclick="stopCountdownTimer(true)">Stop</button></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Brightness & Intensity Sliders -->
+    <div class="card">
+      <div class="row">
+        <div class="row-left"><span style="font-size:11px; font-weight:bold;">Brightness</span></div>
+        <div class="row-right"><span id="briVal" style="font-size:11px; color:#f5a623;">50%</span></div>
+      </div>
+      <input type="range" id="briSlider" min="1" max="255" value="128" onchange="setBrightness(this.value)" oninput="previewBri(this.value)">
+
+      <div class="row" style="margin-top:2px;">
+        <div class="row-left"><span style="font-size:11px; font-weight:bold;">Effect Intensity</span></div>
+        <div class="row-right"><span id="ixVal" style="font-size:11px; color:#58a6ff;">50%</span></div>
+      </div>
+      <input type="range" id="ixSlider" min="0" max="255" value="128" onchange="setIntensity(this.value)" oninput="previewIx(this.value)">
+    </div>
+
+    <!-- 2-Tab Bar: Colour Wheel | Presets -->
+    <div class="tabs">
+      <button id="tabBtnColors" class="active" onclick="switchTab('colors')">Colour Wheel</button>
+      <button id="tabBtnPresets" onclick="switchTab('presets')">Saved Presets (P1-P8)</button>
+    </div>
+
+    <!-- Tab 1: Colour Wheel & Swatches -->
+    <div class="card tab-content active" id="tabColors">
+      <div class="picker-split">
+        <div class="picker-col-left">
+          <canvas id="colorWheel" width="86" height="86"></canvas>
+          <div id="colorPreview" class="color-preview" style="background:#ff9900"></div>
+        </div>
+        <div class="picker-col-right">
+          <table class="swatch-table">
+            <tr>
+              <td class="color-swatch" style="background:#ff9900" onclick="setFastColor([255,153,0])"></td>
+              <td class="color-swatch" style="background:#ff3300" onclick="setFastColor([255,51,0])"></td>
+              <td class="color-swatch" style="background:#ffffff" onclick="setFastColor([255,255,255])"></td>
+            </tr>
+            <tr>
+              <td class="color-swatch" style="background:#0077ff" onclick="setFastColor([0,119,255])"></td>
+              <td class="color-swatch" style="background:#8800ff" onclick="setFastColor([136,0,255])"></td>
+              <td class="color-swatch" style="background:#00f2fe" onclick="setFastColor([0,242,254])"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Saved Presets -->
+    <div class="card tab-content" id="tabPresets">
+      <table class="preset-table">
+        <tr>
+          <td><button onclick="setPreset(1)">P 1</button></td>
+          <td><button onclick="setPreset(2)">P 2</button></td>
+          <td><button onclick="setPreset(3)">P 3</button></td>
+          <td><button onclick="setPreset(4)">P 4</button></td>
+        </tr>
+        <tr>
+          <td><button onclick="setPreset(5)">P 5</button></td>
+          <td><button onclick="setPreset(6)">P 6</button></td>
+          <td><button onclick="setPreset(7)">P 7</button></td>
+          <td><button onclick="setPreset(8)">P 8</button></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="status-text" id="status">Syncing with WLED (4.3.2.1)...</div>
+  </div>
+
+</div>
+
+<!-- Custom Timer Keypad Modal -->
+<div class="modal-overlay" id="customTimerModal" onclick="closeCustomTimerOverlay(event)">
+  <div class="modal-content" style="top:8%; left:15%; width:70%; height:84%;" onclick="stopProp(event)">
+    <div class="row" style="margin-bottom:6px;">
+      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#f5a623;">Set Custom Countdown Timer</span></div>
+      <div class="row-right"><button onclick="closeCustomTimerDirect()" style="padding:4px 10px;">X</button></div>
+    </div>
+    <div style="background:#0d1117; border:1px solid #f5a623; border-radius:6px; padding:8px 12px; text-align:center; margin-bottom:6px;">
+      <span id="customMinutesDisplay" style="font-size:24px; font-weight:bold; color:#ffffff; font-family:monospace;">25</span>
+      <span style="font-size:14px; color:#f5a623; font-weight:bold;"> MINUTES</span>
+    </div>
+    <div style="margin-bottom:6px; text-align:center;">
+      <span class="cmd-chip" onclick="startCustomAndClose(5)">5 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(10)">10 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(15)">15 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(20)">20 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(30)">30 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(45)">45 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(60)">60 Min</span>
+      <span class="cmd-chip" onclick="startCustomAndClose(90)">90 Min</span>
+    </div>
+    <table class="numpad-table">
+      <tr>
+        <td><button class="numpad-btn" onclick="numpadPress('1')">1</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('2')">2</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('3')">3</button></td>
+        <td><button class="numpad-btn" style="background:#5c1d1d; border-color:#8b2424;" onclick="numpadClear()">Clear</button></td>
+      </tr>
+      <tr>
+        <td><button class="numpad-btn" onclick="numpadPress('4')">4</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('5')">5</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('6')">6</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('0')">0</button></td>
+      </tr>
+      <tr>
+        <td><button class="numpad-btn" onclick="numpadPress('7')">7</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('8')">8</button></td>
+        <td><button class="numpad-btn" onclick="numpadPress('9')">9</button></td>
+        <td><button class="numpad-btn" style="background:#195b28; border-color:#2ea043;" onclick="confirmCustomTimerPad()">Start</button></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- Voice Command / Natural Language Command Modal -->
+<div class="modal-overlay" id="voiceModal" onclick="closeVoiceOverlay(event)">
+  <div class="modal-content" style="top:6%; left:7%; width:86%; height:88%;" onclick="stopProp(event)">
+    <div class="row" style="margin-bottom:6px;">
+      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#d2a8ff;">Robot Voice &amp; Command Center</span></div>
+      <div class="row-right"><button onclick="closeVoiceDirect()" style="padding:4px 10px;">X</button></div>
+    </div>
+    <div style="font-size:11px; color:#8b949e; margin-bottom:6px;">
+      Tap any command below to execute immediately, type a custom command, or tap <b>[Mic]</b> (Note: when connected to offline WLED Wi-Fi <b>wledtabletop</b>, Google's cloud mic has no internet, so you can tap or type commands right here!):
+    </div>
+    <div class="task-input-row">
+      <div class="task-input-cell">
+        <input type="text" id="voiceCmdInput" placeholder="Type command: e.g. timer 20, turn on lights, add task study PID...">
+      </div>
+      <div class="task-btn-cell" style="width:85px; padding-right:4px;">
+        <button onclick="runTypedVoiceCommand()" style="width:100%; background:#195b28; border-color:#2ea043; font-weight:bold;">Run</button>
+      </div>
+      <div class="task-btn-cell" style="width:85px;">
+        <button onclick="startNativeMicOnly()" style="width:100%; background:#231738; border-color:#a371f7; color:#e2c5ff; font-weight:bold;">[Mic]</button>
+      </div>
+    </div>
+    <div style="font-size:11px; color:#f5a623; margin:4px 0 4px 0; font-weight:bold;">1-Tap Robot Voice Commands (Works 100% Offline on wledtabletop):</div>
+    <div>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 10 minutes')">Timer: 10 Min</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 15 minutes')">Timer: 15 Min</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set timer for 30 minutes')">Timer: 30 Min</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('stop timer')">Stop Timer</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('turn on lights')">Turn On Lights</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('turn off lights')">Turn Off Lights</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('random color')">Random Colour</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('random effect')">Random Effect</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color orange')">Colour: Orange</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color blue')">Colour: Blue</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color red')">Colour: Red</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set color purple')">Colour: Purple</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set effect intensity 80 percent')">Intensity: 80%</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('set effect intensity 40 percent')">Intensity: 40%</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('write note check sensor pin')">Write Note: Sensor Pin</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('what is the weather')">Speak Weather</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('next class')">Speak Next Class</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('read my tasks')">Read Tasks &amp; Notes</span>
+      <span class="cmd-chip" onclick="executeVoiceCommand('full briefing')">Full Briefing</span>
+    </div>
+    <div id="voiceCmdFeedback" style="margin-top:8px; padding:8px; background:#0d1117; border:1px solid #30363d; border-radius:6px; font-size:12px; color:#3fb950; min-height:30px;">
+      Ready! Tap any command chip above or type a command.
+    </div>
+  </div>
+</div>
+
+<!-- Timetable Modal -->
+<div class="modal-overlay" id="scheduleModal" onclick="closeSchedule(event)">
+  <div class="modal-content" onclick="stopProp(event)">
+    <div class="row">
+      <div class="row-left"><span style="font-size:14px; font-weight:bold;">Full Academic Timetable</span></div>
+      <div class="row-right"><button onclick="closeScheduleDirect()" style="padding:4px 10px;">X</button></div>
+    </div>
+    <div class="day-selector">
+      <button id="dayBtn1" onclick="showDay(1)">Mon</button>
+      <button id="dayBtn2" onclick="showDay(2)">Tue</button>
+      <button id="dayBtn3" onclick="showDay(3)">Wed</button>
+      <button id="dayBtn4" onclick="showDay(4)">Thu</button>
+      <button id="dayBtn5" onclick="showDay(5)">Fri</button>
+    </div>
+    <div id="scheduleDisplay"></div>
+  </div>
+</div>
+
+<!-- Quick Notes & Task Scheduler Modal -->
+<div class="modal-overlay" id="notesModal" onclick="closeNotesOverlay(event)">
+  <div class="modal-content notes-modal-content" onclick="stopProp(event)">
+    <div class="row" style="margin-bottom: 6px;">
+      <div class="row-left">
+        <button id="subTabNotes" onclick="switchNotesSubTab('notes')" style="background:#f5a623; color:#000; font-weight:bold; padding:5px 10px; margin-right:4px;">Quick Scratchpad</button>
+        <button id="subTabTasks" onclick="switchNotesSubTab('tasks')" style="background:#21262d; color:#fff; padding:5px 10px;">Task Scheduler</button>
+      </div>
+      <div class="row-right"><button onclick="closeNotesDirect()" style="padding:4px 10px;">X</button></div>
+    </div>
+
+    <!-- Notes Panel -->
+    <div id="panelNotes">
+      <textarea id="quickNotesArea" placeholder="Jot down quick pinouts, reminders, or formulas here..."></textarea>
+      <div class="row" style="margin-top: 8px;">
+        <div class="row-left">
+          <button onclick="clearNotes()" style="background:#5c1d1d; border-color:#8b2424; font-size:11px;">Clear</button>
+          <button onclick="speakNotesOnly()" style="background:#21262d; border-color:#58a6ff; color:#58a6ff; font-size:11px; margin-left:4px;">[Speak] Read Notes</button>
+        </div>
+        <div class="row-right">
+          <span id="saveStatus" style="font-size:11px; color:#2ea043; margin-right:8px;"></span>
+          <button onclick="saveNotes()" style="background:#195b28; border-color:#2ea043; font-weight:bold;">Save Notes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Scheduler Panel -->
+    <div id="panelTasks" style="display:none;">
+      <div class="task-input-row">
+        <div class="task-time-cell">
+          <input type="text" id="newTaskTime" placeholder="e.g. 17:30">
+        </div>
+        <div class="task-input-cell">
+          <input type="text" id="newTaskText" placeholder="Add a scheduled task or reminder...">
+        </div>
+        <div class="task-btn-cell">
+          <button onclick="addTask()" style="width:100%; background:#195b28; border-color:#2ea043; font-weight:bold;">+ Add</button>
+        </div>
+      </div>
+      <div id="tasksContainer" style="max-height:200px; overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WLED & Wi-Fi Settings Modal -->
+<div class="modal-overlay" id="settingsModal" onclick="closeSettingsOverlay(event)">
+  <div class="modal-content" style="top:12%; left:12%; width:76%; height:76%;" onclick="stopProp(event)">
+    <div class="row" style="margin-bottom:10px;">
+      <div class="row-left"><span style="font-size:14px; font-weight:bold; color:#58a6ff;">WLED AP &amp; Wi-Fi Watchdog Settings</span></div>
+      <div class="row-right"><button onclick="closeSettingsDirect()" style="padding:4px 10px;">X</button></div>
+    </div>
+    <div style="font-size:12px; margin-bottom:8px;">
+      <div style="margin-bottom:4px; color:#8b949e;">WLED IP Address (Default AP is 4.3.2.1):</div>
+      <input type="text" id="wledIpInput" value="4.3.2.1" style="width:100%; padding:8px; background:#0d1117; color:#fff; border:1px solid #30363d; border-radius:5px;">
+    </div>
+    <div style="font-size:12px; margin-bottom:12px;">
+      <div style="margin-bottom:4px; color:#8b949e;">Target WLED Wi-Fi SSID (Auto-Reconnect Lock):</div>
+      <input type="text" id="wledSsidInput" value="wledtabletop" style="width:100%; padding:8px; background:#0d1117; color:#fff; border:1px solid #30363d; border-radius:5px;">
+    </div>
+    <div class="row">
+      <div class="row-left">
+        <button onclick="triggerManualReconnect()" style="background:#21262d; border-color:#58a6ff; color:#58a6ff;">Force Wi-Fi Reconnect</button>
+        <button onclick="fetchLiveWeather(true)" style="background:#21262d; border-color:#2ea043; color:#3fb950; margin-left:4px;">Sync Weather</button>
+      </div>
+      <div class="row-right">
+        <button onclick="saveWledSettings()" style="background:#195b28; border-color:#2ea043; font-weight:bold;">Save &amp; Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var NOTES_KEY = 'desk_dashboard_notes';
+  var TASKS_KEY = 'desk_dashboard_tasks';
+  var WEATHER_KEY = 'patiala_weather_cache';
+  var IP_KEY = 'wled_host_ip';
+  var SSID_KEY = 'target_ssid';
+
+  var wledIp = '4.3.2.1';
+  var targetSsid = 'wledtabletop';
+  var isPoweredOn = false;
+  var currentRgb = [255, 153, 0];
+  var mouthAnimTimer = null;
+
+  /* Timer State */
+  var timerRemainingSecs = 0;
+  var timerTotalMins = 0;
+  var timerInterval = null;
+  var customPadStr = '25';
+
+  var DEFAULT_WEATHER = {
+    temp: 22.5,
+    high: 28.7,
+    low: 17.7,
+    humidity: 66,
+    wind: 7.4,
+    cond: 'Clear'
+  };
+
+  var WLED_EFFECTS = [
+    { id: 0, name: 'Solid' },
+    { id: 1, name: 'Blink' },
+    { id: 2, name: 'Breathe' },
+    { id: 3, name: 'Wipe' },
+    { id: 6, name: 'Sweep' },
+    { id: 8, name: 'Colorloop' },
+    { id: 9, name: 'Rainbow' },
+    { id: 10, name: 'Scan' },
+    { id: 11, name: 'Dual Scan' },
+    { id: 12, name: 'Fade' },
+    { id: 13, name: 'Theater Chase' },
+    { id: 15, name: 'Running' },
+    { id: 17, name: 'Twinkle' },
+    { id: 18, name: 'Dissolve' },
+    { id: 20, name: 'Sparkle' },
+    { id: 21, name: 'Dark Sparkle' },
+    { id: 26, name: 'Android' },
+    { id: 28, name: 'Chase' },
+    { id: 33, name: 'Aurora' },
+    { id: 38, name: 'Red and Blue' },
+    { id: 41, name: 'Lighthouse' },
+    { id: 42, name: 'Fireworks' },
+    { id: 43, name: 'Rain' },
+    { id: 46, name: 'Twinklefox' },
+    { id: 49, name: 'Fairy' },
+    { id: 51, name: 'Gradual' },
+    { id: 57, name: 'Lightning' },
+    { id: 63, name: 'Pride' },
+    { id: 65, name: 'Palette' },
+    { id: 66, name: 'Fire 2012' },
+    { id: 67, name: 'Colorwaves' },
+    { id: 73, name: 'Colortwinkles' },
+    { id: 74, name: 'Lake' },
+    { id: 75, name: 'Meteor' },
+    { id: 76, name: 'Smooth Meteor' },
+    { id: 79, name: 'Ripple' },
+    { id: 87, name: 'Glitter' },
+    { id: 88, name: 'Candle' },
+    { id: 90, name: 'Starburst' },
+    { id: 101, name: 'Pacifica' },
+    { id: 110, name: 'Flow' }
+  ];
+
+  function storeSet(key, val) {
+    try { localStorage.setItem(key, val); } catch(e) {}
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.savePref) {
+        window.AndroidBridge.savePref(key, val);
+      }
+    } catch(e) {}
+  }
+
+  function storeGet(key, fallback) {
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.loadPref) {
+        var nativeVal = window.AndroidBridge.loadPref(key, '');
+        if (nativeVal !== null && nativeVal !== '') return nativeVal;
+      }
+    } catch(e) {}
+    try {
+      var lsVal = localStorage.getItem(key);
+      if (lsVal !== null && lsVal !== '') return lsVal;
+    } catch(e) {}
+    return fallback;
+  }
+
+  var autoWakeOn = true;
+
+  function initConfig() {
+    wledIp = storeGet(IP_KEY, '4.3.2.1');
+    targetSsid = storeGet(SSID_KEY, 'wledtabletop');
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.isAutoWakeEnabled) {
+        autoWakeOn = !!window.AndroidBridge.isAutoWakeEnabled();
+      }
+    } catch(e) {}
+    syncAutoWakeButtonUi();
+    updateWifiBadge();
+    updateWeatherUI();
+  }
+
+  function syncAutoWakeButtonUi() {
+    var btn = document.getElementById('autoWakeBtn');
+    if (!btn) return;
+    if (autoWakeOn) {
+      btn.innerHTML = '[Auto-Wake: ON]';
+      btn.className = 'autowake-btn';
+    } else {
+      btn.innerHTML = '[Auto-Wake: OFF]';
+      btn.className = 'autowake-btn off';
+    }
+  }
+
+  function toggleAutoWake() {
+    autoWakeOn = !autoWakeOn;
+    syncAutoWakeButtonUi();
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.setAutoWakeEnabled) {
+        window.AndroidBridge.setAutoWakeEnabled(autoWakeOn);
+      }
+    } catch(e) {}
+    var speechEl = document.getElementById('speechText');
+    if (speechEl) {
+      if (autoWakeOn) {
+        speechEl.innerHTML = 'Auto-Wake ON: Listening continuously for <b>"Jipsy listen"</b> or <b>"Wake up"</b>!';
+      } else {
+        speechEl.innerHTML = 'Auto-Wake OFF: Catch-phrase listening stopped. Tap <b>[Auto-Wake: OFF]</b> to resume or tap <b>[Mic] Speak Now</b>.';
+      }
+    }
+  }
+
+  function getApiUrl() {
+    return 'http://' + wledIp + '/json/state';
+  }
+
+  function updateWifiBadge() {
+    var ssidNow = targetSsid;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.getWifiSsid) {
+        var cur = window.AndroidBridge.getWifiSsid();
+        if (cur && cur !== '<unknown ssid>') ssidNow = cur;
+      }
+    } catch(e) {}
+    document.getElementById('wifiBadge').innerHTML = 'Wi-Fi: ' + ssidNow + ' [*]';
+  }
+
+  /* ================= DESK & SLEEP TIMER ENGINE (10m, 15m, 30m, Custom) ================= */
+  function formatMmSs(totalSecs) {
+    var m = Math.floor(totalSecs / 60);
+    var s = totalSecs % 60;
+    return (m < 10 ? '0' + m : '' + m) + ':' + (s < 10 ? '0' + s : '' + s);
+  }
+
+  function updateTimerDisplay() {
+    var pill = document.getElementById('topTimerPill');
+    var digits = document.getElementById('timerDigits');
+    if (timerRemainingSecs > 0) {
+      var formatted = formatMmSs(timerRemainingSecs);
+      digits.innerHTML = formatted;
+      digits.style.color = '#3fb950';
+      digits.style.borderColor = '#2ea043';
+      pill.innerHTML = '[Timer: ' + formatted + ']';
+      pill.className = 'timer-pill active';
+    } else {
+      digits.innerHTML = '00:00';
+      digits.style.color = '#ffffff';
+      digits.style.borderColor = '#30363d';
+      pill.innerHTML = '[Timer: Off]';
+      pill.className = 'timer-pill';
+    }
+  }
+
+  function startCountdownTimer(minutes) {
+    var mins = parseInt(minutes, 10);
+    if (isNaN(mins) || mins <= 0) return;
+    if (timerInterval) clearInterval(timerInterval);
+    timerTotalMins = mins;
+    timerRemainingSecs = mins * 60;
+    updateTimerDisplay();
+
+    var msg = 'Timer started for ' + mins + (mins === 1 ? ' minute.' : ' minutes.');
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+
+    timerInterval = setInterval(function() {
+      if (timerRemainingSecs > 0) {
+        timerRemainingSecs--;
+        updateTimerDisplay();
+        if (timerRemainingSecs === 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          onTimerFinished();
+        }
+      }
+    }, 1000);
+  }
+
+  function stopCountdownTimer(speakConfirm) {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    timerRemainingSecs = 0;
+    updateTimerDisplay();
+    if (speakConfirm) {
+      var msg = 'Timer stopped and reset.';
+      document.getElementById('speechText').innerHTML = msg;
+      safeSpeak(msg);
+    }
+  }
+
+  function openCustomTimerModal() {
+    customPadStr = '25';
+    document.getElementById('customMinutesDisplay').innerHTML = customPadStr;
+    document.getElementById('customTimerModal').className = 'modal-overlay open';
+  }
+
+  function closeCustomTimerDirect() {
+    document.getElementById('customTimerModal').className = 'modal-overlay';
+  }
+
+  function closeCustomTimerOverlay(e) {
+    if (e.target.id === 'customTimerModal') closeCustomTimerDirect();
+  }
+
+  function numpadPress(digit) {
+    if (customPadStr === '0' || customPadStr.length >= 3) {
+      customPadStr = digit;
+    } else {
+      customPadStr += digit;
+    }
+    document.getElementById('customMinutesDisplay').innerHTML = customPadStr;
+  }
+
+  function numpadClear() {
+    customPadStr = '0';
+    document.getElementById('customMinutesDisplay').innerHTML = '0';
+  }
+
+  function confirmCustomTimerPad() {
+    var mins = parseInt(customPadStr, 10);
+    if (isNaN(mins) || mins <= 0) {
+      safeSpeak('Please enter a valid number of minutes.');
+      return;
+    }
+    closeCustomTimerDirect();
+    startCountdownTimer(mins);
+  }
+
+  function startCustomAndClose(mins) {
+    closeCustomTimerDirect();
+    startCountdownTimer(mins);
+  }
+
+  function onTimerFinished() {
+    updateTimerDisplay();
+    var turnOffLeds = document.getElementById('timerTurnOffLeds').checked;
+    var finishMsg = 'Attention! Your ' + timerTotalMins + ' minute timer has finished!';
+    if (turnOffLeds) {
+      finishMsg += ' Turning off your Batman logo now.';
+      xhrRequest('POST', getApiUrl(), { on: false, v: true }, updateUI);
+    }
+    document.getElementById('speechText').innerHTML = finishMsg;
+    safeSpeak(finishMsg);
+  }
+
+  /* ================= VOICE COMMAND RECOGNITION & PARSER ENGINE ================= */
+  function triggerVoiceCommand() {
+    var startedNative = false;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.startVoiceRecognition) {
+        startedNative = window.AndroidBridge.startVoiceRecognition();
+      }
+    } catch(e) {}
+    if (!startedNative) {
+      openVoiceModal();
+    }
+  }
+
+  function startNativeMicOnly() {
+    var ok = false;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.startVoiceRecognition) {
+        ok = window.AndroidBridge.startVoiceRecognition();
+      }
+    } catch(e) {}
+    if (!ok) {
+      document.getElementById('voiceCmdFeedback').innerHTML = 'Offline Mic recognizer unavailable on wledtabletop. Tap any command chip above or type in the box!';
+    }
+  }
+
+  window.onVoiceCommandResult = function(spokenText) {
+    var micBtn = document.getElementById('mainMicBtn');
+    if (micBtn) {
+      micBtn.innerHTML = '[Mic] Speak Now';
+      micBtn.style.background = '#231738';
+      micBtn.style.borderColor = '#a371f7';
+    }
+    executeVoiceCommand(spokenText);
+  };
+
+  window.onOfflineMicState = function(state, message) {
+    var micBtn = document.getElementById('mainMicBtn');
+    var speechEl = document.getElementById('speechText');
+    var fb = document.getElementById('voiceCmdFeedback');
+    var antenna = document.getElementById('robo-antenna');
+    if (state === 'PREPARING') {
+      if (micBtn) {
+        micBtn.innerHTML = '[Wait... Waking Up]';
+        micBtn.style.background = '#3d2408';
+        micBtn.style.borderColor = '#f5a623';
+      }
+      if (antenna) antenna.setAttribute('fill', '#f5a623');
+      animateRobotTalking(2200);
+      if (speechEl && message) speechEl.innerHTML = message;
+      if (fb && message) fb.innerHTML = message;
+    } else if (state === 'LISTENING' || state === 'SPEAKING') {
+      if (micBtn) {
+        micBtn.innerHTML = '[Done Speaking (Tap)]';
+        micBtn.style.background = '#195b28';
+        micBtn.style.borderColor = '#3fb950';
+      }
+      if (antenna) antenna.setAttribute('fill', '#3fb950');
+      if (speechEl && message) speechEl.innerHTML = message;
+      if (fb && message) fb.innerHTML = message;
+    } else if (state === 'PARTIAL') {
+      if (speechEl) speechEl.innerHTML = 'Hearing: <b>"' + message + '"</b> (Auto-executes after 1.8s silence)';
+      if (fb) fb.innerHTML = 'Hearing: "' + message + '" (Auto-executes after 1.8s silence)';
+    } else if (state === 'SPEAKING_REPLY') {
+      if (micBtn) {
+        micBtn.innerHTML = '[Jipsy Speaking...]';
+        micBtn.style.background = '#3d2408';
+        micBtn.style.borderColor = '#f5a623';
+      }
+    } else if (state === 'WAKEUP_PAUSED') {
+      autoWakeOn = false;
+      syncAutoWakeButtonUi();
+      if (micBtn) {
+        micBtn.innerHTML = '[Mic] Speak Now';
+        micBtn.style.background = '#231738';
+        micBtn.style.borderColor = '#a371f7';
+      }
+      if (antenna) antenna.setAttribute('fill', '#8b949e');
+      if (fb && message) fb.innerHTML = message;
+    } else if (state === 'WAKEUP_READY') {
+      autoWakeOn = true;
+      syncAutoWakeButtonUi();
+      if (micBtn) {
+        micBtn.innerHTML = '[Mic] Speak Now';
+        micBtn.style.background = '#231738';
+        micBtn.style.borderColor = '#a371f7';
+      }
+      if (antenna) antenna.setAttribute('fill', '#f5a623');
+      if (fb && message) fb.innerHTML = message;
+    } else {
+      if (micBtn) {
+        micBtn.innerHTML = '[Mic] Speak Now';
+        micBtn.style.background = '#231738';
+        micBtn.style.borderColor = '#a371f7';
+      }
+      if (antenna) antenna.setAttribute('fill', '#f5a623');
+      if (speechEl && message) speechEl.innerHTML = message;
+      if (fb && message) fb.innerHTML = message;
+    }
+  };
+
+  window.onVoiceCommandFallback = function() {
+    openVoiceModal();
+    var fb = document.getElementById('voiceCmdFeedback');
+    if (fb) {
+      fb.innerHTML = 'Note: Google Voice Search requires internet (tablet is on offline WLED Wi-Fi wledtabletop). Tap any 1-Tap Command above or type your command!';
+    }
+  };
+
+  function openVoiceModal() {
+    document.getElementById('voiceModal').className = 'modal-overlay open';
+  }
+
+  function closeVoiceDirect() {
+    document.getElementById('voiceModal').className = 'modal-overlay';
+  }
+
+  function closeVoiceOverlay(e) {
+    if (e.target.id === 'voiceModal') closeVoiceDirect();
+  }
+
+  function runTypedVoiceCommand() {
+    var input = document.getElementById('voiceCmdInput');
+    var cmd = input.value.replace(/^\s+|\s+$/g, '');
+    if (!cmd) return;
+    input.value = '';
+    executeVoiceCommand(cmd);
+  }
+
+  function executeVoiceCommand(rawText) {
+    if (!rawText) return;
+    var text = rawText.toLowerCase().replace(/^\s+|\s+$/g, '');
+    var feedbackEl = document.getElementById('voiceCmdFeedback');
+    var reply = '';
+
+    // 1. Timer Commands (e.g. "set timer for 15 minutes", "timer 10 min", "stop timer")
+    if (text.indexOf('stop timer') !== -1 || text.indexOf('cancel timer') !== -1 || text.indexOf('reset timer') !== -1) {
+      stopCountdownTimer(false);
+      reply = 'Command: Stop Timer — Timer stopped and reset.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+    if (text.indexOf('timer') !== -1) {
+      var numMatch = text.match(/(\d+)/);
+      var mins = numMatch ? parseInt(numMatch[1], 10) : 10;
+      if (text.indexOf('turn off') !== -1 || text.indexOf('sleep') !== -1) {
+        document.getElementById('timerTurnOffLeds').checked = true;
+      }
+      startCountdownTimer(mins);
+      if (feedbackEl) feedbackEl.innerHTML = 'Executed: Started ' + mins + ' minute timer.';
+      return;
+    }
+
+    // 2. Add Task / Schedule Command (e.g. "add task submit assignment", "schedule lab report")
+    if (text.indexOf('add task') === 0 || text.indexOf('new task') === 0 || text.indexOf('schedule task') === 0 || text.indexOf('schedule ') === 0) {
+      var taskBody = rawText.replace(/^(add task|new task|schedule task|schedule)\s*/i, '');
+      if (taskBody) {
+        var list = getTasks();
+        list.push({ time: 'Voice', text: taskBody, done: false });
+        saveTasksList(list);
+        renderTasks();
+        reply = 'Added task to your scheduler: ' + taskBody;
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 3. Write / Add Quick Note Command (e.g. "write note exam tomorrow", "quick note check sensor pin")
+    if (text.indexOf('add note') === 0 || text.indexOf('write note') === 0 || text.indexOf('quick note') === 0 || text.indexOf('take note') === 0 || text.indexOf('new note') === 0 || text.indexOf('note ') === 0) {
+      var noteBody = rawText.replace(/^(add|write|quick|take|new)?\s*notes?\s*/i, '');
+      if (noteBody) {
+        var existing = storeGet(NOTES_KEY, '');
+        var updated = existing ? (existing + '\n- ' + noteBody) : ('- ' + noteBody);
+        storeSet(NOTES_KEY, updated);
+        var notesArea = document.getElementById('quickNotesArea');
+        if (notesArea) notesArea.value = updated;
+        reply = 'Wrote in your quick notes: ' + noteBody;
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 4. Power On / Off Commands
+    if (text.indexOf('turn on') !== -1 || text.indexOf('lights on') !== -1 || text.indexOf('logo on') !== -1 || text.indexOf('power on') !== -1) {
+      xhrRequest('POST', getApiUrl(), { on: true, v: true }, updateUI);
+      reply = 'Turning on the Batman WLED logo.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+    if (text.indexOf('turn off') !== -1 || text.indexOf('lights off') !== -1 || text.indexOf('logo off') !== -1 || text.indexOf('power off') !== -1) {
+      xhrRequest('POST', getApiUrl(), { on: false, v: true }, updateUI);
+      reply = 'Turning off the Batman WLED logo.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+
+    // 5. Random Colour / Random Effect
+    if (text.indexOf('random color') !== -1 || text.indexOf('random colour') !== -1) {
+      setRandomColor();
+      reply = 'Applied a new random colour to your Batman logo.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+    if (text.indexOf('random effect') !== -1 || text.indexOf('change effect') !== -1 || text.indexOf('next effect') !== -1) {
+      setRandomEffectKeepColor();
+      reply = 'Switched to a random WLED animation while keeping your current colour.';
+      finishVoiceExec(reply, feedbackEl);
+      return;
+    }
+
+    // 6. Named Colours
+    var colorMap = {
+      'orange': [255, 153, 0],
+      'yellow': [255, 220, 0],
+      'gold': [255, 180, 0],
+      'red': [255, 20, 0],
+      'blue': [0, 119, 255],
+      'cyan': [0, 242, 254],
+      'purple': [136, 0, 255],
+      'violet': [160, 32, 240],
+      'green': [0, 230, 64],
+      'pink': [255, 40, 140],
+      'white': [255, 255, 255]
+    };
+    for (var cName in colorMap) {
+      if (text.indexOf(cName) !== -1) {
+        setFastColor(colorMap[cName]);
+        reply = 'Changed Batman logo colour to ' + cName + '.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 7. Preset Command (e.g. "preset 3")
+    if (text.indexOf('preset') !== -1) {
+      var pMatch = text.match(/(\d+)/);
+      if (pMatch) {
+        var pid = parseInt(pMatch[1], 10);
+        setPreset(pid);
+        reply = 'Activated WLED preset ' + pid + '.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 8. Brightness Command (e.g. "brightness 80", "set brightness to 50 percent")
+    if (text.indexOf('brightness') !== -1) {
+      var bMatch = text.match(/(\d+)/);
+      if (bMatch) {
+        var pct = Math.min(100, Math.max(1, parseInt(bMatch[1], 10)));
+        var bVal = Math.round((pct / 100) * 255);
+        document.getElementById('briSlider').value = bVal;
+        setBrightness(bVal);
+        reply = 'Set brightness to ' + pct + ' percent.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 8b. Effect Intensity Command (e.g. "set effect intensity to 80 percent", "intensity 50 percent")
+    if (text.indexOf('intensity') !== -1) {
+      var ixMatch = text.match(/(\d+)/);
+      if (ixMatch) {
+        var ixPct = Math.min(100, Math.max(0, parseInt(ixMatch[1], 10)));
+        var ixVal = Math.round((ixPct / 100) * 255);
+        document.getElementById('ixSlider').value = ixVal;
+        setIntensity(ixVal);
+        reply = 'Set effect intensity to ' + ixPct + ' percent.';
+        finishVoiceExec(reply, feedbackEl);
+        return;
+      }
+    }
+
+    // 9. Weather / Timetable / Tasks / Briefing Queries
+    if (text.indexOf('weather') !== -1 || text.indexOf('temperature') !== -1) {
+      speakWeather();
+      if (feedbackEl) feedbackEl.innerHTML = 'Speaking Patiala weather report...';
+      return;
+    }
+    if (text.indexOf('class') !== -1 || text.indexOf('timetable') !== -1 || text.indexOf('lecture') !== -1) {
+      reciteClosestSchedule();
+      if (feedbackEl) feedbackEl.innerHTML = 'Speaking next scheduled class...';
+      return;
+    }
+    if (text.indexOf('task') !== -1 || text.indexOf('note') !== -1) {
+      speakTasksAndNotes();
+      if (feedbackEl) feedbackEl.innerHTML = 'Reading your tasks and desk notes...';
+      return;
+    }
+    if (text.indexOf('briefing') !== -1 || text.indexOf('status') !== -1 || text.indexOf('hello') !== -1) {
+      speakFullBriefing();
+      if (feedbackEl) feedbackEl.innerHTML = 'Speaking full desk briefing...';
+      return;
+    }
+
+    reply = 'Heard "' + rawText + '". Try "timer 15", "turn on lights", "random color", or "add task..."';
+    finishVoiceExec(reply, feedbackEl);
+  }
+
+  function finishVoiceExec(reply, feedbackEl) {
+    document.getElementById('speechText').innerHTML = reply;
+    if (feedbackEl) feedbackEl.innerHTML = reply;
+    safeSpeak(reply);
+  }
+
+  /* Weather Engine */
+  function getWeatherData() {
+    var raw = storeGet(WEATHER_KEY, '');
+    var w = DEFAULT_WEATHER;
+    if (raw) {
+      try { w = JSON.parse(raw); } catch(e) {}
+    }
+    var hr = new Date().getHours();
+    var estTemp = w.temp;
+    if (hr >= 6 && hr <= 15) {
+      estTemp = Math.round(w.low + ((hr - 6) / 9) * (w.high - w.low));
+    } else if (hr > 15) {
+      estTemp = Math.round(w.high - ((hr - 15) / 14) * (w.high - w.low));
+    } else {
+      estTemp = Math.round(w.low + 1);
+    }
+    return {
+      temp: estTemp,
+      high: Math.round(w.high),
+      low: Math.round(w.low),
+      humidity: w.humidity || 66,
+      cond: w.cond || 'Clear'
+    };
+  }
+
+  function updateWeatherUI() {
+    var w = getWeatherData();
+    document.getElementById('weatherPill').innerHTML = 'Patiala: ' + w.temp + '°C';
+  }
+
+  function fetchLiveWeather(speakAfter) {
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=30.3398&longitude=76.3869&current=temperature_2m,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto';
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.httpRequest) {
+        var res = window.AndroidBridge.httpRequest('GET', url, '');
+        if (res) {
+          var j = JSON.parse(res);
+          if (j && j.current) {
+            var code = j.current.weather_code || 0;
+            var condStr = code === 0 ? 'Clear' : (code <= 3 ? 'Partly Cloudy' : (code <= 48 ? 'Hazy' : 'Rainy'));
+            var saved = {
+              temp: j.current.temperature_2m,
+              humidity: j.current.relative_humidity_2m,
+              high: (j.daily && j.daily.temperature_2m_max) ? j.daily.temperature_2m_max[0] : 28.7,
+              low: (j.daily && j.daily.temperature_2m_min) ? j.daily.temperature_2m_min[0] : 17.7,
+              cond: condStr
+            };
+            storeSet(WEATHER_KEY, JSON.stringify(saved));
+            updateWeatherUI();
+            if (speakAfter) speakWeather();
+            return;
+          }
+        }
+      }
+    } catch(e) {}
+    updateWeatherUI();
+    if (speakAfter) speakWeather();
+  }
+
+  /* Robot Voice Assistant Functions */
+  function speakWeather() {
+    var w = getWeatherData();
+    var msg = 'In Patiala Punjab, it is currently ' + w.temp + ' degrees Celsius with ' + w.cond + ' skies. Today\'s high is ' + w.high + ' degrees and the low is ' + w.low + ' degrees, with ' + w.humidity + ' percent humidity.';
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+  }
+
+  function speakTasksAndNotes() {
+    var tasks = getTasks();
+    var pending = [];
+    for (var i = 0; i < tasks.length; i++) {
+      if (!tasks[i].done) pending.push(tasks[i]);
+    }
+    var notes = storeGet(NOTES_KEY, '').replace(/^\s+|\s+$/g, '');
+    var parts = [];
+
+    if (pending.length === 0) {
+      parts.push('You have no pending tasks scheduled.');
+    } else {
+      parts.push('You have ' + pending.length + (pending.length === 1 ? ' pending task: ' : ' pending tasks: '));
+      for (var j = 0; j < pending.length; j++) {
+        var t = pending[j];
+        parts.push((j + 1) + ', ' + (t.time ? 'at ' + t.time + ', ' : '') + t.text + '.');
+      }
+    }
+
+    if (notes) {
+      parts.push('Your quick desk notes say: ' + notes);
+    } else {
+      parts.push('Your quick desk scratchpad is currently empty.');
+    }
+
+    var fullMsg = parts.join(' ');
+    document.getElementById('speechText').innerHTML = fullMsg;
+    safeSpeak(fullMsg);
+  }
+
+  function speakNotesOnly() {
+    var notes = storeGet(NOTES_KEY, '').replace(/^\s+|\s+$/g, '');
+    var msg = notes ? ('Your desk notes say: ' + notes) : 'Your quick notes scratchpad is empty.';
+    safeSpeak(msg);
+  }
+
+  function getClosestClassMsg() {
+    var now = new Date();
+    var day = now.getDay();
+    var mins = (now.getHours() * 60) + now.getMinutes();
+
+    if (day < 1 || day > 5) {
+      return 'It is the weekend! No scheduled classes today.';
+    }
+    var list = TIMETABLE[day] || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].start >= mins) {
+        return 'Next class at ' + list[i].time + ' is ' + list[i].name + ' (' + list[i].type + ').';
+      }
+    }
+    return 'All academic classes are completed for today!';
+  }
+
+  function reciteClosestSchedule() {
+    var msg = getClosestClassMsg();
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+  }
+
+  function speakFullBriefing() {
+    var d = new Date();
+    var hr = d.getHours();
+    var greet = hr < 12 ? 'Good morning!' : (hr < 17 ? 'Good afternoon!' : 'Good evening!');
+    var w = getWeatherData();
+    var classMsg = getClosestClassMsg();
+    var tasks = getTasks();
+    var pendingCount = 0;
+    for (var i = 0; i < tasks.length; i++) {
+      if (!tasks[i].done) pendingCount++;
+    }
+    var notes = storeGet(NOTES_KEY, '').replace(/^\s+|\s+$/g, '');
+
+    var msg = greet + ' In Patiala it is ' + w.temp + ' degrees and ' + w.cond + '. ' + classMsg + ' ';
+    if (timerRemainingSecs > 0) {
+      msg += 'You have a timer running with ' + Math.ceil(timerRemainingSecs / 60) + ' minutes remaining. ';
+    }
+    if (pendingCount > 0) {
+      msg += 'You have ' + pendingCount + ' pending task' + (pendingCount > 1 ? 's' : '') + ' on your list. ';
+    } else {
+      msg += 'All scheduled tasks are clear. ';
+    }
+    if (notes) {
+      msg += 'Note reminder: ' + notes;
+    }
+
+    document.getElementById('speechText').innerHTML = msg;
+    safeSpeak(msg);
+  }
+
+  function animateRobotTalking(durationMs) {
+    var mouth = document.getElementById('robo-mouth');
+    var antenna = document.getElementById('robo-antenna');
+    if (mouthAnimTimer) clearInterval(mouthAnimTimer);
+    var open = false;
+    var elapsed = 0;
+    mouthAnimTimer = setInterval(function() {
+      elapsed += 180;
+      open = !open;
+      if (open) {
+        mouth.setAttribute('d', 'M16 27 Q22 35 28 27');
+        antenna.setAttribute('fill', '#3fb950');
+      } else {
+        mouth.setAttribute('d', 'M18 29 Q22 30 26 29');
+        antenna.setAttribute('fill', '#f5a623');
+      }
+      if (elapsed >= durationMs) {
+        clearInterval(mouthAnimTimer);
+        mouth.setAttribute('d', isPoweredOn ? 'M16 28 Q22 32 28 28' : 'M18 30 H26');
+        antenna.setAttribute('fill', '#f5a623');
+      }
+    }, 180);
+  }
+
+  function safeSpeak(text) {
+    var estMs = Math.max(2000, Math.min(18000, text.length * 65));
+    animateRobotTalking(estMs);
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.speakText) {
+        window.AndroidBridge.speakText(text);
+        return;
+      }
+      if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
+        window.speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+      }
+    } catch(err) {}
+  }
+
+  /* Random Colour & Random Effect (Keep Same Colour) Generators */
+  function hslToRgb(h, s, l) {
+    var r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      var hue2rgb = function(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  function setRandomColor() {
+    var randomHue = Math.random();
+    var rgb = hslToRgb(randomHue, 1.0, 0.5);
+    currentRgb = rgb;
+    var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+    document.getElementById('colorPreview').style.backgroundColor = rgbStr;
+    document.getElementById('robo-eye-l').setAttribute('fill', rgbStr);
+    document.getElementById('robo-eye-r').setAttribute('fill', rgbStr);
+    document.getElementById('status').innerHTML = 'Random Colour: RGB(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+    xhrRequest('POST', getApiUrl(), { on: true, seg: [{ col: [rgb] }], v: true }, updateUI);
+  }
+
+  function setRandomEffectKeepColor() {
+    var pick = WLED_EFFECTS[Math.floor(Math.random() * WLED_EFFECTS.length)];
+    document.getElementById('status').innerHTML = 'Effect: ' + pick.name + ' (ID ' + pick.id + ') - Keeping Current Colour';
+    xhrRequest('POST', getApiUrl(), {
+      on: true,
+      seg: [{
+        fx: pick.id,
+        pal: 0,
+        col: [currentRgb]
+      }],
+      v: true
+    }, updateUI);
+  }
+
+  var TIMETABLE = {
+    1: [
+      { start: 530, time: '08:50 AM - 09:40 AM', name: 'Industrial Instrumentation (E102)', type: 'Lecture' },
+      { start: 580, time: '09:40 AM - 10:30 AM', name: 'Bio-Medical Instrumentation Lab', type: 'Practical' },
+      { start: 630, time: '10:30 AM - 11:20 AM', name: 'Bio-Medical Instrumentation Lab', type: 'Practical' },
+      { start: 680, time: '11:20 AM - 12:10 PM', name: 'Process Dynamics and Control Lab', type: 'Practical' },
+      { start: 730, time: '12:10 PM - 01:00 PM', name: 'Process Dynamics and Control Lab', type: 'Practical' },
+      { start: 885, time: '02:45 PM - 03:30 PM', name: 'Industrial Instrumentation (I304)', type: 'Tutorial' },
+      { start: 930, time: '03:30 PM - 04:20 PM', name: 'Bio-Medical Instrumentation (E103)', type: 'Lecture' },
+      { start: 980, time: '04:20 PM - 05:10 PM', name: 'UEIXXX (E101)', type: 'Lecture' }
+    ],
+    2: [
+      { start: 480, time: '08:00 AM - 08:50 AM', name: 'Process Dynamics and Control (E102)', type: 'Lecture' },
+      { start: 530, time: '08:50 AM - 09:40 AM', name: 'Network Analysis (E102)', type: 'Lecture' },
+      { start: 580, time: '09:40 AM - 10:30 AM', name: 'Bio-Medical Instrumentation', type: 'Lecture' },
+      { start: 630, time: '10:30 AM - 11:20 AM', name: 'UEIXXX (E102)', type: 'Tutorial' },
+      { start: 680, time: '11:20 AM - 12:10 PM', name: 'Industrial Instrumentation (E102)', type: 'Lecture' },
+      { start: 835, time: '01:55 PM - 02:45 PM', name: 'UEIXXX Lab', type: 'Practical' },
+      { start: 885, time: '02:45 PM - 03:35 PM', name: 'UEIXXX Lab', type: 'Practical' }
+    ],
+    3: [
+      { start: 580, time: '09:40 AM - 10:30 AM', name: 'Industrial Instrumentation Lab', type: 'Practical' },
+      { start: 630, time: '10:30 AM - 11:20 AM', name: 'Industrial Instrumentation Lab', type: 'Practical' },
+      { start: 835, time: '01:55 PM - 02:45 PM', name: 'UEIXXX (E102)', type: 'Lecture' },
+      { start: 885, time: '02:45 PM - 03:35 PM', name: 'UEIXXX (E102)', type: 'Lecture' },
+      { start: 930, time: '03:30 PM - 04:20 PM', name: 'Network Analysis (E102)', type: 'Lecture' },
+      { start: 980, time: '04:20 PM - 05:10 PM', name: 'Process Dynamics and Control (E102)', type: 'Lecture' }
+    ],
+    4: [
+      { start: 580, time: '09:40 AM - 10:30 AM', name: 'Network Analysis (F315)', type: 'Tutorial' },
+      { start: 630, time: '10:30 AM - 11:20 AM', name: 'Process Dynamics and Control (F315)', type: 'Tutorial' },
+      { start: 680, time: '11:20 AM - 12:10 PM', name: 'Innovation and Entrepreneurship (E102)', type: 'Lecture' },
+      { start: 835, time: '01:55 PM - 02:45 PM', name: 'UEIXXX Lab', type: 'Practical' },
+      { start: 885, time: '02:45 PM - 03:35 PM', name: 'UEIXXX Lab', type: 'Practical' },
+      { start: 930, time: '03:30 PM - 04:20 PM', name: 'Innovation and Entrepreneurship Lab', type: 'Practical' },
+      { start: 980, time: '04:20 PM - 05:10 PM', name: 'Innovation and Entrepreneurship Lab', type: 'Practical' }
+    ],
+    5: [
+      { start: 530, time: '08:50 AM - 09:40 AM', name: 'UEIXXX (E102)', type: 'Tutorial' },
+      { start: 580, time: '09:40 AM - 10:30 AM', name: 'Industrial Instrumentation (E102)', type: 'Lecture' },
+      { start: 630, time: '10:30 AM - 11:20 AM', name: 'Bio-Medical Instrumentation (E102)', type: 'Lecture' },
+      { start: 680, time: '11:20 AM - 12:10 PM', name: 'UEIXXX (E102)', type: 'Lecture' },
+      { start: 730, time: '12:10 PM - 01:00 PM', name: 'Process Dynamics and Control (E102)', type: 'Lecture' }
+    ]
+  };
+
+  /* Local Scratchpad & Task Scheduler Functions */
+  function openNotesModal(tab) {
+    document.getElementById('quickNotesArea').value = storeGet(NOTES_KEY, '');
+    document.getElementById('saveStatus').innerHTML = '';
+    renderTasks();
+    switchNotesSubTab(tab || 'notes');
+    document.getElementById('notesModal').className = 'modal-overlay open';
+  }
+
+  function switchNotesSubTab(tab) {
+    var isNotes = (tab === 'notes');
+    document.getElementById('panelNotes').style.display = isNotes ? 'block' : 'none';
+    document.getElementById('panelTasks').style.display = isNotes ? 'none' : 'block';
+    document.getElementById('subTabNotes').style.background = isNotes ? '#f5a623' : '#21262d';
+    document.getElementById('subTabNotes').style.color = isNotes ? '#000' : '#fff';
+    document.getElementById('subTabTasks').style.background = !isNotes ? '#58a6ff' : '#21262d';
+    document.getElementById('subTabTasks').style.color = !isNotes ? '#000' : '#fff';
+  }
+
+  function closeNotesDirect() {
+    saveNotes();
+    document.getElementById('notesModal').className = 'modal-overlay';
+  }
+
+  function closeNotesOverlay(e) {
+    if (e.target.id === 'notesModal') closeNotesDirect();
+  }
+
+  function saveNotes() {
+    var text = document.getElementById('quickNotesArea').value;
+    storeSet(NOTES_KEY, text);
+    var status = document.getElementById('saveStatus');
+    status.innerHTML = 'Saved to Tablet Storage!';
+    setTimeout(function() { status.innerHTML = ''; }, 2000);
+  }
+
+  function clearNotes() {
+    if (confirm("Clear all scratchpad notes?")) {
+      document.getElementById('quickNotesArea').value = '';
+      storeSet(NOTES_KEY, '');
+      document.getElementById('saveStatus').innerHTML = 'Cleared';
+    }
+  }
+
+  function getTasks() {
+    var raw = storeGet(TASKS_KEY, '[]');
+    try { return JSON.parse(raw) || []; } catch(e) { return []; }
+  }
+
+  function saveTasksList(list) {
+    storeSet(TASKS_KEY, JSON.stringify(list));
+  }
+
+  function addTask() {
+    var timeEl = document.getElementById('newTaskTime');
+    var textEl = document.getElementById('newTaskText');
+    var txt = textEl.value.replace(/^\s+|\s+$/g, '');
+    if (!txt) return;
+    var list = getTasks();
+    list.push({ time: timeEl.value.replace(/^\s+|\s+$/g, ''), text: txt, done: false });
+    saveTasksList(list);
+    timeEl.value = '';
+    textEl.value = '';
+    renderTasks();
+  }
+
+  function toggleTaskDone(idx) {
+    var list = getTasks();
+    if (list[idx]) {
+      list[idx].done = !list[idx].done;
+      saveTasksList(list);
+      renderTasks();
+    }
+  }
+
+  function deleteTask(idx) {
+    var list = getTasks();
+    list.splice(idx, 1);
+    saveTasksList(list);
+    renderTasks();
+  }
+
+  function renderTasks() {
+    var container = document.getElementById('tasksContainer');
+    var list = getTasks();
+    if (list.length === 0) {
+      container.innerHTML = '<div style="font-size:12px; color:#8b949e; text-align:center; padding:16px;">No scheduled tasks yet. Add one above!</div>';
+      return;
+    }
+    var html = '';
+    for (var i = 0; i < list.length; i++) {
+      var t = list[i];
+      var timeBadge = t.time ? '<span class="task-time-badge">' + t.time + '</span>' : '';
+      html += '<div class="task-item' + (t.done ? ' done' : '') + '">' +
+        '<div style="display:table-cell; vertical-align:middle;" onclick="toggleTaskDone(' + i + ')">' +
+          timeBadge + '<span class="task-text">' + (t.done ? '[x] ' : '[ ] ') + t.text + '</span>' +
+        '</div>' +
+        '<div style="display:table-cell; width:40px; text-align:right; vertical-align:middle;">' +
+          '<button onclick="deleteTask(' + i + ')" style="padding:3px 7px; font-size:11px; background:#5c1d1d; border-color:#8b2424;">X</button>' +
+        '</div>' +
+      '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  /* Settings Modal */
+  function openSettingsModal() {
+    document.getElementById('wledIpInput').value = wledIp;
+    document.getElementById('wledSsidInput').value = targetSsid;
+    document.getElementById('settingsModal').className = 'modal-overlay open';
+  }
+  function closeSettingsDirect() {
+    document.getElementById('settingsModal').className = 'modal-overlay';
+  }
+  function closeSettingsOverlay(e) {
+    if (e.target.id === 'settingsModal') closeSettingsDirect();
+  }
+  function saveWledSettings() {
+    var newIp = document.getElementById('wledIpInput').value.replace(/^\s+|\s+$/g, '') || '4.3.2.1';
+    var newSsid = document.getElementById('wledSsidInput').value.replace(/^\s+|\s+$/g, '') || 'wledtabletop';
+    wledIp = newIp;
+    targetSsid = newSsid;
+    storeSet(IP_KEY, wledIp);
+    storeSet(SSID_KEY, targetSsid);
+    updateWifiBadge();
+    closeSettingsDirect();
+    fetchState();
+  }
+  function triggerManualReconnect() {
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.forceReconnectWifi) {
+        window.AndroidBridge.forceReconnectWifi();
+      }
+    } catch(e) {}
+    document.getElementById('status').innerHTML = 'Forcing Wi-Fi reconnect to ' + targetSsid + '...';
+  }
+
+  function stopProp(e) {
+    if (e.stopPropagation) e.stopPropagation();
+    else e.cancelBubble = true;
+  }
+  function openSchedule() {
+    document.getElementById('scheduleModal').className = 'modal-overlay open';
+    var d = new Date().getDay();
+    showDay(d >= 1 && d <= 5 ? d : 1);
+  }
+  function closeScheduleDirect() {
+    document.getElementById('scheduleModal').className = 'modal-overlay';
+  }
+  function closeSchedule(e) {
+    if (e.target.id === 'scheduleModal') closeScheduleDirect();
+  }
+  function showDay(dayNum) {
+    for (var i = 1; i <= 5; i++) {
+      document.getElementById('dayBtn' + i).className = (i === dayNum) ? 'active' : '';
+    }
+    var container = document.getElementById('scheduleDisplay');
+    container.innerHTML = '';
+    var list = TIMETABLE[dayNum] || [];
+    for (var j = 0; j < list.length; j++) {
+      var p = list[j];
+      var tagClass = p.type === 'Lecture' ? 'tag-lecture' : p.type === 'Practical' ? 'tag-practical' : 'tag-tutorial';
+      container.innerHTML += '<div class="period-item">' +
+        '<div class="period-left">' +
+          '<div class="period-time">' + p.time + '</div>' +
+          '<div class="period-title">' + p.name + '</div>' +
+        '</div>' +
+        '<div class="period-right">' +
+          '<span class="period-tag ' + tagClass + '">' + p.type + '</span>' +
+        '</div>' +
+      '</div>';
+    }
+  }
+
+  function switchTab(tab) {
+    document.getElementById('tabColors').className = 'card tab-content' + (tab === 'colors' ? ' active' : '');
+    document.getElementById('tabPresets').className = 'card tab-content' + (tab === 'presets' ? ' active' : '');
+    document.getElementById('tabBtnColors').className = (tab === 'colors' ? 'active' : '');
+    document.getElementById('tabBtnPresets').className = (tab === 'presets' ? 'active' : '');
+  }
+
+  function xhrRequest(method, url, data, callback) {
+    var payload = data ? JSON.stringify(data) : '';
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    xhr.timeout = 2500;
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200 && xhr.responseText) {
+          try {
+            var json = JSON.parse(xhr.responseText);
+            if (callback) callback(json);
+            return;
+          } catch(e) {}
+        }
+        try {
+          if (window.AndroidBridge && window.AndroidBridge.httpRequest) {
+            var res = window.AndroidBridge.httpRequest(method, url, payload);
+            if (res && callback) {
+              callback(JSON.parse(res));
+              return;
+            }
+          }
+        } catch(err) {}
+      }
+    };
+    try {
+      xhr.send(payload ? payload : null);
+    } catch(e) {
+      try {
+        if (window.AndroidBridge && window.AndroidBridge.httpRequest) {
+          var res2 = window.AndroidBridge.httpRequest(method, url, payload);
+          if (res2 && callback) callback(JSON.parse(res2));
+        }
+      } catch(err) {}
+    }
+  }
+
+  function fetchState() {
+    updateWifiBadge();
+    xhrRequest('GET', getApiUrl(), null, function(data) {
+      isPoweredOn = data.on;
+      updateUI(data);
+    });
+  }
+
+  function updateUI(data) {
+    if (!data || typeof data.on === 'undefined') return;
+    isPoweredOn = data.on;
+    var btn = document.getElementById('toggleBtn');
+    btn.innerHTML = data.on ? 'Turn Off Batman Logo' : 'Turn On Batman Logo';
+    btn.className = 'power-btn' + (data.on ? ' on' : '');
+    if (typeof data.bri !== 'undefined') {
+      document.getElementById('briSlider').value = data.bri;
+      document.getElementById('briVal').innerHTML = Math.round((data.bri / 255) * 100) + '%';
+    }
+    if (data.seg && data.seg[0] && typeof data.seg[0].ix !== 'undefined') {
+      document.getElementById('ixSlider').value = data.seg[0].ix;
+      document.getElementById('ixVal').innerHTML = Math.round((data.seg[0].ix / 255) * 100) + '%';
+    }
+    document.getElementById('status').innerHTML = 'Connected to WLED (' + wledIp + ')';
+    
+    var rStatus = document.getElementById('roboStatus');
+    var rEyeL = document.getElementById('robo-eye-l');
+    var rEyeR = document.getElementById('robo-eye-r');
+    var rMouth = document.getElementById('robo-mouth');
+    
+    if (data.on) {
+      rStatus.innerHTML = 'Status: Awake & Online!';
+      rStatus.style.color = '#2ea043';
+      rMouth.setAttribute('d', 'M16 28 Q22 32 28 28');
+      
+      try {
+        var rgb = data.seg[0].col[0];
+        if (rgb) {
+          currentRgb = [rgb[0], rgb[1], rgb[2]];
+          var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+          rEyeL.setAttribute('fill', rgbStr);
+          rEyeR.setAttribute('fill', rgbStr);
+          document.getElementById('colorPreview').style.backgroundColor = rgbStr;
+        }
+      } catch (e) {}
+    } else {
+      rStatus.innerHTML = 'Status: Logo Asleep...';
+      rStatus.style.color = '#8b949e';
+      rEyeL.setAttribute('fill', '#444c56');
+      rEyeR.setAttribute('fill', '#444c56');
+      rMouth.setAttribute('d', 'M18 30 H26');
+    }
+  }
+
+  function togglePower() {
+    xhrRequest('POST', getApiUrl(), { on: !isPoweredOn, v: true }, updateUI);
+  }
+
+  function previewBri(val) {
+    document.getElementById('briVal').innerHTML = Math.round((val / 255) * 100) + '%';
+  }
+
+  function setBrightness(val) {
+    previewBri(val);
+    xhrRequest('POST', getApiUrl(), { bri: parseInt(val, 10), v: true }, updateUI);
+  }
+
+  function previewIx(val) {
+    document.getElementById('ixVal').innerHTML = Math.round((val / 255) * 100) + '%';
+  }
+
+  function setIntensity(val) {
+    previewIx(val);
+    xhrRequest('POST', getApiUrl(), { seg: [{ ix: parseInt(val, 10) }], v: true }, updateUI);
+  }
+
+  function setColor(rgb) {
+    currentRgb = [rgb[0], rgb[1], rgb[2]];
+    xhrRequest('POST', getApiUrl(), { on: true, seg: [{ col: [rgb] }], v: true }, updateUI);
+  }
+
+  function setFastColor(rgb) {
+    currentRgb = [rgb[0], rgb[1], rgb[2]];
+    var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+    document.getElementById('colorPreview').style.backgroundColor = rgbStr;
+    document.getElementById('robo-eye-l').setAttribute('fill', rgbStr);
+    document.getElementById('robo-eye-r').setAttribute('fill', rgbStr);
+    setColor(rgb);
+  }
+
+  function setPreset(id) {
+    xhrRequest('POST', getApiUrl(), { on: true, ps: parseInt(id, 10), v: true }, updateUI);
+  }
+
+  var canvas = document.getElementById('colorWheel');
+  var ctx = canvas.getContext('2d');
+  var radius = canvas.width / 2;
+
+  function drawWheel() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var wedges = 36;
+    for (var i = 0; i < wedges; i++) {
+      var angleStart = (i * 2 * Math.PI) / wedges;
+      var angleEnd = ((i + 1.2) * 2 * Math.PI) / wedges;
+      ctx.beginPath();
+      ctx.moveTo(radius, radius);
+      ctx.arc(radius, radius, radius, angleStart, angleEnd);
+      ctx.closePath();
+      var hue = Math.round((i * 360) / wedges);
+      ctx.fillStyle = 'hsl(' + hue + ', 100%, 50%)';
+      ctx.fill();
+    }
+    var gradient = ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient.addColorStop(0.28, 'rgba(255, 255, 255, 0.7)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.beginPath();
+    ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }
+
+  var sendTimeout = null;
+  function getTouchPos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    var y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    return {
+      x: (x - rect.left) * (canvas.width / rect.width),
+      y: (y - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  function pickColor(e) {
+    if (e.touches) e.preventDefault();
+    var pos = getTouchPos(e);
+    var pixel = ctx.getImageData(pos.x, pos.y, 1, 1).data;
+    if (pixel[3] > 0) {
+      var rgb = [pixel[0], pixel[1], pixel[2]];
+      currentRgb = rgb;
+      var rgbStr = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+      document.getElementById('colorPreview').style.backgroundColor = rgbStr;
+      document.getElementById('robo-eye-l').setAttribute('fill', rgbStr);
+      document.getElementById('robo-eye-r').setAttribute('fill', rgbStr);
+      clearTimeout(sendTimeout);
+      sendTimeout = setTimeout(function() {
+        setColor(rgb);
+      }, 90);
+    }
+  }
+
+  function updateClock() {
+    var d = new Date();
+    var hh = d.getHours();
+    var mm = d.getMinutes();
+    var ampm = hh >= 12 ? 'PM' : 'AM';
+    hh = hh % 12;
+    if (hh === 0) hh = 12;
+    var mmStr = mm < 10 ? '0' + mm : '' + mm;
+    document.getElementById('clockDisplay').innerHTML = hh + ':' + mmStr + ' ' + ampm;
+    updateWeatherUI();
+  }
+
+  window.handleAndroidBack = function() {
+    closeScheduleDirect();
+    closeNotesDirect();
+    closeSettingsDirect();
+    closeVoiceDirect();
+    closeCustomTimerDirect();
+  };
+
+  canvas.addEventListener('click', pickColor);
+  canvas.addEventListener('touchmove', pickColor);
+  canvas.addEventListener('touchstart', pickColor);
+
+  initConfig();
+  drawWheel();
+  updateClock();
+  fetchState();
+  setInterval(fetchState, 4000);
+  setInterval(updateClock, 15000);
+</script>
+
+</body>
+</html>

@@ -5,13 +5,13 @@ A complete hardware-software desk companion project that transforms a legacy **S
 ![Platform](https://img.shields.io/badge/Android-4.2.2%2B%20(API%2017)-3DDC84?logo=android)
 ![Hardware](https://img.shields.io/badge/Hardware-ESP32%20%2B%20WS2812B-f5a623)
 ![Network](https://img.shields.io/badge/Wi--Fi%20AP-wledtabletop%20(4.3.2.1)-58a6ff)
-![APK Versions](https://img.shields.io/badge/Android%20APKs-v1%20%7C%20v2%20%7C%20v3%20(33KB)-a371f7)
+![APK Versions](https://img.shields.io/badge/Android%20APKs-v1%20%7C%20v2%20%7C%20v3%20%7C%20v4%20(Offline%20ASR)-a371f7)
 
 ---
 
 ## 📖 Table of Contents
 1. [Project Overview](#-project-overview)
-2. [Complete Version History (4 Web Versions + 3 Android App Versions)](#-complete-version-history-4-web-versions--3-android-app-versions)
+2. [Complete Version History (4 Web Versions + 4 Android App Versions)](#-complete-version-history-4-web-versions--4-android-app-versions)
    - [Web Version 1 (`dashboard.htm` / Tag `v1.0`) — Initial Modern Web Prototype](#web-version-1-dashboardhtm--tag-v10--initial-modern-web-prototype)
    - [Web Version 2 (`dashboard1.htm` / Tag `v2.0`) — Android 4.2 WebKit Compatibility & Timetable](#web-version-2-dashboard1htm--tag-v20--android-42-webkit-compatibility--timetable)
    - [Web Version 3 (`dashboard2.htm` / Tag `v3.0`) — Landscape Split-Screen, Robo Companion & Canvas Colour Wheel](#web-version-3-dashboard2htm--tag-v30--landscape-split-screen-robo-companion--canvas-colour-wheel)
@@ -19,6 +19,7 @@ A complete hardware-software desk companion project that transforms a legacy **S
    - [Android App Version 1 (`BatmanWledDashboard-v1.apk` / Tag `v5.0`) — Native Kiosk Wrapper, Wi-Fi Auto-Reconnect Watchdog, Intensity Slider & Task Scheduler](#android-app-version-1-batmanwleddashboard-v1apk--tag-v50--native-kiosk-wrapper-wi-fi-auto-reconnect-watchdog-intensity-slider--task-scheduler)
    - [Android App Version 2 (`BatmanWledDashboard-v2.apk` / Tag `v6.0`) — Interactive Talking Robot (Weather, Tasks, Notes, Full Briefing) & Colour/Effect Randomizers](#android-app-version-2-batmanwleddashboard-v2apk--tag-v60--interactive-talking-robot-weather-tasks-notes-full-briefing--coloureffect-randomizers)
    - [Android App Version 3 (`BatmanWledDashboard-v3.apk` / Tag `v7.0`) — Desk & Sleep Countdown Timer (`10m`/`15m`/`30m`/`Custom`) + Voice Command Recognition (`🎤 Talk to Robot`)](#android-app-version-3-batmanwleddashboard-v3apk--tag-v70--desk--sleep-countdown-timer-10m15m30mcustom--voice-command-recognition--talk-to-robot)
+   - [Android App Version 4 (`BatmanWledDashboard-v4.apk` / Tag `v8.0`) — 100% Offline CMU PocketSphinx ASR, `"Jipsy Listen"` / `"Wake Up"` Catch-Phrase, 1.8s Silence Auto-Stop & `[Auto-Wake: ON/OFF]` Toggle](#android-app-version-4-batmanwleddashboard-v4apk--tag-v80--100-offline-cmu-pocketsphinx-asr-jipsy-listen--wake-up-catch-phrase-18s-silence-auto-stop--auto-wake-onoff-toggle)
 3. [Deep Dive: Solving the Android 4.2 WLED AP Wi-Fi Disconnect & Captive Portal Bug](#-deep-dive-solving-the-android-42-wled-ap-wi-fi-disconnect--captive-portal-bug)
 4. [Repository Structure](#-repository-structure)
 5. [Building & Installing on Android 4.2](#-building--installing-on-android-42)
@@ -31,13 +32,13 @@ Controlling an ESP32 running **WLED** (`WS2812B` Batman wall/desk logo) typicall
 
 1. **Legacy WebKit Engine (Android 4.2 / Chrome 18-era WebView)**: Does not support ES6 (`const`, `let`, `async/await`, `fetch`), CSS Grid, CSS Custom Properties (`--var`), modern Flexbox, or the Web Speech API (`window.speechSynthesis`).
 2. **Android 4.2 Captive Portal & TouchWiz Wi-Fi Watchdog**: Because the ESP32 WLED Access Point (`wledtabletop` at `4.3.2.1`) has no upstream internet connection and spoofs DNS for its captive portal, Samsung's TouchWiz OS pops up a *"Sign in to Wi-Fi network"* screen and **automatically disconnects from the Wi-Fi after 30–60 seconds**.
-3. **Cross-Origin Restrictions & Persistent Storage**: Running a dashboard from local device storage while sending JSON `POST` payloads to `http://4.3.2.1/json/state` and permanently saving desk notes and tasks.
+3. **Cross-Origin Restrictions, Offline Speech Recognition & Persistent Storage**: Running a dashboard from local device storage while sending JSON `POST` payloads to `http://4.3.2.1/json/state`, recognizing voice commands 100% offline without Google cloud servers, and permanently saving desk notes and tasks.
 
-This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** and **both Native Android Kiosk App versions (`v5.0` App v1 and `v6.0` App v2)** in both dedicated directories and sequential Git commits.
+This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** and **all 4 Native Android Kiosk App versions (`v5.0` App v1 through `v8.0` App v4)** in both dedicated directories and sequential Git tags.
 
 ---
 
-## 🚀 Complete Version History (4 Web Versions + 3 Android App Versions)
+## 🚀 Complete Version History (4 Web Versions + 4 Android App Versions)
 
 | Stage / Tag | Version Name | Artifact / Directory | Key Improvements Over Previous Version |
 | :--- | :--- | :--- | :--- |
@@ -48,6 +49,7 @@ This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** a
 | **Tag `v5.0`** | **Android App v1** | [`android-app-versions/v1-kiosk-wifi-watchdog/`](android-app-versions/v1-kiosk-wifi-watchdog/) (`25 KB` APK) | Wrapped in **Fullscreen Android 4.2 Kiosk APK**; added **Wi-Fi Auto-Reconnect Watchdog (`wledtabletop`)**, **Dual XHR + Java HTTP Bridge**, **Effect Intensity (`ix`) Slider**, **36-Wedge Colour Wheel**, and **Task Scheduler**. |
 | **Tag `v6.0`** | **Android App v2** | [`android-app-versions/v2-talking-robo-randomizers/`](android-app-versions/v2-talking-robo-randomizers/) (`29 KB` APK) | Upgraded into an **Interactive Talking Robot** (speaks **Patiala Weather**, **Pending Tasks & Notes**, **Next Class**, and **Full Briefing** with animated talking mouth/antenna) + added **`🎲 Random Colour`** & **`✨ Random Effect (Same Colour)`** generators. |
 | **Tag `v7.0`** | **Android App v3** | [`android-app-versions/v3-timer-and-voice-commands/`](android-app-versions/v3-timer-and-voice-commands/) (`33 KB` APK) | Added **Desk & Sleep Countdown Timer (`10m`, `15m`, `30m`, + `Custom` minutes)** with optional auto-LED shutoff + **Two-Way Voice Commands (`🎤 Give Voice Command to Robot`)** via native Android `RecognizerIntent` (`RECORD_AUDIO`) & Natural Language Command Parser. |
+| **Tag `v8.0`** | **Android App v4** | [`android-app-versions/v4-offline-pocketsphinx-jipsy-autowake/`](android-app-versions/v4-offline-pocketsphinx-jipsy-autowake/) (`4.98 MB` APK) | Embedded **100% Offline CMU PocketSphinx Speech Recognition (`en-us-ptm` + JNI)** so voice commands work on offline `wledtabletop` Wi-Fi; added **`"Jipsy listen"` / `"Wake up"`** hands-free wake word, **1.8s silence auto-stop after last spoken word**, **`[Auto-Wake: ON/OFF]` toggle button**, **Voice Quick Notes dictation**, **Voice Effect Intensity % control**, Always-Visible Desk Timer + Touch Numpad, and custom Batman launcher icon. |
 
 ---
 
@@ -137,6 +139,36 @@ This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** a
 
 ---
 
+### Android App Version 4 (`BatmanWledDashboard-v4.apk` / Tag `v8.0`) — 100% Offline CMU PocketSphinx ASR, `"Jipsy Listen"` / `"Wake Up"` Catch-Phrase, 1.8s Silence Auto-Stop & `[Auto-Wake: ON/OFF]` Toggle
+- **Directory**: [`android-app-versions/v4-offline-pocketsphinx-jipsy-autowake/`](android-app-versions/v4-offline-pocketsphinx-jipsy-autowake/) (and root [`BatmanWledDashboard.apk`](BatmanWledDashboard.apk))
+- **APK File**: [`BatmanWledDashboard-v4.apk`](android-app-versions/v4-offline-pocketsphinx-jipsy-autowake/BatmanWledDashboard-v4.apk) (`4,982,932 bytes`)
+- **What was added in Android App v4**:
+  1. **🎙️ 100% Offline Embedded Voice Recognition (CMU PocketSphinx JNI + `en-us-ptm` Model)**:
+     - On Android 4.2.2 (`SM-T111`), Google's legacy `RecognizerIntent` (`com.google.android.voicesearch:4.0.0`) requires an internet connection and fails whenever the tablet is connected to the offline ESP32 WLED Wi-Fi Access Point (`wledtabletop` at `4.3.2.1`).
+     - Embedded **`pocketsphinx-android-5prealpha`** (`pocketsphinx.jar` + `armeabi-v7a/libpocketsphinx_jni.so`), the US-English **`en-us-ptm`** acoustic model, a 188-word custom phonetic dictionary ([`batman.dict`](app/src/main/assets/sync/batman.dict)), and a JSGF command grammar ([`batman.gram`](app/src/main/assets/sync/batman.gram)) directly inside the APK so speech recognition runs **100% offline on the tablet's CPU**.
+  2. **🗣️ Hands-Free Wake Phrase (`"Jipsy Listen"` / `"Wake Up"`) with Natural Voice Assistant Delay**:
+     - Continuous keyword-spotting (`SEARCH_WAKEUP` via [`wakeup.keys`](app/src/main/assets/sync/wakeup.keys)) listens for **`"Jipsy listen"`**, **`"Jipsy wake up"`**, or **`"Wake up"`**.
+     - When heard, Jipsy speaks *"Yes, I am listening."* via native Android TTS, waits **2.5 seconds** (so the microphone never picks up the tablet's own speaker), and opens a **10-second command listening window**.
+  3. **🔘 Dedicated `[Auto-Wake: ON]` / `[Auto-Wake: OFF]` Toggle Button**:
+     - Added an on-screen **`[Auto-Wake: ON]`** (green) / **`[Auto-Wake: OFF]`** (red) button (`#autoWakeBtn`) directly below the robot companion so you can choose when the tablet should continuously listen for the catch phrase and when it should stop listening completely (`AndroidBridge.setAutoWakeEnabled(boolean)`).
+     - Even when Auto-Wake is `OFF`, tapping **`[Mic] Speak Now`** lets you trigger a single voice command on demand.
+  4. **📝 Voice Quick Notes Dictation & Effect Intensity Percentage Command**:
+     - **Voice Quick Notes**: Speak *"Write note exam tomorrow"*, *"Quick note check sensor pin"*, or *"Add note submit assignment"* to append notes directly into the Quick Scratchpad.
+     - **Voice Effect Intensity (`ix`)**: Speak *"Set effect intensity to 80 percent"* or *"Intensity 50 percent"* to set WLED's animation intensity (`0–255`) by voice.
+  5. **🦇 Custom Yellow-and-Black Batman Emblem App Icon**:
+     - Added custom multi-DPI (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`) Bat-Signal launcher icons (`@drawable/ic_batman_logo`).
+- **What was improved & fixed over Android App v3**:
+  1. **⚡ Instant Execution After Last Spoken Word (1.8s Silence Buffer Max Instead of Waiting Full 10 Seconds)**:
+     - Fixed the PocketSphinx `onPartialResult()` behavior where identical partial hypotheses emitted every 100ms during silence kept resetting the silence countdown. Now, [`MainActivity.java`](app/src/main/java/com/batman/wleddashboard/MainActivity.java) only resets the **1.8-second silence timer (`END_OF_COMMAND_SILENCE_MS = 1800L`)** when a **new word** is actually detected (`!clean.equals(lastHeardCommandPartial)`), executing your command ~1.8 seconds after your last word.
+  2. **🎯 Multi-Accent Phonetic Pronunciations for `"Jipsy"` & `"Listen"`**:
+     - Added 5 phonetic variations for `jipsy` (`JH IH P S IY`, `JH IH P Z IY`, `G IH P S IY`, `JH IH B S IY`, `Y IH P S IY`) and 3 for `listen` (`L IH S AH N`, `L IH S IH N`, `L IH Z AH N`) in `batman.dict`, plus tuned keyword thresholds in `wakeup.keys`.
+  3. **🛠️ Windows `CRLF` (`\r\n`) to Unix `LF` (`\n`) Asset Sanitizer**:
+     - Added `copyTextAssetUnixLf()` in `MainActivity.java` to strip `\r` bytes when extracting PocketSphinx dictionary, grammar, and keyword files on Android.
+  4. **⏱️ Always-Visible Desk Timer Bar + Custom Touch Numpad**:
+     - Moved the Desk Timer (`10 Min`, `15 Min`, `30 Min`, `Custom`, `Stop`) directly onto the main right-hand panel so it is always visible without switching tabs, and added an on-screen **Touch Numpad Modal** for custom minutes.
+
+---
+
 ## 📶 Deep Dive: Solving the Android 4.2 WLED AP Wi-Fi Disconnect & Captive Portal Bug
 
 ### The Problem
@@ -179,7 +211,7 @@ When loading a dashboard from `file:///android_asset/index.html`, legacy WebView
 ## 📂 Repository Structure
 
 ```text
-├── BatmanWledDashboard.apk                              # Latest (v2) signed APK ready to install
+├── BatmanWledDashboard.apk                              # Latest (App v4 / Tag v8.0) signed APK ready to install
 ├── build_apk.ps1                                        # Standalone PowerShell APK build script
 ├── README.md                                            # Complete documentation & version history
 ├── web-dashboard-versions/                              # All 4 historical Web HTML iterations (Tags v1.0 - v4.0)
@@ -187,30 +219,39 @@ When loading a dashboard from `file:///android_asset/index.html`, legacy WebView
 │   ├── v2-dashboard1.htm                                # Web v2: Android 4.2 table layout + XHR + Timetable modal
 │   ├── v3-dashboard2.htm                                # Web v3: Landscape split + SVG Robot + Canvas Colour Wheel
 │   └── v4-dashboard3.htm                                # Web v4: LocalStorage Quick Notes + AndroidBridge TTS hook
-├── android-app-versions/                                # All 3 Native Android Kiosk App iterations (Tags v5.0, v6.0 & v7.0)
+├── android-app-versions/                                # All 4 Native Android Kiosk App iterations (Tags v5.0 - v8.0)
 │   ├── v1-kiosk-wifi-watchdog/                          # Android App v1 (Tag v5.0): Kiosk + Wi-Fi Watchdog + Tasks + Intensity
 │   │   ├── BatmanWledDashboard-v1.apk                   # Compiled App v1 APK (25 KB)
 │   │   └── index.html                                   # App v1 dashboard asset
 │   ├── v2-talking-robo-randomizers/                     # Android App v2 (Tag v6.0): Talking Robot + Weather + Randomizers
 │   │   ├── BatmanWledDashboard-v2.apk                   # Compiled App v2 APK (29 KB)
 │   │   └── index.html                                   # App v2 dashboard asset
-│   └── v3-timer-and-voice-commands/                     # Android App v3 (Tag v7.0): 10/15/30/Custom Timer + Voice Commands
-│       ├── BatmanWledDashboard-v3.apk                   # Compiled App v3 APK (33 KB)
-│       ├── MainActivity.java                            # App v3 Java host with SpeechRecognizer + TTS + Wi-Fi Watchdog
-│       └── index.html                                   # App v3 dashboard asset
-└── app/                                                 # Active Android Gradle/CLI Source Tree (v3 / Tag v7.0)
+│   ├── v3-timer-and-voice-commands/                     # Android App v3 (Tag v7.0): 10/15/30/Custom Timer + Voice Commands
+│   │   ├── BatmanWledDashboard-v3.apk                   # Compiled App v3 APK (33 KB)
+│   │   ├── MainActivity.java                            # App v3 Java host with SpeechRecognizer + TTS + Wi-Fi Watchdog
+│   │   └── index.html                                   # App v3 dashboard asset
+│   └── v4-offline-pocketsphinx-jipsy-autowake/          # Android App v4 (Tag v8.0): 100% Offline PocketSphinx ASR + Jipsy Auto-Wake
+│       ├── BatmanWledDashboard-v4.apk                   # Compiled App v4 APK (4.98 MB with embedded acoustic model)
+│       ├── README.md                                    # Detailed release notes & improvements for App v4
+│       ├── MainActivity.java                            # App v4 Java host with PocketSphinx JNI + 1.8s Silence Buffer + Auto-Wake
+│       ├── index.html                                   # App v4 dashboard asset with [Auto-Wake: ON/OFF] toggle
+│       └── sync/                                        # PocketSphinx dictionary (batman.dict), grammar (batman.gram), wakeup.keys
+└── app/                                                 # Active Android Gradle/CLI Source Tree (v4 / Tag v8.0)
     ├── build.gradle                                     # Android app module config (minSdkVersion 17)
+    ├── libs/pocketsphinx.jar                            # CMU PocketSphinx Android library
     └── src/main/
-        ├── AndroidManifest.xml                          # Permissions (INTERNET, WIFI, WAKE_LOCK) & Kiosk config
+        ├── AndroidManifest.xml                          # Permissions (INTERNET, WIFI, WAKE_LOCK, RECORD_AUDIO) & Kiosk config
         ├── assets/
-        │   └── index.html                               # Active (App v2) dashboard UI
+        │   ├── index.html                               # Active (App v4) dashboard UI
+        │   └── sync/                                    # en-us-ptm acoustic model + batman.dict + batman.gram + wakeup.keys
         ├── java/com/batman/wleddashboard/
-        │   └── MainActivity.java                        # Native WebView host, Wi-Fi Watchdog, TTS & HTTP bridge
+        │   └── MainActivity.java                        # Native WebView host, Offline PocketSphinx ASR, Wi-Fi Watchdog, TTS & HTTP bridge
+        ├── lib/armeabi-v7a/libpocketsphinx_jni.so       # Native ARMv7 PocketSphinx speech recognition library
         └── res/
-            ├── drawable-mdpi/ic_launcher.png            # Batman emblem app icon (48x48)
-            ├── drawable-hdpi/ic_launcher.png            # Batman emblem app icon (72x72)
-            ├── drawable-xhdpi/ic_launcher.png           # Batman emblem app icon (96x96)
-            └── drawable-xxhdpi/ic_launcher.png          # Batman emblem app icon (144x144)
+            ├── drawable-mdpi/ic_batman_logo.png         # Custom yellow-and-black Batman emblem app icon (48x48)
+            ├── drawable-hdpi/ic_batman_logo.png         # Custom yellow-and-black Batman emblem app icon (72x72)
+            ├── drawable-xhdpi/ic_batman_logo.png        # Custom yellow-and-black Batman emblem app icon (96x96)
+            └── drawable-xxhdpi/ic_batman_logo.png       # Custom yellow-and-black Batman emblem app icon (144x144)
 ```
 
 ---
