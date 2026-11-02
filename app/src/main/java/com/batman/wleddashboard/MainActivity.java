@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -23,6 +24,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -32,16 +35,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends Activity implements TextToSpeech.OnInitListener, Runnable {
+import edu.cmu.pocketsphinx.Hypothesis;
+import edu.cmu.pocketsphinx.RecognitionListener;
+import edu.cmu.pocketsphinx.SpeechRecognizer;
+import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
+
+public class MainActivity extends Activity implements TextToSpeech.OnInitListener, Runnable, RecognitionListener {
 
     private static final String PREFS_NAME = "BatmanWledPrefs";
     private static final String DEFAULT_SSID = "wledtabletop";
+    private static final String SEARCH_BATMAN_CMD = "batman_cmd";
     private static final int REQ_CODE_SPEECH_INPUT = 1001;
 
     private WebView webView;
     private TextToSpeech tts;
     private boolean ttsReady = false;
     private SharedPreferences prefs;
+
+    private SpeechRecognizer offlineRecognizer;
+    private volatile boolean offlineAsrReady = false;
+    private volatile boolean offlineListening = false;
 
     private WifiManager wifiManager;
     private WifiManager.WifiLock wifiLock;
@@ -106,6 +119,147 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         webView.addJavascriptInterface(new AndroidBridge(this), "AndroidBridge");
 
         webView.loadUrl("file:///android_asset/index.html");
+
+        setupOfflinePocketSphinxAsync();
+    }
+
+    private void setupOfflinePocketSphinxAsync() {
+        Thread t = new Thread(new PocketSphinxInitWorker(this));
+        t.start();
+    }
+
+    public void initPocketSphinxBlocking() {
+        try {
+            File syncDir = new File(getFilesDir(), "sync");
+            File ptmDir = new File(syncDir, "en-us-ptm");
+            if (!ptmDir.exists()) {
+                ptmDir.mkdirs();
+            }
+
+            String[] ptmFiles = new String[]{
+                    "feat.params", "mdef", "means", "noisedict",
+                    "README", "sendump", "transition_matrices", "variances"
+            };
+            AssetManager am = getAssets();
+            for (int i = 0; i < ptmFiles.length; i++) {
+                String name = ptmFiles[i];
+                File dest = new File(ptmDir, name);
+                if (!dest.exists() || dest.length() == 0) {
+                    copyAssetFile(am, "sync/en-us-ptm/" + name, dest);
+                }
+            }
+
+            File dictFile = new File(syncDir, "batman.dict");
+            copyAssetFile(am, "sync/batman.dict", dictFile);
+
+            File gramFile = new File(syncDir, "batman.gram");
+            copyAssetFile(am, "sync/batman.gram", gramFile);
+
+            SpeechRecognizer rec = SpeechRecognizerSetup.defaultSetup()
+                    .setAcousticModel(ptmDir)
+                    .setDictionary(dictFile)
+                    .getRecognizer();
+            rec.addListener(this);
+            rec.addGrammarSearch(SEARCH_BATMAN_CMD, gramFile);
+
+            this.offlineRecognizer = rec;
+            this.offlineAsrReady = true;
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('READY', 'Offline Voice Engine Ready');}");
+        } catch (Exception e) {
+            this.offlineAsrReady = false;
+        }
+    }
+
+    private void copyAssetFile(AssetManager am, String assetPath, File outFile) throws Exception {
+        InputStream in = am.open(assetPath);
+        FileOutputStream out = new FileOutputStream(outFile);
+        byte[] buf = new byte[8192];
+        int read;
+        while ((read = in.read(buf)) != -1) {
+            out.write(buf, 0, read);
+        }
+        out.flush();
+        out.close();
+        in.close();
+    }
+
+    private void sendJsToWebView(String jsCode) {
+        if (watchdogHandler != null) {
+            watchdogHandler.post(new JsCallbackRunnable(webView, jsCode));
+        }
+    }
+
+    private String normalizeNumbersInSpeech(String raw) {
+        if (raw == null) return "";
+        String s = " " + raw.toLowerCase() + " ";
+        s = s.replace(" fifteen ", " 15 ")
+                .replace(" twenty ", " 20 ")
+                .replace(" thirty ", " 30 ")
+                .replace(" forty ", " 40 ")
+                .replace(" fifty ", " 50 ")
+                .replace(" sixty ", " 60 ")
+                .replace(" ninety ", " 90 ")
+                .replace(" hundred ", " 100 ")
+                .replace(" ten ", " 10 ")
+                .replace(" five ", " 5 ")
+                .replace(" one ", " 1 ")
+                .replace(" two ", " 2 ")
+                .replace(" three ", " 3 ")
+                .replace(" four ", " 4 ")
+                .replace(" six ", " 6 ")
+                .replace(" seven ", " 7 ")
+                .replace(" eight ", " 8 ");
+        return s.trim();
+    }
+
+    @Override
+    public void onBeginningOfSpeech() {
+        sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('SPEAKING', 'Hearing your voice...');}");
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        if (offlineRecognizer != null && offlineListening) {
+            offlineListening = false;
+            offlineRecognizer.stop();
+        }
+    }
+
+    @Override
+    public void onPartialResult(Hypothesis hypothesis) {
+        if (hypothesis == null) return;
+        String partial = hypothesis.getHypstr();
+        if (partial != null && partial.trim().length() > 0) {
+            String clean = normalizeNumbersInSpeech(partial).replace("'", "");
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('PARTIAL', '" + clean + "');}");
+        }
+    }
+
+    @Override
+    public void onResult(Hypothesis hypothesis) {
+        offlineListening = false;
+        if (hypothesis != null && hypothesis.getHypstr() != null && hypothesis.getHypstr().trim().length() > 0) {
+            String spoken = normalizeNumbersInSpeech(hypothesis.getHypstr()).replace("'", "");
+            sendJsToWebView("if(window.onVoiceCommandResult){window.onVoiceCommandResult('" + spoken + "');}");
+        } else {
+            sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('IDLE', 'Did not catch that. Tap [Mic] and speak clearly!');}");
+        }
+    }
+
+    @Override
+    public void onError(Exception error) {
+        offlineListening = false;
+        sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('ERROR', 'Mic error. Opening Command Center...');}");
+        sendJsToWebView("if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}");
+    }
+
+    @Override
+    public void onTimeout() {
+        offlineListening = false;
+        if (offlineRecognizer != null) {
+            offlineRecognizer.stop();
+        }
+        sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('IDLE', 'Mic timeout. Tap [Mic] to speak again.');}");
     }
 
     private void setupWifiLock() {
@@ -153,6 +307,19 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             if (tts != null) {
                 tts.stop();
             }
+            if (offlineAsrReady && offlineRecognizer != null) {
+                if (offlineListening) {
+                    offlineListening = false;
+                    offlineRecognizer.stop();
+                    return;
+                }
+                offlineListening = true;
+                offlineRecognizer.cancel();
+                offlineRecognizer.startListening(SEARCH_BATMAN_CMD, 7000);
+                sendJsToWebView("if(window.onOfflineMicState){window.onOfflineMicState('LISTENING', 'Listening Offline... Speak command now!');}");
+                return;
+            }
+
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
@@ -161,9 +328,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             intent.putExtra("android.speech.extra.PREFER_OFFLINE", true);
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (Exception e) {
-            if (watchdogHandler != null) {
-                watchdogHandler.postDelayed(new JsCallbackRunnable(webView, "if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}"), 200);
-            }
+            sendJsToWebView("if(window.onVoiceCommandFallback){window.onVoiceCommandFallback();}");
         }
     }
 
@@ -204,6 +369,19 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
     public WifiManager getAppWifiManager() {
         return wifiManager;
+    }
+
+    private static class PocketSphinxInitWorker implements Runnable {
+        private final MainActivity activity;
+
+        PocketSphinxInitWorker(MainActivity act) {
+            this.activity = act;
+        }
+
+        @Override
+        public void run() {
+            activity.initPocketSphinxBlocking();
+        }
     }
 
     private static class VoiceLaunchRunnable implements Runnable {
@@ -400,6 +578,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         super.onPause();
         isRunning = false;
         watchdogHandler.removeCallbacks(this);
+        if (offlineRecognizer != null && offlineListening) {
+            offlineListening = false;
+            offlineRecognizer.stop();
+        }
     }
 
     @Override
@@ -409,6 +591,13 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         if (wifiLock != null && wifiLock.isHeld()) {
             try {
                 wifiLock.release();
+            } catch (Exception ignored) {
+            }
+        }
+        if (offlineRecognizer != null) {
+            try {
+                offlineRecognizer.cancel();
+                offlineRecognizer.shutdown();
             } catch (Exception ignored) {
             }
         }

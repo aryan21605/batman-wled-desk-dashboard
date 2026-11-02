@@ -1,0 +1,26 @@
+#JSGF V1.0;
+
+grammar batman;
+
+<power_cmd> = ( turn on | turn off | power on | power off | lights on | lights off | logo on | logo off ) [ the ] [ lights | light | batman | logo ];
+
+<timer_num> = ( five | ten | fifteen | twenty | thirty | forty | sixty | ninety );
+<timer_cmd> = [ set | start | enable ] timer [ for ] <timer_num> [ minute | minutes ] | ( stop | cancel | reset ) timer;
+
+<rand_cmd> = [ set | change ] random ( color | effect | animation ) | next effect;
+
+<color_name> = ( orange | yellow | gold | red | blue | cyan | purple | violet | green | pink | white );
+<color_cmd> = [ set | change ] [ color ] <color_name>;
+
+<preset_num> = ( one | two | three | four | five | six | seven | eight );
+<preset_cmd> = [ set ] preset <preset_num>;
+
+<bri_num> = ( twenty | fifty | hundred );
+<bri_cmd> = [ set ] brightness <bri_num> [ percent ];
+
+<task_item> = ( study | homework | assignment | lab );
+<task_cmd> = ( add | new | schedule ) ( task | note ) <task_item>;
+
+<info_cmd> = [ what is ] [ the ] ( weather | temperature ) | next ( class | lecture ) | [ show ] timetable | [ read ] [ my ] ( tasks | notes ) | [ full ] ( briefing | status ) | hello [ robot ];
+
+public <command> = <power_cmd> | <timer_cmd> | <rand_cmd> | <color_cmd> | <preset_cmd> | <bri_cmd> | <task_cmd> | <info_cmd>;
