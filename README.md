@@ -206,8 +206,11 @@ When loading a dashboard from `file:///android_asset/index.html`, legacy WebView
         │   └── index.html                               # Active (App v2) dashboard UI
         ├── java/com/batman/wleddashboard/
         │   └── MainActivity.java                        # Native WebView host, Wi-Fi Watchdog, TTS & HTTP bridge
-        └── res/drawable/
-            └── ic_launcher.xml                          # Custom Batman gold/dark vector launcher icon
+        └── res/
+            ├── drawable-mdpi/ic_launcher.png            # Batman emblem app icon (48x48)
+            ├── drawable-hdpi/ic_launcher.png            # Batman emblem app icon (72x72)
+            ├── drawable-xhdpi/ic_launcher.png           # Batman emblem app icon (96x96)
+            └── drawable-xxhdpi/ic_launcher.png          # Batman emblem app icon (144x144)
 ```
 
 ---
