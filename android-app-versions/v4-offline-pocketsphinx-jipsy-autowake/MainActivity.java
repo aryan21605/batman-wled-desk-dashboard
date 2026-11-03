@@ -13,6 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -71,15 +73,24 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     private ResumeWakeupRunnable resumeWakeupRunnable;
     private StartCommandAfterGreetingRunnable startCommandAfterGreetingRunnable;
     private FinalizeCommandRunnable finalizeCommandRunnable;
+    private NativeTimerTickRunnable nativeTimerTickRunnable;
 
     private WifiManager wifiManager;
     private WifiManager.WifiLock wifiLock;
+    private PowerManager.WakeLock timerWakeLock;
+    private PowerManager.WakeLock alarmScreenWakeLock;
     private Handler watchdogHandler;
     private boolean isRunning = false;
 
+    /* Native Screen-Off Hardware Countdown Timer State */
+    private volatile long nativeTimerEndElapsedMs = 0L;
+    private volatile int nativeTimerTotalMins = 0;
+    private volatile boolean nativeTimerAutoOffLeds = false;
+    private volatile String nativeTimerWledIp = "4.3.2.1";
+
     @Override
     public void run() {
-        if (!isRunning) return;
+        if (!isRunning && nativeTimerEndElapsedMs <= 0L) return;
         checkAndKeepWifiAlive();
         watchdogHandler.postDelayed(this, 6000);
     }
@@ -110,6 +121,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         resumeWakeupRunnable = new ResumeWakeupRunnable(this);
         startCommandAfterGreetingRunnable = new StartCommandAfterGreetingRunnable(this);
         finalizeCommandRunnable = new FinalizeCommandRunnable(this);
+        nativeTimerTickRunnable = new NativeTimerTickRunnable(this);
 
         setupWifiLock();
         setupTextToSpeech();
@@ -495,7 +507,145 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
                 wifiLock.setReferenceCounted(false);
                 wifiLock.acquire();
             }
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            if (pm != null) {
+                timerWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BatmanTimerWakeLock");
+                timerWakeLock.setReferenceCounted(false);
+                alarmScreenWakeLock = pm.newWakeLock(
+                        PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                        "BatmanTimerAlarmWake"
+                );
+                alarmScreenWakeLock.setReferenceCounted(false);
+            }
         } catch (Exception ignored) {
+        }
+    }
+
+    /* ================= NATIVE SCREEN-OFF HARDWARE COUNTDOWN TIMER ================= */
+    public void requestStartNativeTimer(int minutes, boolean autoOffLeds, String wledIp) {
+        if (watchdogHandler != null) {
+            watchdogHandler.post(new StartNativeTimerRunnable(this, minutes, autoOffLeds, wledIp));
+        }
+    }
+
+    public void requestStopNativeTimer() {
+        if (watchdogHandler != null) {
+            watchdogHandler.post(new StopNativeTimerRunnable(this));
+        }
+    }
+
+    public void setNativeTimerAutoOffConfig(boolean autoOffLeds, String wledIp) {
+        this.nativeTimerAutoOffLeds = autoOffLeds;
+        if (wledIp != null && wledIp.length() > 0) {
+            this.nativeTimerWledIp = wledIp;
+        }
+    }
+
+    public int getNativeTimerRemainingSeconds() {
+        long endMs = nativeTimerEndElapsedMs;
+        if (endMs <= 0L) return 0;
+        long remMs = endMs - SystemClock.elapsedRealtime();
+        if (remMs <= 0L) return 0;
+        return (int) ((remMs + 999L) / 1000L);
+    }
+
+    public void startNativeTimerOnUi(int minutes, boolean autoOffLeds, String wledIp) {
+        if (minutes <= 0) return;
+        this.nativeTimerTotalMins = minutes;
+        this.nativeTimerAutoOffLeds = autoOffLeds;
+        if (wledIp != null && wledIp.length() > 0) {
+            this.nativeTimerWledIp = wledIp;
+        } else if (prefs != null) {
+            this.nativeTimerWledIp = prefs.getString("wled_host_ip", "4.3.2.1");
+        }
+        this.nativeTimerEndElapsedMs = SystemClock.elapsedRealtime() + ((long) minutes * 60000L);
+
+        try {
+            if (timerWakeLock != null && !timerWakeLock.isHeld()) {
+                timerWakeLock.acquire();
+            }
+            if (wifiLock != null && !wifiLock.isHeld()) {
+                wifiLock.acquire();
+            }
+        } catch (Exception ignored) {
+        }
+
+        Log.i(TAG, "Started Native Screen-Off Timer for " + minutes + " mins (autoOffLeds=" + autoOffLeds + ")");
+        if (watchdogHandler != null && nativeTimerTickRunnable != null) {
+            watchdogHandler.removeCallbacks(nativeTimerTickRunnable);
+            watchdogHandler.postDelayed(nativeTimerTickRunnable, 1000L);
+        }
+    }
+
+    public void stopNativeTimerOnUi() {
+        this.nativeTimerEndElapsedMs = 0L;
+        if (watchdogHandler != null && nativeTimerTickRunnable != null) {
+            watchdogHandler.removeCallbacks(nativeTimerTickRunnable);
+        }
+        try {
+            if (timerWakeLock != null && timerWakeLock.isHeld()) {
+                timerWakeLock.release();
+            }
+        } catch (Exception ignored) {
+        }
+        Log.i(TAG, "Stopped Native Screen-Off Timer");
+    }
+
+    public void tickNativeTimerOnUi() {
+        long endMs = nativeTimerEndElapsedMs;
+        if (endMs <= 0L) return;
+
+        long remMs = endMs - SystemClock.elapsedRealtime();
+        if (remMs <= 0L) {
+            /* Timer reached 00:00 (works even if screen is completely OFF!) */
+            nativeTimerEndElapsedMs = 0L;
+            if (watchdogHandler != null && nativeTimerTickRunnable != null) {
+                watchdogHandler.removeCallbacks(nativeTimerTickRunnable);
+            }
+            Log.i(TAG, "Native Timer FINISHED! Executing completion actions (screen-off capable).");
+
+            /* Briefly wake the screen so the user sees the 00:00 alert */
+            try {
+                if (alarmScreenWakeLock != null) {
+                    alarmScreenWakeLock.acquire(10000L);
+                }
+            } catch (Exception ignored) {
+            }
+
+            /* 1. If Auto-Off LEDs is enabled, turn off WLED directly from native Java thread */
+            if (nativeTimerAutoOffLeds) {
+                String ipToUse = (nativeTimerWledIp != null && nativeTimerWledIp.length() > 0)
+                        ? nativeTimerWledIp
+                        : (prefs != null ? prefs.getString("wled_host_ip", "4.3.2.1") : "4.3.2.1");
+                Thread offThread = new Thread(new WledOffWorker(ipToUse));
+                offThread.start();
+            }
+
+            /* 2. Speak the completion alert via Android TTS even if screen was off */
+            String finishSpeech = "Attention! Your " + nativeTimerTotalMins + " minute timer has finished!";
+            if (nativeTimerAutoOffLeds) {
+                finishSpeech += " Turning off your Batman logo now.";
+            }
+            speakOut(finishSpeech);
+
+            /* 3. Notify WebView UI */
+            sendJsToWebView("if(window.onNativeTimerFinished){window.onNativeTimerFinished();}");
+
+            try {
+                if (timerWakeLock != null && timerWakeLock.isHeld()) {
+                    timerWakeLock.release();
+                }
+            } catch (Exception ignored) {
+            }
+            return;
+        }
+
+        int remSecs = (int) ((remMs + 999L) / 1000L);
+        if (isRunning) {
+            sendJsToWebView("if(window.onNativeTimerTick){window.onNativeTimerTick(" + remSecs + ");}");
+        }
+        if (watchdogHandler != null && nativeTimerTickRunnable != null) {
+            watchdogHandler.postDelayed(nativeTimerTickRunnable, 1000L);
         }
     }
 
@@ -680,6 +830,99 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
     }
 
+    private static class NativeTimerTickRunnable implements Runnable {
+        private final MainActivity activity;
+
+        NativeTimerTickRunnable(MainActivity act) {
+            this.activity = act;
+        }
+
+        @Override
+        public void run() {
+            activity.tickNativeTimerOnUi();
+        }
+    }
+
+    private static class StartNativeTimerRunnable implements Runnable {
+        private final MainActivity activity;
+        private final int minutes;
+        private final boolean autoOffLeds;
+        private final String wledIp;
+
+        StartNativeTimerRunnable(MainActivity act, int mins, boolean autoOff, String ip) {
+            this.activity = act;
+            this.minutes = mins;
+            this.autoOffLeds = autoOff;
+            this.wledIp = ip;
+        }
+
+        @Override
+        public void run() {
+            activity.startNativeTimerOnUi(minutes, autoOffLeds, wledIp);
+        }
+    }
+
+    private static class StopNativeTimerRunnable implements Runnable {
+        private final MainActivity activity;
+
+        StopNativeTimerRunnable(MainActivity act) {
+            this.activity = act;
+        }
+
+        @Override
+        public void run() {
+            activity.stopNativeTimerOnUi();
+        }
+    }
+
+    private static class WledOffWorker implements Runnable {
+        private final String wledIp;
+
+        WledOffWorker(String ip) {
+            this.wledIp = (ip != null && ip.length() > 0) ? ip : "4.3.2.1";
+        }
+
+        @Override
+        public void run() {
+            String urlStr = "http://" + wledIp + "/json/state";
+            String payload = "{\"on\":false,\"v\":true}";
+            for (int attempt = 0; attempt < 3; attempt++) {
+                HttpURLConnection conn = null;
+                try {
+                    URL url = new URL(urlStr);
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(2500);
+                    conn.setReadTimeout(2500);
+                    conn.setUseCaches(false);
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    conn.setRequestProperty("Connection", "close");
+                    conn.setDoOutput(true);
+                    byte[] out = payload.getBytes("UTF-8");
+                    conn.setFixedLengthStreamingMode(out.length);
+                    OutputStream os = conn.getOutputStream();
+                    os.write(out);
+                    os.flush();
+                    os.close();
+                    int code = conn.getResponseCode();
+                    if (code >= 200 && code < 300) {
+                        Log.i(TAG, "WledOffWorker: Successfully powered off WLED at " + wledIp);
+                        return;
+                    }
+                } catch (Exception ignored) {
+                } finally {
+                    if (conn != null) {
+                        conn.disconnect();
+                    }
+                }
+                try {
+                    Thread.sleep(800L);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+    }
+
     private static class JsCallbackRunnable implements Runnable {
         private final WebView targetWebView;
         private final String jsCode;
@@ -775,6 +1018,26 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
 
         @JavascriptInterface
+        public void startNativeTimer(int minutes, boolean autoOffLeds, String wledIp) {
+            activity.requestStartNativeTimer(minutes, autoOffLeds, wledIp);
+        }
+
+        @JavascriptInterface
+        public void stopNativeTimer() {
+            activity.requestStopNativeTimer();
+        }
+
+        @JavascriptInterface
+        public void setNativeTimerAutoOff(boolean autoOffLeds, String wledIp) {
+            activity.setNativeTimerAutoOffConfig(autoOffLeds, wledIp);
+        }
+
+        @JavascriptInterface
+        public int getNativeTimerRemainingSecs() {
+            return activity.getNativeTimerRemainingSeconds();
+        }
+
+        @JavascriptInterface
         public void savePref(String key, String value) {
             if (key == null) return;
             activity.getAppPrefs().edit().putString(key, value != null ? value : "").apply();
@@ -864,6 +1127,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
         watchdogHandler.removeCallbacks(this);
         watchdogHandler.post(this);
+        int remSecs = getNativeTimerRemainingSeconds();
+        if (remSecs > 0) {
+            sendJsToWebView("if(window.onNativeTimerTick){window.onNativeTimerTick(" + remSecs + ");}");
+        }
         if (offlineAsrReady) {
             scheduleResumeWakeup(1000L);
         }
@@ -873,7 +1140,10 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     protected void onPause() {
         super.onPause();
         isRunning = false;
-        watchdogHandler.removeCallbacks(this);
+        /* Keep Wi-Fi watchdog running while screen is off if a Desk Timer is active! */
+        if (nativeTimerEndElapsedMs <= 0L) {
+            watchdogHandler.removeCallbacks(this);
+        }
         cancelPendingVoiceTimers();
         if (offlineRecognizer != null) {
             currentSearchMode = "";
@@ -884,8 +1154,18 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     @Override
     protected void onDestroy() {
         isRunning = false;
+        nativeTimerEndElapsedMs = 0L;
         watchdogHandler.removeCallbacks(this);
+        if (nativeTimerTickRunnable != null) {
+            watchdogHandler.removeCallbacks(nativeTimerTickRunnable);
+        }
         cancelPendingVoiceTimers();
+        if (timerWakeLock != null && timerWakeLock.isHeld()) {
+            try {
+                timerWakeLock.release();
+            } catch (Exception ignored) {
+            }
+        }
         if (wifiLock != null && wifiLock.isHeld()) {
             try {
                 wifiLock.release();

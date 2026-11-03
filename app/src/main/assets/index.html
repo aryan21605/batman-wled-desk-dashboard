@@ -782,7 +782,7 @@
         </div>
         <div class="qt-right">
           <label style="cursor:pointer;">
-            <input type="checkbox" id="timerTurnOffLeds" style="vertical-align:middle;"> Auto-Off LEDs
+            <input type="checkbox" id="timerTurnOffLeds" style="vertical-align:middle;" onchange="syncTimerAutoOffCheckbox()"> Auto-Off LEDs
           </label>
         </div>
       </div>
@@ -1063,6 +1063,7 @@
   /* Timer State */
   var timerRemainingSecs = 0;
   var timerTotalMins = 0;
+  var timerEndEpochMs = 0;
   var timerInterval = null;
   var customPadStr = '25';
 
@@ -1228,26 +1229,73 @@
     }
   }
 
+  function syncTimerAutoOffCheckbox() {
+    var turnOffLeds = document.getElementById('timerTurnOffLeds').checked;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.setNativeTimerAutoOff) {
+        window.AndroidBridge.setNativeTimerAutoOff(turnOffLeds, wledIp);
+      }
+    } catch(e) {}
+  }
+
+  window.onNativeTimerTick = function(remSecs) {
+    timerRemainingSecs = parseInt(remSecs, 10) || 0;
+    timerEndEpochMs = Date.now() + (timerRemainingSecs * 1000);
+    updateTimerDisplay();
+  };
+
+  window.onNativeTimerFinished = function() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    timerRemainingSecs = 0;
+    timerEndEpochMs = 0;
+    updateTimerDisplay();
+    var turnOffLeds = document.getElementById('timerTurnOffLeds').checked;
+    var finishMsg = 'Attention! Your ' + timerTotalMins + ' minute timer has finished!';
+    if (turnOffLeds) {
+      finishMsg += ' Turning off your Batman logo now.';
+      xhrRequest('POST', getApiUrl(), { on: false, v: true }, updateUI);
+    }
+    document.getElementById('speechText').innerHTML = finishMsg;
+    animateRobotTalking(4000);
+  };
+
   function startCountdownTimer(minutes) {
     var mins = parseInt(minutes, 10);
     if (isNaN(mins) || mins <= 0) return;
     if (timerInterval) clearInterval(timerInterval);
     timerTotalMins = mins;
     timerRemainingSecs = mins * 60;
+    timerEndEpochMs = Date.now() + (mins * 60000);
     updateTimerDisplay();
+
+    var turnOffLeds = document.getElementById('timerTurnOffLeds').checked;
+    var hasNativeTimer = false;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.startNativeTimer) {
+        window.AndroidBridge.startNativeTimer(mins, turnOffLeds, wledIp);
+        hasNativeTimer = true;
+      }
+    } catch(e) {}
 
     var msg = 'Timer started for ' + mins + (mins === 1 ? ' minute.' : ' minutes.');
     document.getElementById('speechText').innerHTML = msg;
     safeSpeak(msg);
 
     timerInterval = setInterval(function() {
-      if (timerRemainingSecs > 0) {
-        timerRemainingSecs--;
+      if (timerEndEpochMs > 0) {
+        var rem = Math.max(0, Math.ceil((timerEndEpochMs - Date.now()) / 1000));
+        timerRemainingSecs = rem;
         updateTimerDisplay();
-        if (timerRemainingSecs === 0) {
+        if (rem === 0) {
           clearInterval(timerInterval);
           timerInterval = null;
-          onTimerFinished();
+          timerEndEpochMs = 0;
+          if (!hasNativeTimer) {
+            onTimerFinished();
+          }
         }
       }
     }, 1000);
@@ -1259,6 +1307,12 @@
       timerInterval = null;
     }
     timerRemainingSecs = 0;
+    timerEndEpochMs = 0;
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.stopNativeTimer) {
+        window.AndroidBridge.stopNativeTimer();
+      }
+    } catch(e) {}
     updateTimerDisplay();
     if (speakConfirm) {
       var msg = 'Timer stopped and reset.';
