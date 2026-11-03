@@ -58,3 +58,10 @@
 
 ### 4. ⏱️ Always-Visible Desk Timer Bar + Custom Touch Numpad
 - Promoted the Desk Timer (`10 Min`, `15 Min`, `30 Min`, `Custom`, `Stop`, and `Auto-Off LEDs`) from a hidden tab to an **always-visible control card** on the right panel, and replaced the native keyboard input with an on-screen **Touch Numpad Modal** so the Android keyboard never covers the kiosk screen.
+
+### 5. 🔒 Fixed Desk Timer Stopping When Screen Turns Off (`PARTIAL_WAKE_LOCK` + Hardware Clock)
+- **Bug Fixed**: Previously, turning off the tablet screen (`onPause()`) froze the WebView's JavaScript `setInterval` timer and allowed the CPU and Wi-Fi watchdog to sleep, causing the countdown timer to pause whenever the screen was off.
+- **How It Was Fixed**:
+  - Added a **Native Hardware-Backed Countdown Timer** (`startNativeTimerOnUi()`, `tickNativeTimerOnUi()`, `NativeTimerTickRunnable`) in `MainActivity.java` using Android's monotonic hardware clock (`SystemClock.elapsedRealtime()`).
+  - Acquires `PowerManager.PARTIAL_WAKE_LOCK` (`BatmanTimerWakeLock`) and keeps the 6-second Wi-Fi watchdog running in `onPause()` whenever a timer is active so the CPU and `wledtabletop` Wi-Fi connection stay alive while the screen is completely off.
+  - When the timer reaches `00:00` while the screen is off, native Java (`WledOffWorker`) directly sends `POST {"on":false,"v":true}` to `http://4.3.2.1/json/state` to turn off the Batman WLED logo, speaks the completion alert out loud via Android TTS, and wakes the screen (`SCREEN_BRIGHT_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP`).

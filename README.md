@@ -166,6 +166,9 @@ This repository preserves **all 4 Web Dashboard iterations (`v1.0`–`v4.0`)** a
      - Added `copyTextAssetUnixLf()` in `MainActivity.java` to strip `\r` bytes when extracting PocketSphinx dictionary, grammar, and keyword files on Android.
   4. **⏱️ Always-Visible Desk Timer Bar + Custom Touch Numpad**:
      - Moved the Desk Timer (`10 Min`, `15 Min`, `30 Min`, `Custom`, `Stop`) directly onto the main right-hand panel so it is always visible without switching tabs, and added an on-screen **Touch Numpad Modal** for custom minutes.
+  5. **🔒 Fixed Desk Timer Stopping When Screen Turns Off (`PARTIAL_WAKE_LOCK` + Hardware Clock)**:
+     - Fixed the issue where turning off the tablet screen (`onPause()`) froze WebView JavaScript `setInterval` timers and paused the countdown.
+     - Added a native hardware countdown timer (`startNativeTimerOnUi()`, `tickNativeTimerOnUi()`, `WledOffWorker`) in [`MainActivity.java`](app/src/main/java/com/batman/wleddashboard/MainActivity.java) backed by `SystemClock.elapsedRealtime()` and `PowerManager.PARTIAL_WAKE_LOCK` (`BatmanTimerWakeLock`). Even when the screen is completely OFF, the timer counts down accurately, keeps the `wledtabletop` Wi-Fi watchdog active, turns off the Batman WLED logo directly from Java when `00:00` is reached, speaks the completion alert via Android TTS, and wakes the screen (`ACQUIRE_CAUSES_WAKEUP`).
 
 ---
 
